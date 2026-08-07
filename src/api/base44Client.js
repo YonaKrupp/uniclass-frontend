@@ -23,7 +23,7 @@ if (typeof window !== 'undefined' && localStorage.getItem('authToken') && !appPa
 const BASE44_SERVER_URL = 'https://learn-le-connect.base44.app';
 const BASE44_APP_ID = '6a37f1517bf59551c5f4b6f9';
 const base44 = createClient({
-  appId: appId || BASE44_APP_ID,
+  appId: BASE44_APP_ID,
   functionsVersion,
   serverUrl: BASE44_SERVER_URL,
   requiresAuth: false,

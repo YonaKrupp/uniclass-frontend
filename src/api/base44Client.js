@@ -22,13 +22,12 @@ if (typeof window !== 'undefined' && localStorage.getItem('authToken') && !appPa
 // back to the domain the user started on.
 const BASE44_SERVER_URL = 'https://learn-le-connect.base44.app';
 const BASE44_APP_ID = '6a37f1517bf59551c5f4b6f9';
-const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
 const base44 = createClient({
   appId: appId || BASE44_APP_ID,
   functionsVersion,
   serverUrl: BASE44_SERVER_URL,
   requiresAuth: false,
-  appBaseUrl: currentOrigin || appBaseUrl || BASE44_SERVER_URL,
+  appBaseUrl: BASE44_SERVER_URL,
   token: '',  // Always empty — no automatic auth attempts
   skipServiceRole: true
 });

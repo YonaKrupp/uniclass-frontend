@@ -4,7 +4,6 @@ import { Home, Menu, X, LogOut, GraduationCap, Video, Sun, Moon, Wallet, Calenda
 import { useDarkMode } from "@/lib/useDarkMode";
 import { useSessionRenewal } from "@/lib/useSessionRenewal";
 import { clearFetchGuard } from "@/lib/fetchGuard";
-import { base44 } from "@/api/base44Client";
 
 const studentMenuItems = [
   { label: "דף הבית", path: "/student-home", icon: Home },
@@ -42,10 +41,10 @@ export default function StudentLayout() {
     sessionStorage.removeItem("googleAuthMessage");
     sessionStorage.removeItem("googleAuthEmail");
     clearFetchGuard();
-    // Call base44.auth.logout to clear the Base44 server-side session (httpOnly cookie).
-    // Without this, loginWithProvider("google") reuses the cached session and skips
-    // the Google account selection screen on the next login.
-    base44.auth.logout("/");
+    // Local logout only — do NOT call base44.auth.logout(): it redirects to the
+    // Base44 app domain (learn-le-connect.base44.app) and the user can't get back.
+    // Clear all local session data and navigate to the login page on the current domain.
+    navigate("/login-choice", { replace: true });
   };
 
   return (

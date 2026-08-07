@@ -6,13 +6,14 @@ const PRODUCTION_BASE = 'http://corewebapi-env.il-central-1.elasticbeanstalk.com
 
 /**
  * Resolves the C# API base URL from a known app/frontend URL string.
- * Returns PRODUCTION_BASE when the url contains "uniclass.co.il", else NGROK_BASE.
+ * Routes to NGROK_BASE only when the caller is Base44 (builder/preview domain);
+ * any other origin (uniclass.co.il or anywhere else) uses PRODUCTION_BASE.
  */
 export function getApiBaseFromAppUrl(appUrl: string): string {
-  if (appUrl && appUrl.includes('uniclass.co.il')) {
-    return PRODUCTION_BASE;
+  if (appUrl && appUrl.includes('base44')) {
+    return NGROK_BASE;
   }
-  return NGROK_BASE;
+  return PRODUCTION_BASE;
 }
 
 /**

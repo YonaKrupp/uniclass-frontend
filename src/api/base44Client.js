@@ -16,13 +16,19 @@ if (typeof window !== 'undefined' && localStorage.getItem('authToken') && !appPa
 // The SDK will work without auth for function calls; pages guard themselves with ProtectedRoute
 // serverUrl is pinned to the Base44 platform so auth/entity/function calls always resolve
 // to Base44 regardless of which domain serves the frontend (custom domain, new address, etc.)
+// Pin serverUrl + appId to the Base44 platform so auth/entity/function calls always
+// resolve correctly regardless of which domain serves the frontend (custom domain,
+// new address, etc.). appBaseUrl uses the current origin so Google OAuth redirects
+// back to the domain the user started on.
 const BASE44_SERVER_URL = 'https://learn-le-connect.base44.app';
+const BASE44_APP_ID = '6a37f1517bf59551c5f4b6f9';
+const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
 const base44 = createClient({
-  appId,
+  appId: appId || BASE44_APP_ID,
   functionsVersion,
   serverUrl: BASE44_SERVER_URL,
   requiresAuth: false,
-  appBaseUrl: appBaseUrl || BASE44_SERVER_URL,
+  appBaseUrl: currentOrigin || appBaseUrl || BASE44_SERVER_URL,
   token: '',  // Always empty — no automatic auth attempts
   skipServiceRole: true
 });

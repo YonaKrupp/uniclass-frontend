@@ -14,12 +14,15 @@ if (typeof window !== 'undefined' && localStorage.getItem('authToken') && !appPa
 // Create client with dynamic token from localStorage
 // Never pass a token at module load time — it happens before custom auth is available
 // The SDK will work without auth for function calls; pages guard themselves with ProtectedRoute
+// serverUrl is pinned to the Base44 platform so auth/entity/function calls always resolve
+// to Base44 regardless of which domain serves the frontend (custom domain, new address, etc.)
+const BASE44_SERVER_URL = 'https://learn-le-connect.base44.app';
 const base44 = createClient({
   appId,
   functionsVersion,
-  serverUrl: '',
+  serverUrl: BASE44_SERVER_URL,
   requiresAuth: false,
-  appBaseUrl,
+  appBaseUrl: appBaseUrl || BASE44_SERVER_URL,
   token: '',  // Always empty — no automatic auth attempts
   skipServiceRole: true
 });

@@ -1,0 +1,36 @@
+{
+  "name": "PaymentScheduleParam",
+  "type": "object",
+  "properties": {
+    "order": {
+      "type": "string",
+      "description": "Order number used as lookup key"
+    },
+    "teacherEmail": {
+      "type": "string"
+    },
+    "studentEmail": {
+      "type": "string"
+    },
+    "firstDayOfWeek": {
+      "type": "string"
+    },
+    "subjectId": {
+      "type": "string"
+    },
+    "subjectName": {
+      "type": "string"
+    },
+    "authToken": {
+      "type": "string",
+      "description": "Student auth token saved at payment creation, used to restore session after HYP redirect"
+    },
+    "appBaseUrl": {
+      "type": "string",
+      "description": "Frontend origin URL (e.g. https://uniclass.co.il) saved at payment creation, used to redirect back to the correct domain after HYP"
+    }
+  },
+  "required": [
+    "order"
+  ]
+}

@@ -22,16 +22,22 @@ if (typeof window !== 'undefined' && localStorage.getItem('authToken') && !appPa
 // back to the domain the user started on.
 const BASE44_SERVER_URL = 'https://learn-le-connect.base44.app';
 const BASE44_APP_ID = '6a37f1517bf59551c5f4b6f9';
-// appBaseUrl = the domain the user is currently on, so Google OAuth redirects
-// back to that same domain (custom domain like uniclass.co.il, or the Base44
-// builder/preview). serverUrl stays pinned to Base44 for SDK API calls.
-const CURRENT_ORIGIN = typeof window !== 'undefined' ? window.location.origin : BASE44_SERVER_URL;
+// appBaseUrl MUST point directly at the Base44 platform (app.base44.com), NOT
+// the app domain (learn-le-connect.base44.app). The SDK's loginWithProvider
+// builds `${appBaseUrl}/api/apps/auth/login` — this platform-level OAuth
+// endpoint only exists on app.base44.com. Going through the app domain adds a
+// 307 redirect that introduces a trailing slash, which 404s. Hitting the
+// platform directly gives a clean 302 → Google. The platform sets the OAuth
+// state `domain` to app.base44.com (a registered domain, so the callback
+// validation passes) and `from_url` to the page the user started on
+// (e.g. https://uniclass.co.il/student-login), so after Google the callback
+// redirects back to from_url on the custom domain.
 const base44 = createClient({
   appId: BASE44_APP_ID,
   functionsVersion,
   serverUrl: BASE44_SERVER_URL,
   requiresAuth: false,
-  appBaseUrl: CURRENT_ORIGIN,
+  appBaseUrl: 'https://app.base44.com',
   token: '',  // Always empty — no automatic auth attempts
   skipServiceRole: true
 });

@@ -6,7 +6,6 @@ import { initiateGoogleLogin } from "@/lib/googleAuth";
 import GoogleIcon from "@/components/GoogleIcon";
 import GoogleAuthLoading from "@/components/GoogleAuthLoading";
 import { useGoogleAuthCallback } from "@/hooks/useGoogleAuthCallback";
-import { appParams } from "@/lib/app-params";
 
 export default function StudentLogin() {
   const [dark, setDark] = useDarkMode();
@@ -17,9 +16,9 @@ export default function StudentLogin() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [authLoading, setAuthLoading] = useState(() => {
-    // Only show loading if we're actually returning from Google (token in URL)
+    // Only show loading if we're actually returning from Google (code in URL)
     if (sessionStorage.getItem("googleAuthLoading") !== "true") return false;
-    return !!appParams.token;
+    return !!new URLSearchParams(window.location.search).get("code");
   });
   const navigate = useNavigate();
   useGoogleAuthCallback("student", "/student-home", navigate, setAuthLoading);
@@ -32,11 +31,11 @@ export default function StudentLogin() {
     }
   }, []);
 
-  const handleGoogle = () => {
+  const handleGoogle = async () => {
     setError("");
     setGoogleLoading(true);
     sessionStorage.setItem("googleAuthLoading", "true");
-    initiateGoogleLogin("/student-login");
+    await initiateGoogleLogin("/student-login");
   };
 
   const handleSubmit = async (e) => {

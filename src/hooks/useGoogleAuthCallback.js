@@ -1,55 +1,18 @@
 import { useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { appParams } from "@/lib/app-params";
-
-const FUNCTIONS_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
 // Module-level guard: prevents double-execution within the same page load
-let _processingToken = null;
+let _processingCode = null;
 
-/**
- * Decodes a JWT token and extracts the email from its payload.
- * Returns null if the token is not a JWT or doesn't contain an email.
- */
-function decodeJwtEmail(token) {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-    console.log("[GoogleAuthCallback] JWT payload keys:", Object.keys(payload));
-    return payload.email || payload.Email || payload["preferred_username"] || payload.sub_email || null;
-  } catch {
-    return null;
-  }
+function getUrlParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
 }
 
 /**
- * Calls the getBase44UserEmail backend function with the token in the
- * Authorization header. The backend calls auth.me() server-side, completely
- * bypassing any browser cookies/cache that return a stale/old user.
- */
-async function fetchEmailFromApi(token) {
-  try {
-    const res = await fetch(`${FUNCTIONS_BASE}/getBase44UserEmail`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    console.log("[GoogleAuthCallback] Backend getBase44UserEmail response:", JSON.stringify(data));
-    return data?.email || null;
-  } catch (err) {
-    console.warn("[GoogleAuthCallback] Backend getBase44UserEmail failed:", err?.message || err);
-    return null;
-  }
-}
-
-/**
- * Detects a Base44 Google OAuth callback (token present from Google, possibly stale C# token),
- * fetches the user's email, authenticates against the C# backend via googleAuthProxy,
- * stores the C# token, and navigates to the home page.
- *
- * Uses client-side navigation (navigate) instead of window.location.href to avoid
- * a full page reload — this eliminates the "double load" and speeds up the transition.
+ * Handles the INDEPENDENT Google OAuth callback: detects ?code= on the current
+ * page (returned by Google), exchanges it for a C# auth token via the
+ * googleOAuthExchange backend function, stores the token, and navigates to the
+ * app home page.
  *
  * @param {string} userType - "teacher" or "student"
  * @param {string} redirectPath - where to navigate after successful C# auth (e.g. "/teacher-home")
@@ -73,33 +36,31 @@ export function useGoogleAuthCallback(userType, redirectPath, navigate, setAuthL
         return;
       }
 
-      // Cross-reload guard: if we already initiated googleAuthProxy this session, skip.
+      // Cross-reload guard: if we already initiated the exchange this session, skip.
       if (sessionStorage.getItem("googleAuthCallbackDone") === "true") {
         sessionStorage.removeItem("googleAuthLoading");
         setAuthLoading?.(false);
         return;
       }
 
-      // appParams.token captures the access_token from the URL at module load time.
-      const base44Token = appParams.token;
+      const code = getUrlParam("code");
 
-      // Only proceed if we have a Base44 token from Google OAuth (from URL only — never localStorage).
-      if (!base44Token) {
+      // Only proceed if we have a Google authorization code in the URL.
+      if (!code) {
         sessionStorage.removeItem("googleAuthLoading");
         setAuthLoading?.(false);
         return;
       }
 
       // Prevent double-execution within the same page load (hook may be on multiple pages)
-      if (_processingToken === base44Token) {
-        // Already processing this token — clear loading so user isn't stuck on spinner
+      if (_processingCode === code) {
         sessionStorage.removeItem("googleAuthLoading");
         setAuthLoading?.(false);
         return;
       }
-      _processingToken = base44Token;
+      _processingCode = code;
 
-      // Mark callback as done early so a remount/reload doesn't re-trigger GoogleLogin
+      // Mark callback as done early so a remount/reload doesn't re-trigger
       sessionStorage.setItem("googleAuthCallbackDone", "true");
 
       // Clear ALL old auth data to prevent mixing users
@@ -108,67 +69,50 @@ export function useGoogleAuthCallback(userType, redirectPath, navigate, setAuthL
       localStorage.removeItem("userRole");
       sessionStorage.removeItem("authToken");
       sessionStorage.removeItem("userData");
-      // Clear StudentHome cache so stale data from a previous user is never displayed
       sessionStorage.removeItem("_studentHome_lastFetch");
       sessionStorage.removeItem("_studentHome_cachedData");
       sessionStorage.removeItem("_studentHome_cachedEmail");
       localStorage.removeItem("_studentHome_lastFetch");
 
-      let email = null;
+      // redirect_uri MUST match the one used in the initial authorize request
+      // (normalized: trailing slash stripped, since S3 adds one on the return).
+      const path = window.location.pathname.replace(/\/+$/, "") || "/";
+      const redirectUri = window.location.origin + path;
 
-      // Method 1: Decode email directly from the JWT token — instant, no network call
-      email = decodeJwtEmail(base44Token);
-      console.log("[GoogleAuthCallback] JWT decoded email:", email);
-
-      // Method 2: Direct API call — bypasses SDK caching entirely
-      if (!email) {
-        email = await fetchEmailFromApi(base44Token);
-        console.log("[GoogleAuthCallback] Direct API email:", email);
-      }
-
-      // Method 3: Last resort — SDK's me() with setToken
-      if (!email) {
-        try {
-          base44.auth.setToken(base44Token);
-          const user = await base44.auth.me();
-          email = user?.email;
-          console.log("[GoogleAuthCallback] base44.auth.me() email:", email);
-        } catch (err) {
-          console.error("[GoogleAuthCallback] base44.auth.me() failed:", err?.message || err);
-        }
-      }
-
-      if (!email) {
-        sessionStorage.setItem("googleAuthMessage", "שגיאה: לא נמצא אימייל בחשבון Google. אנא נסו שוב.");
-        sessionStorage.removeItem("googleAuthCallbackDone");
-        sessionStorage.removeItem("googleAuthLoading");
-        window.location.reload();
-        return;
-      }
-
-      console.log("[GoogleAuthCallback] Calling googleAuthProxy with:", { userType, email });
+      console.log("[GoogleAuthCallback] Exchanging code for C# token:", { userType, redirectUri });
 
       try {
-        const res = await fetch(`${FUNCTIONS_BASE}/googleAuthProxy`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userType, email }),
+        const response = await base44.functions.invoke("googleOAuthExchange", {
+          code,
+          redirectUri,
+          userType,
         });
-        const data = await res.json();
-        console.log("[GoogleAuthCallback] googleAuthProxy response:", JSON.stringify(data));
+        const data = response?.data || {};
+        console.log("[GoogleAuthCallback] googleOAuthExchange response:", JSON.stringify(data));
         const token = data.accessToken || data.AccessToken || data.token || "";
 
         if (!token) {
+          const email = data.email || "";
           // User not found in C# DB — redirect to registration page with email pre-filled
-          sessionStorage.removeItem("googleAuthCallbackDone");
-          sessionStorage.setItem("googleAuthEmail", email);
+          if (email) {
+            sessionStorage.setItem("googleAuthEmail", email);
+            sessionStorage.setItem(
+              "googleAuthMessage",
+              "לא נמצא חשבון לאימייל זה. אנא השלימו את הרישום (כולל בחירת סיסמה) כדי להמשיך."
+            );
+            sessionStorage.removeItem("googleAuthLoading");
+            const registerPath = userType === "teacher" ? "/register-teacher" : "/register-student";
+            navigate(registerPath, { replace: true });
+            return;
+          }
+          // Other error (e.g. code exchange failed, no email returned)
           sessionStorage.setItem(
             "googleAuthMessage",
-            "לא נמצא חשבון לאימייל זה. אנא השלימו את הרישום (כולל בחירת סיסמה) כדי להמשיך."
+            data.error || "הכניסה עם Google נכשלה. אנא נסו שוב."
           );
+          sessionStorage.removeItem("googleAuthCallbackDone");
           sessionStorage.removeItem("googleAuthLoading");
-          const registerPath = userType === "teacher" ? "/register-teacher" : "/register-student";
-          navigate(registerPath, { replace: true });
+          window.location.reload();
           return;
         }
 
@@ -179,7 +123,7 @@ export function useGoogleAuthCallback(userType, redirectPath, navigate, setAuthL
         sessionStorage.setItem("userData", JSON.stringify(data));
 
         sessionStorage.removeItem("googleAuthLoading");
-        console.log("[GoogleAuthCallback] Auth success, navigating to:", redirectPath, "email:", email);
+        console.log("[GoogleAuthCallback] Auth success, navigating to:", redirectPath);
         navigate(redirectPath, { replace: true });
       } catch (err) {
         console.error("[GoogleAuthCallback] Error:", err);

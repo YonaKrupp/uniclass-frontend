@@ -22,12 +22,16 @@ if (typeof window !== 'undefined' && localStorage.getItem('authToken') && !appPa
 // back to the domain the user started on.
 const BASE44_SERVER_URL = 'https://learn-le-connect.base44.app';
 const BASE44_APP_ID = '6a37f1517bf59551c5f4b6f9';
+// appBaseUrl = the domain the user is currently on, so Google OAuth redirects
+// back to that same domain (custom domain like uniclass.co.il, or the Base44
+// builder/preview). serverUrl stays pinned to Base44 for SDK API calls.
+const CURRENT_ORIGIN = typeof window !== 'undefined' ? window.location.origin : BASE44_SERVER_URL;
 const base44 = createClient({
   appId: BASE44_APP_ID,
   functionsVersion,
   serverUrl: BASE44_SERVER_URL,
   requiresAuth: false,
-  appBaseUrl: BASE44_SERVER_URL,
+  appBaseUrl: CURRENT_ORIGIN,
   token: '',  // Always empty — no automatic auth attempts
   skipServiceRole: true
 });

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Shield, Loader2, Calendar, Users, MessageSquare, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
-import { useSingleMountEffect } from "@/hooks/useSingleMountEffect";
+import { Shield, Loader2, Calendar, Users, MessageSquare, ChevronDown, ChevronUp, RefreshCw, Banknote } from "lucide-react";
 import PageLogo from "@/components/PageLogo";
+import { base44 } from "@/api/base44Client";
 
 const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
@@ -14,6 +14,15 @@ const smsColumnLabels = {
 const traceColumnLabels = {
   dateTimeIs: "תאריך שעה",
   trace_Description: "תאור התהליך",
+};
+
+const incomeColumnLabels = {
+  heb_month: "חודש",
+  lessonsCount: "כמות שיעורים",
+  payment: "תשלום",
+  verify: "סטטוס",
+  yyyyMM: "חודש שנה",
+  teacher_name: "מורה",
 };
 
 const contactColumnLabels = {
@@ -38,7 +47,9 @@ const TODAY = () => {
 };
 
 export default function AdminInterface() {
-  const [authToken, setAuthToken] = useState("");
+  const [authToken, setAuthToken] = useState(() =>
+    (typeof window !== "undefined" && (localStorage.getItem("authToken") || sessionStorage.getItem("authToken"))) || ""
+  );
 
   const [selectedDate, setSelectedDate] = useState(TODAY());
   const [personType, setPersonType] = useState("2"); // 2=מורה, 1=תלמיד
@@ -52,6 +63,10 @@ export default function AdminInterface() {
   const [showTrace, setShowTrace] = useState(true);
   const [showSms, setShowSms] = useState(true);
   const [showContact, setShowContact] = useState(true);
+  const [showIncome, setShowIncome] = useState(true);
+  const [incomeDate, setIncomeDate] = useState(TODAY());
+  const [incomeList, setIncomeList] = useState(null);
+  const [loadingIncome, setLoadingIncome] = useState(false);
   const [editingMsgId, setEditingMsgId] = useState(null);
   const [editDesc, setEditDesc] = useState("");
   const [savingContact, setSavingContact] = useState(false);
@@ -60,12 +75,6 @@ export default function AdminInterface() {
   const [loadingSms, setLoadingSms] = useState(false);
   const [loadingContact, setLoadingContact] = useState(false);
   const [error, setError] = useState("");
-
-  // Read token on mount
-  useSingleMountEffect("adminInterface", () => {
-    const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken") || "";
-    setAuthToken(token);
-  });
 
   // Fetch mail dropdown
   const fetchMails = useCallback(async (pType, token) => {
@@ -208,6 +217,41 @@ export default function AdminInterface() {
     }
   }, [selectedDate, personType, showHandled, authToken]);
 
+  // Fetch teacher income (full month) — uses base44.functions.invoke so it hits
+  // the latest deployed code (raw fetch to the function URL serves a stale version).
+  const fetchIncome = useCallback(async (date, token) => {
+    setLoadingIncome(true);
+    setError("");
+    try {
+      const response = await base44.functions.invoke('adminInterfaceProxy', {
+        action: 'teacherIncome',
+        p_Today_yyyyMMdd: date,
+        token,
+      });
+      const res = response?.data ?? response;
+      if (res?.success === false || (res?._status && res._status !== 200)) {
+        const backendMsg = res?.message || res?.error || "";
+        setError(backendMsg ? `שגיאה מהשרת: ${backendMsg}` : "שגיאה בטעינת רשימת הכנסות");
+        setIncomeList([]);
+      } else {
+        setIncomeList(res?.data ?? []);
+      }
+    } catch (err) {
+      console.error("[AdminInterface] Income fetch error:", err);
+      setError(err.message || "שגיאה בטעינת רשימת הכנסות");
+    } finally {
+      setLoadingIncome(false);
+    }
+  }, []);
+
+  // Refetch teacher income when incomeDate changes
+  useEffect(() => {
+    console.log("[AdminInterface] income useEffect fired", { hasToken: !!authToken, incomeDate });
+    if (authToken) {
+      fetchIncome(incomeDate, authToken);
+    }
+  }, [incomeDate, authToken, fetchIncome]);
+
   // Refresh all lists at once
   const handleRefresh = useCallback(() => {
     if (!authToken) return;
@@ -217,7 +261,8 @@ export default function AdminInterface() {
       fetchSms(selectedDate, selectedMail, authToken);
     }
     fetchContact(selectedDate, personType, showHandled, authToken);
-  }, [authToken, personType, selectedMail, selectedDate, showHandled, fetchMails, fetchTrace, fetchSms, fetchContact]);
+    fetchIncome(incomeDate, authToken);
+  }, [authToken, personType, selectedMail, selectedDate, showHandled, incomeDate, fetchMails, fetchTrace, fetchSms, fetchContact, fetchIncome]);
 
   // Save handling description for a contact message
   const handleSaveContact = useCallback(async (msgId, desc) => {
@@ -546,6 +591,69 @@ export default function AdminInterface() {
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+
+      {/* Teacher Income (Full Month) */}
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <button
+          onClick={() => setShowIncome(!showIncome)}
+          className="w-full px-5 py-4 border-b border-border flex items-center gap-2 hover:bg-muted/30 transition-colors"
+        >
+          <Banknote className="w-5 h-5 text-primary" />
+          <h2 className="text-base font-heading font-semibold text-foreground flex-1 text-right">הכנסות מורים (חודש מלא)</h2>
+          {!loadingIncome && incomeList != null && (
+            <span className="text-sm font-body text-muted-foreground bg-muted/60 rounded-full px-2.5 py-0.5">{incomeList.length}</span>
+          )}
+          {showIncome ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
+        </button>
+
+        {showIncome && (
+          <div className="px-5 py-4 border-b border-border flex flex-col sm:flex-row sm:items-center gap-3">
+            <label className="flex items-center gap-2 text-sm font-heading font-semibold text-foreground shrink-0">
+              <Calendar className="w-4 h-4 text-primary" />
+              תאריך לבחירה
+            </label>
+            <input
+              type="date"
+              value={incomeDate}
+              onChange={(e) => setIncomeDate(e.target.value)}
+              className="w-full sm:w-auto rounded-lg border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+        )}
+
+        {showIncome && (loadingIncome ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        ) : !incomeList || incomeList.length === 0 ? (
+          <div className="px-5 py-10 text-center text-muted-foreground font-body text-sm">
+            אין נתונים לתצוגה
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm font-body">
+              <thead>
+                <tr className="bg-muted/50 text-xs font-heading font-semibold text-muted-foreground">
+                  {Object.keys(incomeList[0]).filter((k) => k.toLowerCase() !== "gn28_seq" && k !== "sort_order").map((k) => (
+                    <th key={k} className="px-4 py-2.5 text-right border-b border-border whitespace-nowrap">{incomeColumnLabels[k] || k}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {incomeList.map((row, i) => (
+                  <tr key={i} className="hover:bg-muted/30 transition-colors">
+                    {Object.keys(incomeList[0]).filter((k) => k.toLowerCase() !== "gn28_seq" && k !== "sort_order").map((k) => (
+                      <td key={k} className="px-4 py-2.5 whitespace-nowrap text-foreground text-right">
+                        {String(row[k] ?? "—")}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

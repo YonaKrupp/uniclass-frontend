@@ -81,6 +81,90 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* === Landing page — blue palette, isolated from the platform tokens.
+     Only elements inside .landing pick these up; the rest of the app keeps
+     the standard tokens defined above. The background is a fuller soft blue
+     (light) / deep navy (dark) with a subtle blue glow for richness. === */
+  .landing {
+    --background: 204 100% 97%;
+    --foreground: 217 44% 35%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 14%;
+    --primary: 217 90% 52%;
+    --primary-foreground: 0 0% 100%;
+    --accent2: 190 95% 42%;
+    --secondary: 204 64% 90%;
+    --secondary-foreground: 222 47% 14%;
+    --muted: 204 74% 93%;
+    --muted-foreground: 215 25% 38%;
+    --accent: 204 80% 92%;
+    --accent-foreground: 222 47% 14%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 64% 88%;
+    --input: 214 64% 88%;
+    --ring: 217 90% 52%;
+    background-image:
+      radial-gradient(58% 48% at 86% -4%, hsl(var(--accent2) / 0.22), transparent 60%),
+      radial-gradient(54% 44% at 8% 8%, hsl(var(--primary) / 0.18), transparent 64%),
+      radial-gradient(42% 36% at 50% 104%, hsl(260 80% 60% / 0.12), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  .dark .landing {
+    --background: 224 52% 9%;
+    --foreground: 217 70% 80%;
+    --card: 222 44% 13%;
+    --card-foreground: 210 60% 96%;
+    --popover: 222 44% 13%;
+    --popover-foreground: 210 60% 96%;
+    --primary: 213 95% 62%;
+    --primary-foreground: 222 47% 9%;
+    --accent2: 190 90% 55%;
+    --secondary: 220 40% 20%;
+    --secondary-foreground: 210 60% 96%;
+    --muted: 220 40% 18%;
+    --muted-foreground: 214 35% 68%;
+    --accent: 220 44% 20%;
+    --accent-foreground: 210 60% 96%;
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 210 60% 96%;
+    --border: 220 40% 24%;
+    --input: 220 40% 24%;
+    --ring: 213 95% 62%;
+    background-image:
+      radial-gradient(58% 48% at 86% -4%, hsl(var(--accent2) / 0.20), transparent 60%),
+      radial-gradient(54% 44% at 8% 8%, hsl(var(--primary) / 0.22), transparent 64%),
+      radial-gradient(42% 36% at 50% 104%, hsl(260 80% 60% / 0.16), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  .landing .animate-land-float { animation: land-float 7s ease-in-out infinite; }
+  .landing .animate-land-blob { animation: land-blob 16s ease-in-out infinite; }
+  .landing .animate-land-fade-up { animation: land-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .landing .land-gradient-text {
+    background: linear-gradient(100deg, hsl(var(--primary)), hsl(var(--accent2)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+@keyframes land-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@keyframes land-blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(22px, -18px) scale(1.08); }
+  66% { transform: translate(-16px, 16px) scale(0.95); }
+}
+@keyframes land-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 

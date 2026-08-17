@@ -12,7 +12,7 @@ export default function LandingFooter() {
   ];
 
   return (
-    <footer className="border-t border-border bg-card/50 py-12">
+    <footer className="border-t border-border/60 bg-card/40 py-12">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <img src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/0cf1a42dc_Logo_UNICLASS_2_PNG.png" alt="UniClass" className="h-8 w-auto" />
@@ -28,7 +28,7 @@ export default function LandingFooter() {
             )}
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground font-body">
+        <div className="mt-8 pt-6 border-t border-border/60 text-center text-sm text-muted-foreground font-body">
           © {new Date().getFullYear()} UniClass. כל הזכויות שמורות.
         </div>
       </div>

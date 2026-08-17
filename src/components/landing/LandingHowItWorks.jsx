@@ -2,34 +2,37 @@ import React from "react";
 import { UserPlus, MailCheck, Rocket } from "lucide-react";
 
 const steps = [
-{ icon: UserPlus, title: "הירשמו לפיילוט", text: "\u05E0\u05E8\u05E9\u05DE\u05D9\u05DD \u05DC\u05E4\u05D9\u05D9\u05DC\u05D5\u05D8 \u2014 \u05DE\u05DE\u05DC\u05D0\u05D9\u05DD \u05D0\u05EA \u05D4\u05E4\u05E8\u05D8\u05D9\u05DD, \u05D4\u05DE\u05E7\u05E6\u05D5\u05E2\u05D5\u05EA \u05E9\u05EA\u05E8\u05E6\u05D5 \u05DC\u05DC\u05DE\u05D3 \u05D5\u05D0\u05EA\u05DD \u05D1\u05E4\u05E0\u05D9\u05DD" },
-{ icon: MailCheck, title: "קבלו הזמנה", text: "\u05E0\u05E9\u05DC\u05D7 \u05D0\u05DC\u05D9\u05DB\u05DD \u05D4\u05D5\u05D3\u05E2\u05D4 \u05DB\u05D0\u05E9\u05E8 \u05D4\u05DE\u05E2\u05E8\u05DB\u05EA \u05EA\u05D4\u05D9\u05D4 \u05E4\u05E2\u05D9\u05DC\u05D4 \u05D5\u05E0\u05D9\u05EA\u05DF \u05D9\u05D4\u05D9\u05D4 \u05DC\u05E7\u05D1\u05D5\u05E2 \u05E9\u05D9\u05E2\u05D5\u05E8\u05D9\u05DD\xA0" },
-{ icon: Rocket, title: "התחילו ללמוד או ללמד", text: "\u05DE\u05DC\u05DE\u05D3\u05D9\u05DD \u05D5\u05DE\u05E8\u05D5\u05D5\u05D9\u05D7\u05D9\u05DD \u2014 \u05DE\u05E2\u05D1\u05D9\u05E8\u05D9\u05DD \u05E9\u05D9\u05E2\u05D5\u05E8\u05D9\u05DD \u05D0\u05D9\u05DB\u05D5\u05EA\u05D9\u05D9\u05DD \u05D1\u05D6\u05DE\u05DF \u05E9\u05E0\u05D5\u05D7 \u05DC\u05DB\u05DD \u05D5\u05DE\u05E7\u05D1\u05DC\u05D9\u05DD \u05EA\u05E9\u05DC\u05D5\u05DD \u05DE\u05D5\u05D1\u05D8\u05D7." }];
-
+  { icon: UserPlus, title: "הירשמו לפיילוט", text: "ממלאים את הפרטים, המקצועות שתרצו ללמד ואתם בפנים.", tint: "217 90% 52%" },
+  { icon: MailCheck, title: "קבלו הזמנה", text: "נשלח אליכם הודעה כאשר המערכת תהיה פעילה וניתן יהיה לקבוע שיעורים.", tint: "190 95% 42%" },
+  { icon: Rocket, title: "התחילו ללמוד או ללמד", text: "מלמדים ומרוויחים — מעבירים שיעורים איכותיים בזמן שנוח לכם ומקבלים תשלום מובטח.", tint: "260 80% 60%" },
+];
 
 export default function LandingHowItWorks() {
   return (
-    <section id="how-it-works" className="py-20 bg-card/50">
+    <section id="how-it-works" className="py-20 sm:py-24">
       <div className="max-w-4xl mx-auto px-4 text-center">
-        <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">איך זה עובד?</h2>
-        <p className="text-lg text-muted-foreground font-body mb-12">שלבים פשוטים להתחיל להרוויח מהידע שלכם</p>
-        <div className="grid sm:grid-cols-3 gap-8">
-          {steps.map((step, i) =>
-          <div key={step.title} className="relative">
-              <div className="absolute -top-3 -right-2 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-heading font-bold text-sm z-10">
+        <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-primary/10 rounded-full text-primary text-xs font-heading font-bold tracking-wide mb-4">פשוט ומהיר</span>
+        <h2 className="text-4xl sm:text-5xl font-heading font-extrabold text-foreground mb-4">איך זה <span className="land-gradient-text">עובד?</span></h2>
+        <p className="text-lg text-muted-foreground font-body mb-14">שלבים פשוטים להתחיל להרוויח מהידע שלכם</p>
+        <div className="relative grid sm:grid-cols-3 gap-6">
+          {/* connecting gradient line (desktop) */}
+          <div className="hidden sm:block absolute top-9 right-[16%] left-[16%] h-0.5 bg-gradient-to-l from-primary/30 via-accent2/40 to-primary/30" />
+          {steps.map((step, i) => (
+            <div key={step.title} className="relative">
+              <div className="absolute -top-2 right-1/2 translate-x-1/2 w-9 h-9 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-heading font-bold text-sm z-10 shadow-lg shadow-primary/30">
                 {i + 1}
               </div>
-              <div className="bg-background rounded-2xl p-6 border border-border pt-8">
-                <div className="w-14 h-14 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                  <step.icon className="w-7 h-7 text-primary" />
+              <div className="bg-card rounded-3xl p-7 border border-border/70 pt-12 hover:shadow-lg hover:-translate-y-1 transition-all h-full">
+                <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-5" style={{ backgroundColor: `hsl(${step.tint} / 0.14)` }}>
+                  <step.icon className="w-8 h-8" style={{ color: `hsl(${step.tint})` }} />
                 </div>
-                <h3 className="font-heading font-bold text-foreground mb-2">{step.title}</h3>
+                <h3 className="font-heading font-bold text-lg text-foreground mb-2">{step.title}</h3>
                 <p className="text-sm text-muted-foreground font-body">{step.text}</p>
               </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }

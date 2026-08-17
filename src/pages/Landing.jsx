@@ -10,7 +10,7 @@ import LandingFooter from "@/components/landing/LandingFooter";
 
 export default function Landing() {
   return (
-    <div dir="rtl" className="min-h-screen bg-background">
+    <div dir="rtl" className="landing min-h-screen bg-background">
       <LandingHeader />
       <main>
         <LandingHero />
@@ -18,9 +18,10 @@ export default function Landing() {
         <LandingFeatures />
         <LandingHowItWorks />
         <LandingCTA />
-        <section id="register" className="py-20">
+        <section id="register" className="py-20 sm:py-24">
           <div className="max-w-4xl mx-auto px-4 text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">הצטרפו לפיילוט</h2>
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-accent2/15 rounded-full text-[hsl(var(--accent2))] text-xs font-heading font-bold tracking-wide mb-4">הרשמה</span>
+            <h2 className="text-4xl sm:text-5xl font-heading font-extrabold text-foreground mb-4">הצטרפו ל<span className="land-gradient-text">פיילוט</span></h2>
             <p className="text-lg text-muted-foreground font-body">הירשמו עכשיו והיו מהראשונים ללמד ב-UniClass</p>
           </div>
           <div className="px-4">

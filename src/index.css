@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,150 +6,158 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 240 6% 99%;
+    --foreground: 240 10% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 9%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 9%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 10% 9%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 243 75% 59%;
+    --chart-1: 243 75% 59%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 152 60% 42%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 280 65% 60%;
+    --radius: 0.5rem;
+    --font-heading: 'Rubik', 'Heebo', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Rubik', 'Heebo', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Rubik', 'Heebo', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --sidebar-background: 240 6% 99%;
+    --sidebar-foreground: 240 10% 9%;
+    --sidebar-primary: 243 75% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 10% 9%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 243 75% 59%;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 240 6% 96%;
+    --card: 240 10% 7%;
+    --card-foreground: 240 6% 96%;
+    --popover: 240 10% 7%;
+    --popover-foreground: 240 6% 96%;
+    --primary: 243 75% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 8% 11%;
+    --secondary-foreground: 240 6% 96%;
+    --muted: 240 8% 11%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 8% 11%;
+    --accent-foreground: 240 6% 96%;
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 14%;
+    --input: 240 6% 14%;
+    --ring: 243 75% 66%;
+    --chart-1: 243 75% 66%;
+    --chart-2: 199 89% 58%;
+    --chart-3: 152 60% 52%;
+    --chart-4: 38 92% 60%;
+    --chart-5: 280 70% 68%;
+    --sidebar-background: 240 10% 4%;
+    --sidebar-foreground: 240 6% 96%;
+    --sidebar-primary: 243 75% 66%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 8% 11%;
+    --sidebar-accent-foreground: 240 6% 96%;
+    --sidebar-border: 240 6% 14%;
+    --sidebar-ring: 243 75% 66%;
+  }
+
+  /* === Landing page — Stripe-inspired palette (clean white + purple/pink/blue
+     signature gradient), isolated from the platform tokens. Only elements
+     inside .landing pick these up; the rest of the app keeps the tokens above. === */
+  .landing {
+    --background: 240 10% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primaryAAA: 217 91% 50%;
-    --primary: 217 44% 35%;
+    --primary: 262 67% 35%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 214 32% 91%;
+    --accent2: 258 90% 58%;
+    --secondary: 240 10% 96%;
     --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
+    --muted: 240 10% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
+    --accent: 262 67% 96%;
+    --accent-foreground: 262 67% 35%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 50%;
-    --chart-1: 217 91% 50%;
-    --chart-2: 199 89% 48%;
-    --chart-3: 210 40% 30%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.75rem;
-    --font-heading: 'Heebo', ui-sans-serif, system-ui, sans-serif;
-    --font-body: 'Heebo', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Heebo', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 12%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 12%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 55%;
-    --primaryBBB: 217 44% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 18%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 15%;
-    --muted-foreground: 215 16% 60%;
-    --accent: 222 47% 18%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 85% 65%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 222 47% 18%;
-    --input: 222 47% 18%;
-    --ring: 217 91% 55%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  /* === Landing page — blue palette, isolated from the platform tokens.
-     Only elements inside .landing pick these up; the rest of the app keeps
-     the standard tokens defined above. The background is a fuller soft blue
-     (light) / deep navy (dark) with a subtle blue glow for richness. === */
-  .landing {
-    --background: 204 100% 97%;
-    --foreground: 217 44% 35%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 14%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 14%;
-    --primary: 217 90% 52%;
-    --primary-foreground: 0 0% 100%;
-    --accent2: 190 95% 42%;
-    --secondary: 204 64% 90%;
-    --secondary-foreground: 222 47% 14%;
-    --muted: 204 74% 93%;
-    --muted-foreground: 215 25% 38%;
-    --accent: 204 80% 92%;
-    --accent-foreground: 222 47% 14%;
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 214 64% 88%;
-    --input: 214 64% 88%;
-    --ring: 217 90% 52%;
-    background-image:
-      radial-gradient(58% 48% at 86% -4%, hsl(var(--accent2) / 0.22), transparent 60%),
-      radial-gradient(54% 44% at 8% 8%, hsl(var(--primary) / 0.18), transparent 64%),
-      radial-gradient(42% 36% at 50% 104%, hsl(260 80% 60% / 0.12), transparent 70%);
-    background-attachment: fixed;
+    --border: 240 10% 90%;
+    --input: 240 10% 90%;
+    --ring: 262 67% 35%;
+    --mint: 160 84% 39%;
+    --mint-foreground: 0 0% 100%;
+    background: hsl(240 10% 98%);
   }
 
   .dark .landing {
-    --background: 224 52% 9%;
-    --foreground: 217 70% 80%;
-    --card: 222 44% 13%;
-    --card-foreground: 210 60% 96%;
-    --popover: 222 44% 13%;
-    --popover-foreground: 210 60% 96%;
-    --primary: 213 95% 62%;
-    --primary-foreground: 222 47% 9%;
-    --accent2: 190 90% 55%;
-    --secondary: 220 40% 20%;
-    --secondary-foreground: 210 60% 96%;
-    --muted: 220 40% 18%;
-    --muted-foreground: 214 35% 68%;
-    --accent: 220 44% 20%;
-    --accent-foreground: 210 60% 96%;
+    --background: 222 47% 7%;
+    --foreground: 220 40% 96%;
+    --card: 222 47% 11%;
+    --card-foreground: 220 40% 96%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 220 40% 96%;
+    --primary: 262 67% 45%;
+    --primary-foreground: 0 0% 100%;
+    --accent2: 258 90% 68%;
+    --secondary: 222 30% 16%;
+    --secondary-foreground: 220 40% 96%;
+    --muted: 222 30% 16%;
+    --muted-foreground: 220 15% 65%;
+    --accent: 222 30% 18%;
+    --accent-foreground: 258 90% 75%;
     --destructive: 0 72% 60%;
-    --destructive-foreground: 210 60% 96%;
-    --border: 220 40% 24%;
-    --input: 220 40% 24%;
-    --ring: 213 95% 62%;
-    background-image:
-      radial-gradient(58% 48% at 86% -4%, hsl(var(--accent2) / 0.20), transparent 60%),
-      radial-gradient(54% 44% at 8% 8%, hsl(var(--primary) / 0.22), transparent 64%),
-      radial-gradient(42% 36% at 50% 104%, hsl(260 80% 60% / 0.16), transparent 70%);
-    background-attachment: fixed;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 30% 22%;
+    --input: 222 30% 22%;
+    --ring: 262 67% 45%;
+    --mint: 160 70% 50%;
+    --mint-foreground: 222 47% 9%;
+    background: hsl(222 47% 7%);
   }
 
   .landing .animate-land-float { animation: land-float 7s ease-in-out infinite; }
   .landing .animate-land-blob { animation: land-blob 16s ease-in-out infinite; }
   .landing .animate-land-fade-up { animation: land-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .landing .stripe-aurora { animation: stripe-aurora 18s ease-in-out infinite; }
+  .landing .stripe-aurora-slow { animation: stripe-aurora 26s ease-in-out infinite; }
   .landing .land-gradient-text {
-    background: linear-gradient(100deg, hsl(var(--primary)), hsl(var(--accent2)));
+    background: linear-gradient(120deg, hsl(258 90% 58%), hsl(263 70% 42%));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  .landing .stripe-gradient-bg {
+    background: linear-gradient(135deg, hsl(262 67% 32%) 0%, hsl(263 75% 42%) 50%, hsl(260 80% 52%) 100%);
+  }
+  .landing .animate-hero-float { animation: hero-float 6s ease-in-out infinite; }
+  .landing .animate-badge-float { animation: badge-float 5s ease-in-out infinite; }
+  .landing .stripe-gradient-button {
+    background: linear-gradient(135deg, hsl(262 67% 35%), hsl(263 70% 45%) 50%, hsl(258 90% 55%));
+    background-size: 200% 200%;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, background-position 0.5s ease;
+  }
+  .landing .stripe-gradient-button:hover {
+    background-position: 100% 50%;
   }
 }
 
@@ -166,8 +174,19 @@
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-
+@keyframes stripe-aurora {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 25px) scale(0.95); }
+}
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+}
+@keyframes badge-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
 
 @layer base {
   * {
@@ -175,12 +194,48 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body;
+    @apply bg-background text-foreground font-body antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
   }
 
   button, [role="button"], a {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     touch-action: manipulation;
+  }
+}
+
+/* === App-wide ambient motion utilities (used by AppBackground + layouts) === */
+@keyframes app-halo {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(22px, -26px) scale(1.12); }
+}
+@keyframes app-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-app-halo { animation: app-halo 20s ease-in-out infinite; }
+.animate-app-halo-slow { animation: app-halo 28s ease-in-out infinite; }
+.app-fade-up { animation: app-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.app-fade-up-d1 { animation: app-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both; }
+.app-fade-up-d2 { animation: app-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both; }
+.app-fade-up-d3 { animation: app-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-app-halo,
+  .animate-app-halo-slow,
+  .app-fade-up,
+  .app-fade-up-d1,
+  .app-fade-up-d2,
+  .app-fade-up-d3,
+  .landing .stripe-aurora,
+  .landing .stripe-aurora-slow,
+  .landing .animate-hero-float,
+  .landing .animate-badge-float {
+    animation: none !important;
   }
 }

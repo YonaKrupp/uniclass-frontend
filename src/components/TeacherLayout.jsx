@@ -4,6 +4,7 @@ import { Home, Menu, X, LogOut, GraduationCap, Calendar, Video, User, Sun, Moon,
 import { useDarkMode } from "@/lib/useDarkMode";
 import { useSessionRenewal } from "@/lib/useSessionRenewal";
 import { clearFetchGuard } from "@/lib/fetchGuard";
+import AppBackground from "@/components/AppBackground";
 
 const teacherMenuItems = [
   { label: "דף הבית", path: "/teacher-home", icon: Home },
@@ -65,48 +66,49 @@ export default function TeacherLayout() {
     navigate("/login-choice", { replace: true });
   };
 
+  const navItemClass = (isActive) =>
+    `flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors ${
+      isActive
+        ? "bg-muted text-foreground"
+        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+    }`;
+
   return (
-    <div dir="rtl" className="min-h-screen bg-background">
+    <div dir="rtl" className="min-h-screen">
+      <AppBackground />
       {/* Navbar */}
       {!hideNav && (
-        <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border shadow-sm">
-          <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-16">
+        <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+          <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-14">
             {/* Logo */}
-            <Link to="/teacher-home" className="flex items-center gap-2">
-              <span className="font-heading font-bold text-foreground text-lg hidden sm:inline">פאנל מורים</span>
+            <Link to="/teacher-home" className="flex items-center gap-2 shrink-0">
+              <span className="text-sm font-semibold tracking-tight text-foreground hidden sm:inline">פאנל מורים</span>
             </Link>
 
             {/* Desktop menu */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-0.5">
               {visibleMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-heading font-medium transition-colors ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
+                  <Link key={item.path} to={item.path} className={navItemClass(isActive)}>
+                    <Icon className="w-3.5 h-3.5" />
                     {item.label}
                   </Link>
                 );
               })}
 
+              <div className="w-px h-5 bg-border mx-2" />
               <button
                 onClick={() => setDark(!dark)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 title={dark ? "מצב בהיר" : "מצב כהה"}
               >
                 {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-heading font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors mr-2"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 התנתקות
@@ -116,7 +118,7 @@ export default function TeacherLayout() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden p-2 rounded-lg text-foreground hover:bg-muted transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="lg:hidden p-2 rounded-md text-foreground hover:bg-muted transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -124,8 +126,8 @@ export default function TeacherLayout() {
 
           {/* Mobile menu */}
           {menuOpen && (
-            <div className="lg:hidden border-t border-border bg-card">
-              <div className="px-4 py-3 space-y-1">
+            <div className="lg:hidden border-t border-border bg-background">
+              <div className="px-3 py-3 space-y-0.5">
                 {visibleMenuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
@@ -134,23 +136,24 @@ export default function TeacherLayout() {
                       key={item.path}
                       to={item.path}
                       onClick={() => setMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-heading font-medium transition-colors min-h-[48px] ${
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[48px] ${
                         isActive
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          ? "bg-muted text-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                       }`}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-4 h-4" />
                       {item.label}
                     </Link>
                   );
                 })}
 
+                <div className="h-px bg-border my-1.5" />
                 <button
                   onClick={() => { setDark(!dark); setMenuOpen(false); }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-heading font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors w-full min-h-[48px]"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors w-full min-h-[48px]"
                 >
-                  {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                   {dark ? "מצב בהיר" : "מצב כהה"}
                 </button>
                 <button
@@ -158,9 +161,9 @@ export default function TeacherLayout() {
                     setMenuOpen(false);
                     handleLogout();
                   }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-heading font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors w-full min-h-[48px]"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors w-full min-h-[48px]"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-4 h-4" />
                   התנתקות
                 </button>
               </div>
@@ -170,7 +173,7 @@ export default function TeacherLayout() {
       )}
 
       {/* Content */}
-      <main className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 sm:py-10 app-fade-up">
         <Outlet />
       </main>
     </div>

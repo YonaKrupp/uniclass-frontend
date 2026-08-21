@@ -12,23 +12,35 @@ export default function LandingFooter() {
   ];
 
   return (
-    <footer className="border-t border-border/60 bg-card/40 py-12">
-      <div className="max-w-5xl mx-auto px-4">
+    <footer className="relative bg-background border-t border-border py-12 overflow-hidden">
+      {/* subtle top gradient line */}
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, hsl(262 67% 35% / 0.35), transparent)" }} />
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-          <img src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/0cf1a42dc_Logo_UNICLASS_2_PNG.png" alt="UniClass" className="h-8 w-auto" />
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-body">
+          <img
+            src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/0cf1a42dc_Logo_UNICLASS_2_PNG.png"
+            alt="UniClass"
+            className="h-7 w-auto"
+          />
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-body font-light">
             {links.map((link) =>
               link.to ? (
-                <Link key={link.label} to={link.to} className="text-muted-foreground hover:text-primary transition-colors">{link.label}</Link>
+                <Link key={link.label} to={link.to} className="text-muted-foreground hover:text-primary transition-colors">
+                  {link.label}
+                </Link>
               ) : link.action ? (
-                <button key={link.label} onClick={link.action} className="text-muted-foreground hover:text-primary transition-colors">{link.label}</button>
+                <button key={link.label} onClick={link.action} className="text-muted-foreground hover:text-primary transition-colors">
+                  {link.label}
+                </button>
               ) : (
-                <span key={link.label} className="text-muted-foreground/40">{link.label}</span>
+                <span key={link.label} className="text-muted-foreground/40">
+                  {link.label}
+                </span>
               )
             )}
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-border/60 text-center text-sm text-muted-foreground font-body">
+        <div className="mt-8 pt-6 border-t border-border/60 text-center text-sm text-muted-foreground font-body font-light">
           © {new Date().getFullYear()} UniClass. כל הזכויות שמורות.
         </div>
       </div>

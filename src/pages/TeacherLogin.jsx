@@ -6,6 +6,7 @@ import { initiateGoogleLogin } from "@/lib/googleAuth";
 import GoogleIcon from "@/components/GoogleIcon";
 import GoogleAuthLoading from "@/components/GoogleAuthLoading";
 import { useGoogleAuthCallback } from "@/hooks/useGoogleAuthCallback";
+import MeshGradient from "@/components/landing/MeshGradient";
 
 const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
@@ -76,7 +77,7 @@ export default function TeacherLogin() {
   if (authLoading) return <GoogleAuthLoading />;
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background flex flex-col items-center justify-center px-4 overflow-x-hidden">
+    <div dir="rtl" className="landing relative min-h-screen overflow-hidden bg-background flex flex-col items-center justify-center px-4">
       <button
         onClick={() => setDark(!dark)}
         className="fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm"
@@ -84,28 +85,35 @@ export default function TeacherLogin() {
       >
         {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </button>
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      </div>
+      <MeshGradient className="inset-0" />
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+          maskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent 80%)",
+        }}
+      />
 
       <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 space-y-3">
-          <div className="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center">
-            <BookOpen className="w-8 h-8 text-primary" />
+        <div className="app-fade-up text-center mb-8 space-y-3">
+          <div className="w-[76px] h-[76px] mx-auto bg-primary/10 rounded-3xl flex items-center justify-center">
+            <BookOpen className="w-9 h-9 text-primary" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground">כניסה למורים</h1>
-          <p className="text-muted-foreground font-body">התחברו לחשבון המורה שלכם</p>
+          <h1 className="text-2xl sm:text-3xl font-heading font-semibold tracking-tight text-foreground">כניסה למורים</h1>
+          <p className="text-muted-foreground font-body font-light">התחברו לחשבון המורה שלכם</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-card rounded-2xl shadow-xl border border-border p-6 sm:p-8 space-y-6">
+        <div className="app-fade-up-d1 bg-card/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-primary/5 border border-border p-6 sm:p-8 space-y-6">
           <button
             type="button"
             onClick={handleGoogle}
             disabled={loading || googleLoading}
-            className="w-full py-3.5 bg-card border border-border text-foreground rounded-xl text-base font-heading font-semibold hover:bg-muted transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-card border border-border text-foreground rounded-xl text-base font-heading font-semibold hover:bg-muted hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
           >
             {googleLoading ? (
               <>
@@ -146,7 +154,7 @@ export default function TeacherLogin() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="הכניסו את האימייל שלכם"
                   required
-                  className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
+                  className="w-full pr-10 pl-4 py-3 rounded-xl border border-primary/15 bg-primary/5 text-foreground placeholder:text-muted-foreground focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/40 focus:shadow-md focus:shadow-primary/10 transition-all text-base font-body min-h-[48px]"
                 />
               </div>
             </div>
@@ -161,7 +169,7 @@ export default function TeacherLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="הכניסו את הסיסמה שלכם"
                   required
-                  className="w-full pr-10 pl-12 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
+                  className="w-full pr-10 pl-12 py-3 rounded-xl border border-primary/15 bg-primary/5 text-foreground placeholder:text-muted-foreground focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/40 focus:shadow-md focus:shadow-primary/10 transition-all text-base font-body min-h-[48px]"
                 />
                 <button
                   type="button"
@@ -176,7 +184,7 @@ export default function TeacherLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
+              className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

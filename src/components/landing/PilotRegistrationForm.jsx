@@ -71,7 +71,7 @@ export default function PilotRegistrationForm() {
 
   if (success) {
     return (
-      <div className="bg-card rounded-2xl p-8 border border-border text-center max-w-xl mx-auto">
+      <div className="bg-card rounded-2xl p-8 border border-border shadow-sm text-center max-w-xl mx-auto">
         <div className="w-16 h-16 mx-auto bg-green-500/10 rounded-2xl flex items-center justify-center mb-4">
           <CheckCircle2 className="w-8 h-8 text-green-500" />
         </div>
@@ -83,7 +83,7 @@ export default function PilotRegistrationForm() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-6 sm:p-8 border border-border space-y-5">
+      <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-6 sm:p-8 border border-border shadow-sm space-y-5">
         <FormField label="שם מלא" icon={User} value={form.fullName} onChange={update("fullName")} placeholder="הכניסו את שמכם המלא" required />
         <div className="grid sm:grid-cols-2 gap-5">
           <div className="space-y-1">
@@ -104,13 +104,13 @@ export default function PilotRegistrationForm() {
             onChange={update("notes")}
             rows={3}
             placeholder="הערות נוספות (אופציונלי)"
-            className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm shadow-sm outline-none focus:ring-1 focus:ring-ring resize-y"
+            className="w-full rounded-lg border border-primary/15 bg-primary/5 px-3 py-2.5 text-sm shadow-sm outline-none focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/40 focus:shadow-md focus:shadow-primary/10 transition-all resize-y"
           />
         </div>
         {error && (
           <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-3 text-sm text-destructive font-body text-center">{error}</div>
         )}
-        <button type="submit" disabled={loading} className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2">
+        <button type="submit" disabled={loading} className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-body font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2">
           {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> שולח...</> : "שמרו לי מקום בפיילוט"}
         </button>
         <p className="text-xs text-muted-foreground text-center font-body">ההרשמה ללא עלות וללא התחייבות. ניצור איתכם קשר לפני ההשקה.</p>

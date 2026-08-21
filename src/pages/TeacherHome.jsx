@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Users, Calendar, Star, Loader2, AlertCircle } from "lucide-react";
+import WelcomeBanner from "@/components/WelcomeBanner";
 
 // Module-level in-flight promise store — prevents duplicate concurrent fetches
 // for the same email when TeacherHome mounts multiple times in quick succession
@@ -142,13 +143,13 @@ export default function TeacherHome() {
         />
       </div>
 
-      {/* Welcome */}
-      <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground">
-          שלום, {name} 👋
-        </h1>
-        <p className="text-muted-foreground font-body">ברוכים הבאים לפאנל המורים</p>
-      </div>
+      {/* Welcome banner */}
+      <WelcomeBanner
+        image="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/aa21c278c_generated_image.png"
+        badge="פאנל מורים"
+        title={`שלום, ${name} 👋`}
+        subtitle="ברוכים הבאים — נהלו את השיעורים והתלמידים שלכם"
+      />
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 gap-4">
@@ -184,8 +185,12 @@ export default function TeacherHome() {
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
         ) : lessonsList.length === 0 ? (
-          <div className="px-5 py-10 text-center text-muted-foreground font-body text-sm">
-            אין שיעורים קרובים
+          <div className="px-5 py-12 flex flex-col items-center gap-3 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
+              <Calendar className="w-7 h-7 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground font-body text-sm">אין שיעורים מתוכננים כרגע</p>
+            <p className="text-muted-foreground/70 font-body text-xs">ברגע שיתוכננו שיעורים, הם יופיעו כאן</p>
           </div>
         ) : (
           <>

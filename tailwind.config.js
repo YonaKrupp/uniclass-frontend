@@ -28,6 +28,10 @@ module.exports = {
   				DEFAULT: 'hsl(var(--accent2))',
   				foreground: 'hsl(var(--accent2-foreground, 0 0% 100%))'
   			},
+  			mint: {
+  				DEFAULT: 'hsl(var(--mint))',
+  				foreground: 'hsl(var(--mint-foreground))'
+  			},
   			secondary: {
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'

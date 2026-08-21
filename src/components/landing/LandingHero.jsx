@@ -11,12 +11,12 @@ const trustPills = [
 
 
 const universities = [
-"האוניברסיטה העברית",
-"אוניברסיטת תל אביב",
-"הטכניון",
-"אוניברסיטת בן-גוריון",
-"האוניברסיטה הפתוחה",
-"אוניברסיטת חיפה"];
+"צ'אט בזמן אמת",
+"תשלום מאובטח",
+"שיעורי וידאו חיים",
+"סיכום AI אוטומטי",
+"גמישות בזמנים",
+"ללא התחייבות"];
 
 export default function LandingHero() {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -82,7 +82,7 @@ export default function LandingHero() {
 
       <Reveal className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 mt-16 sm:mt-20 pt-8 border-t border-border/60">
         <p className="text-center text-xs text-muted-foreground/60 mb-6 tracking-[0.2em] uppercase font-body">
-          נגישה לכל מוסדות הלימוד
+          בנוי כדי לעבוד בשבילכם
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-12 gap-y-4 opacity-60">
           {universities.map((u) =>

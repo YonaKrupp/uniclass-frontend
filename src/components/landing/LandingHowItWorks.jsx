@@ -8,7 +8,7 @@ const steps = [
   { icon: Rocket, title: "התחילו ללמוד או ללמד", text: "מלמדים ומרוויחים — מעבירים שיעורים איכותיים בזמן שנוח לכם ומקבלים תשלום מובטח.", tone: "indigo" },
 ];
 
-const STUDENT_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/35e139a67_generated_image.png";
+const STUDENT_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/36cf222ec_generated_image.png";
 
 export default function LandingHowItWorks() {
   return (

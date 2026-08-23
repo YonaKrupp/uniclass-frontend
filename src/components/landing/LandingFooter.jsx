@@ -7,8 +7,8 @@ export default function LandingFooter() {
     { label: "אודות", action: () => scrollTo("about") },
     { label: "תכונות", action: () => scrollTo("features") },
     { label: "הצטרפות", action: () => scrollTo("register") },
-    { label: "כניסת מורים", to: "/teacher-login" },
-    { label: "כניסת תלמידים", to: "/student-login" },
+    { label: "כניסת מורים", to: "/teacher-login", disabled: true },
+    { label: "כניסת תלמידים", to: "/student-login", disabled: true },
   ];
 
   return (
@@ -18,14 +18,14 @@ export default function LandingFooter() {
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <img
-            src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/0cf1a42dc_Logo_UNICLASS_2_PNG.png"
+            src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c40751db9_Logo_UNICLASS_purple_PNG.png"
             alt="UniClass"
             className="h-7 w-auto"
           />
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-body font-light">
             {links.map((link) =>
               link.to ? (
-                <Link key={link.label} to={link.to} className="text-muted-foreground hover:text-primary transition-colors">
+                <Link key={link.label} to={link.to} aria-disabled={link.disabled} className={`transition-colors ${link.disabled ? "text-muted-foreground/50 pointer-events-none cursor-not-allowed" : "text-muted-foreground hover:text-primary"}`}>
                   {link.label}
                 </Link>
               ) : link.action ? (

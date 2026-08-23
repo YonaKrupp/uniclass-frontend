@@ -22,7 +22,7 @@ export default function LandingHeader() {
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
-        <img src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/0cf1a42dc_Logo_UNICLASS_2_PNG.png" alt="UniClass" className="h-7 sm:h-8 w-auto" />
+        <img src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c40751db9_Logo_UNICLASS_purple_PNG.png" alt="UniClass" className="h-7 sm:h-8 w-auto" />
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
             <button key={link.target} onClick={() => scrollTo(link.target)} className="px-4 py-2 rounded-full text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
@@ -34,7 +34,7 @@ export default function LandingHeader() {
           <button onClick={() => setDark(!dark)} className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title={dark ? "מצב בהיר" : "מצב כהה"}>
             {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
-          <Link to="/login-choice" className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/login-choice" aria-disabled="true" className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm font-body font-medium text-muted-foreground/50 transition-colors pointer-events-none cursor-not-allowed">
             <LogIn className="w-4 h-4" /> כניסה
           </Link>
           <button onClick={() => scrollTo("register")} className="hidden sm:inline-flex items-center px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all">
@@ -52,7 +52,7 @@ export default function LandingHeader() {
               {link.label}
             </button>
           ))}
-          <Link to="/login-choice" className="block px-4 py-2.5 text-sm font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors">
+          <Link to="/login-choice" aria-disabled="true" className="block px-4 py-2.5 text-sm font-body font-medium text-muted-foreground/50 pointer-events-none cursor-not-allowed rounded-xl transition-colors">
             כניסה
           </Link>
         </div>

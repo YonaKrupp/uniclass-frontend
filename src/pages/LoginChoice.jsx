@@ -45,7 +45,7 @@ export default function LoginChoice() {
           {/* Teacher — indigo accent */}
           <Link
             to="/teacher-login"
-            className="group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] overflow-hidden"
+            className="group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden pointer-events-none opacity-60 cursor-not-allowed"
           >
             <div
               className="absolute -top-16 -right-16 w-48 h-48 rounded-full blur-[90px] opacity-[0.13] pointer-events-none"
@@ -66,7 +66,7 @@ export default function LoginChoice() {
           {/* Student — mint accent */}
           <Link
             to="/student-login"
-            className="group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] overflow-hidden"
+            className="group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden pointer-events-none opacity-60 cursor-not-allowed"
           >
             <div
               className="absolute -top-16 -left-16 w-48 h-48 rounded-full blur-[90px] opacity-[0.13] pointer-events-none"

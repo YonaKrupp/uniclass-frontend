@@ -112,8 +112,8 @@ export default function TeacherLogin() {
           <button
             type="button"
             onClick={handleGoogle}
-            disabled={loading || googleLoading}
-            className="w-full py-3.5 bg-card border border-border text-foreground rounded-xl text-base font-heading font-semibold hover:bg-muted hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
+            disabled
+            className="w-full py-3.5 bg-card border border-border text-foreground rounded-xl text-base font-heading font-semibold transition-all opacity-60 cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
           >
             {googleLoading ? (
               <>
@@ -183,8 +183,8 @@ export default function TeacherLogin() {
 
             <button
               type="submit"
-              disabled={loading}
-              className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
+              disabled
+              className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-heading font-semibold shadow-lg shadow-primary/25 transition-all opacity-60 cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

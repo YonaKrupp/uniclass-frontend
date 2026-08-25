@@ -96,7 +96,7 @@
     --secondary: 240 10% 96%;
     --secondary-foreground: 222 47% 11%;
     --muted: 240 10% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 216 22% 33%;
     --accent: 262 67% 96%;
     --accent-foreground: 262 67% 35%;
     --destructive: 0 72% 51%;
@@ -224,6 +224,11 @@
 .app-fade-up-d1 { animation: app-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both; }
 .app-fade-up-d2 { animation: app-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both; }
 .app-fade-up-d3 { animation: app-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both; }
+
+/* === Landing page: larger body / descriptive text (headings untouched) === */
+.landing .text-sm { font-size: 1rem; line-height: 1.6rem; }
+.landing .text-base { font-size: 1.09375rem; line-height: 1.7rem; }
+.landing .text-lg { font-size: 1.25rem; line-height: 2rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-app-halo,

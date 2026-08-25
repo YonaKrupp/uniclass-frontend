@@ -3,10 +3,10 @@ import { UserPlus, MailCheck, Rocket } from "lucide-react";
 import Reveal from "./Reveal";
 
 const steps = [
-  { icon: UserPlus, title: "הירשמו לפיילוט", text: "ממלאים את הפרטים, המקצועות שתרצו ללמד ואתם בפנים.", tone: "indigo" },
-  { icon: MailCheck, title: "קבלו הזמנה", text: "נשלח אליכם הודעה כאשר המערכת תהיה פעילה וניתן יהיה לקבוע שיעורים.", tone: "mint" },
-  { icon: Rocket, title: "התחילו ללמוד או ללמד", text: "מלמדים ומרוויחים — מעבירים שיעורים איכותיים בזמן שנוח לכם ומקבלים תשלום מובטח.", tone: "indigo" },
-];
+{ icon: UserPlus, title: "הירשמו לפיילוט", text: "\u05DE\u05DE\u05DC\u05D0\u05D9\u05DD \u05D0\u05EA \u05D4\u05E4\u05E8\u05D8\u05D9\u05DD \u05D5\u05D0\u05EA\u05DD \u05D1\u05E4\u05E0\u05D9\u05DD.", tone: "indigo" },
+{ icon: MailCheck, title: "קבלו הזמנה", text: "נשלח אליכם הודעה כאשר המערכת תהיה פעילה וניתן יהיה לקבוע שיעורים.", tone: "mint" },
+{ icon: Rocket, title: "התחילו ללמוד או ללמד", text: "מלמדים ומרוויחים — מעבירים שיעורים איכותיים בזמן שנוח לכם ומקבלים תשלום מובטח.", tone: "indigo" }];
+
 
 const STUDENT_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/36cf222ec_generated_image.png";
 
@@ -46,8 +46,8 @@ export default function LandingHowItWorks() {
         {/* Steps */}
         <div className="relative grid sm:grid-cols-3 gap-6 text-center">
           <div className="hidden sm:block absolute top-8 right-[16%] left-[16%] h-px bg-gradient-to-l from-transparent via-border to-transparent" />
-          {steps.map((step, i) => (
-            <Reveal key={step.title} delay={i * 120} className="relative h-full group">
+          {steps.map((step, i) =>
+          <Reveal key={step.title} delay={i * 120} className="relative h-full group">
               <div className="absolute -top-3 right-1/2 translate-x-1/2 w-10 h-10 bg-card border-2 border-primary text-primary rounded-full flex items-center justify-center font-heading font-semibold text-sm z-10 shadow-sm group-hover:scale-110 transition-transform duration-300">
                 {i + 1}
               </div>
@@ -59,9 +59,9 @@ export default function LandingHowItWorks() {
                 <p className="text-sm text-muted-foreground font-body font-light leading-relaxed">{step.text}</p>
               </div>
             </Reveal>
-          ))}
+          )}
         </div>
       </div>
-    </section>
-  );
+    </section>);
+
 }

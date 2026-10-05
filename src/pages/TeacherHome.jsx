@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Users, Calendar, Star, Loader2, AlertCircle } from "lucide-react";
-import WelcomeBanner from "@/components/WelcomeBanner";
+import { AlertCircle } from "lucide-react";
+import TeacherBanner from "@/components/teacher/TeacherBanner";
+import TeacherStats from "@/components/teacher/TeacherStats";
+import TeacherActivityChart from "@/components/teacher/TeacherActivityChart";
+import TeacherLessonsBoard from "@/components/teacher/TeacherLessonsBoard";
 
 // Module-level in-flight promise store — prevents duplicate concurrent fetches
 // for the same email when TeacherHome mounts multiple times in quick succession
@@ -105,21 +108,6 @@ export default function TeacherHome() {
 
   const lessonsList = data?.lessonsList ?? [];
 
-  const lessonColumnLabels = {
-    dayInTheWeek: "יום",
-    dateInTheMonth: "תאריך",
-    startEndHoure: "שעה",
-    subjectName: "מקצוע",
-    studentName: "שם התלמיד/ה",
-  };
-
-  const stats = [
-    { label: "שיעורים היום", value: loading ? null : todayLessons, icon: Calendar, color: "bg-primary/10 text-primary", valueColor: "text-orange-500" },
-    { label: "דירוג מורה", value: loading ? null : ratingLabel, icon: Star, color: "bg-chart-4/10 text-chart-4", small: true },
-    { label: "שיעורים מתוכננים", value: loading ? null : scheduledLessons, icon: BookOpen, color: "bg-chart-1/10 text-chart-1" },
-    { label: "תלמידים", value: loading ? null : students, icon: Users, color: "bg-chart-2/10 text-chart-2" },
-  ];
-
   if (authError) {
     return (
       <div dir="rtl" className="flex flex-col items-center justify-center py-20 px-4 text-center space-y-4">
@@ -133,106 +121,23 @@ export default function TeacherHome() {
   }
 
   return (
-    <div dir="rtl" className="space-y-8">
-      {/* Logo */}
-      <div className="flex justify-center">
-        <img
-          src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/0cf1a42dc_Logo_UNICLASS_2_PNG.png"
-          alt="UniClass"
-          className="h-12 sm:h-14 w-auto object-contain"
-        />
-      </div>
-
-      {/* Welcome banner */}
-      <WelcomeBanner
-        image="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/aa21c278c_generated_image.png"
-        badge="פאנל מורים"
-        title={`שלום, ${name} 👋`}
-        subtitle="ברוכים הבאים — נהלו את השיעורים והתלמידים שלכם"
+    <div dir="rtl" className="relative">
+      {/* Ambient dashboard gradient — consistent with the landing design language */}
+      <div
+        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[80%] h-64 rounded-full blur-[130px] opacity-[0.05] pointer-events-none"
+        style={{ background: "radial-gradient(circle, hsl(243 75% 59%), transparent 70%)" }}
       />
-
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 gap-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div key={stat.label} className="bg-card rounded-2xl border border-border p-4 sm:p-5 space-y-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.color}`}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div>
-                {stat.value === null ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                ) : (
-                  <p className={`font-heading font-bold ${stat.valueColor ?? "text-foreground"} ${stat.small ? "text-lg" : "text-2xl"}`}>{stat.value}</p>
-                )}
-                <p className="text-sm text-muted-foreground font-body">{stat.label}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Upcoming lessons */}
-      <div className="bg-card rounded-2xl border border-border overflow-hidden">
-        <div className="px-5 py-4 border-b border-border flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
-          <h2 className="text-base font-heading font-semibold text-foreground">שיעורים מתוכננים</h2>
-        </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-          </div>
-        ) : lessonsList.length === 0 ? (
-          <div className="px-5 py-12 flex flex-col items-center gap-3 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
-              <Calendar className="w-7 h-7 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground font-body text-sm">אין שיעורים מתוכננים כרגע</p>
-            <p className="text-muted-foreground/70 font-body text-xs">ברגע שיתוכננו שיעורים, הם יופיעו כאן</p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm font-body">
-                <thead>
-                  <tr className="bg-muted/50 text-xs font-heading font-semibold text-muted-foreground">
-                    {typeof lessonsList[0] === "object" &&
-                      Object.keys(lessonsList[0]).map((k) => (
-                        <th key={k} className="px-4 py-2.5 text-center border-b border-border">
-                          {lessonColumnLabels[k] || k}
-                        </th>
-                      ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {lessonsList.map((lesson, i) => {
-                    const lessonDate = typeof lesson === "object" ? (lesson.dateInTheMonth || "") : "";
-                    const [y, m, d] = todayDate.split("-");
-                    const todayDDMMYYYY = `${d}/${m}/${y}`;
-                    const isToday = lessonDate === todayDate || lessonDate === todayDDMMYYYY;
-                    return (
-                      <tr key={i} className="hover:bg-muted/30 transition-colors">
-                        {typeof lesson === "object"
-                          ? Object.values(lesson).map((v, j) => (
-                              <td key={j} className={`px-4 py-2.5 whitespace-nowrap text-center ${isToday ? "text-orange-500 font-semibold" : "text-foreground"}`}>
-                                {String(v ?? "—")}
-                              </td>
-                            ))
-                          : <td className="px-4 py-2.5 text-foreground text-center">{String(lesson)}</td>
-                        }
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <div className="md:hidden px-4 py-2 bg-muted/40 border-t border-border text-xs text-muted-foreground font-body text-center">
-              ← גלול לרוחב לצפייה בכל העמודות →
-            </div>
-          </>
-        )}
+      <div className="relative z-10 space-y-6">
+        <TeacherBanner name={name} />
+        <TeacherStats
+          loading={loading}
+          todayLessons={todayLessons}
+          students={students}
+          scheduledLessons={scheduledLessons}
+          ratingLabel={ratingLabel}
+        />
+        <TeacherActivityChart lessons={lessonsList} />
+        <TeacherLessonsBoard loading={loading} lessons={lessonsList} todayDate={todayDate} />
       </div>
     </div>
   );

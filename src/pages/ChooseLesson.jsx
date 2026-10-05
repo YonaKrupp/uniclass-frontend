@@ -19,6 +19,7 @@ const SEARCH_MODES = [
 const UNIVERSITY_MODES = [
   { value: "1", label: "אוניברסיטה", icon: School },
   { value: "2", label: "האוניברסיטה הפתוחה", icon: BookOpen },
+  { value: "3", label: "בית ספר", icon: GraduationCap },
 ];
 
 // Module-level: prevents concurrent fetch calls across component remounts within the same page load
@@ -375,6 +376,31 @@ export default function ChooseLesson() {
                 </SelectContent>
               </Select>
             </div>
+
+              {/* Year of study — only for school mode */}
+              {universityMode === "3" && (
+                <div className="space-y-2" dir="rtl">
+                  <label className={`w-full text-right text-sm font-heading font-semibold block ${canSelectYear ? "text-foreground" : "text-muted-foreground/50"}`}>
+                    שנת לימוד
+                  </label>
+                  <Select value={selectedYear} onValueChange={setSelectedYear} disabled={!canSelectYear}>
+                    <SelectTrigger className="w-full text-right flex flex-row-reverse justify-between items-center">
+                      <SelectValue placeholder={canSelectYear ? "בחרו שנת לימוד" : "בחרו תואר קודם"} />
+                    </SelectTrigger>
+                    <SelectContent className="min-w-[16rem] max-w-[90vw] text-right" align="end">
+                      {years.map((y, i) => (
+                        <SelectItem
+                          key={y.year_id ?? y.gn22_id ?? y.id ?? i}
+                          value={String(y.year_id ?? y.gn22_id ?? y.id ?? i)}
+                          className="whitespace-normal break-words leading-snug py-2 text-right justify-start flex-row-reverse"
+                        >
+                          {y.degree_years ?? y.Degree_years ?? y.year_name ?? y.gn22_yearName ?? y.name ?? `שנה ${i + 1}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Courses */}
               <div className="space-y-2" dir="rtl">

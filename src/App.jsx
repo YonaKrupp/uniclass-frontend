@@ -43,6 +43,10 @@ import RateTeacher from './pages/RateTeacher';
 import Contact from './pages/Contact';
 import PilotRegistrationsExport from './pages/PilotRegistrationsExport';
 import LoginChoice from './pages/LoginChoice';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+import Unsubscribe from './pages/Unsubscribe';
+import AccessibilityStatement from './pages/AccessibilityStatement';
 import AdminInterface from './pages/AdminInterface';
 
 function App() {
@@ -92,6 +96,11 @@ function App() {
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-failed" element={<PaymentFailed />} />
             <Route path="/pilot-export" element={<PilotRegistrationsExport />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/accessibility" element={<AccessibilityStatement />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Router>

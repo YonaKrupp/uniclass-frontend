@@ -1,20 +1,22 @@
 import React from "react";
 
+// Brand-aligned palette (indigo / mint / soft gray / amber).
+// Visual colors only — the cssClass keys and their meanings are unchanged.
 const COLOR_MAP = {
-  available: { bg: "#d1edd8", border: "#4caf73", text: "#1a5c30" },
-  booked: { bg: "#fde0e3", border: "#e05470", text: "#7a1c2c" },
-  bookedAtherteacher: { bg: "#dce8fa", border: "#4a7fc1", text: "#1a3a6e" },
-  occupiedMove: { bg: "#ffe2bf", border: "#f0a24a", text: "#8a4b00" },
-  past: { bg: "#edeef0", border: "#d0d3d8", text: "#9aa0aa" },
-  pastDark: { bg: "#dcdde0", border: "#bbbfc6", text: "#7a7f8a" },
-  tentative: { bg: "#fef9e6", border: "#c8a84b", text: "#7a5c00" },
-  selected: { bg: "#cce5ff", border: "#c8a84b", text: "#004085" },
-  disabled: { bg: "#edeef0", border: "#d0d3d8", text: "#9aa0aa" },
+  available:         { bg: "#d8f5e6", border: "#34a86b", text: "#0f5c34" },   // mint — פנויים ללמד
+  booked:            { bg: "#e3e7ff", border: "#6366f1", text: "#3730a3" },   // indigo — שיעור עם תלמיד
+  bookedAtherteacher:{ bg: "#e8edff", border: "#818cf8", text: "#4334c9" },   // light indigo
+  occupiedMove:      { bg: "#fff1d6", border: "#f0a24a", text: "#8a4b00" },  // amber — reschedule source (transient)
+  past:              { bg: "#f1f2f4", border: "#d7dade", text: "#9aa0aa" },   // soft gray
+  pastDark:          { bg: "#e6e8ec", border: "#c2c6cf", text: "#7a7f8a" },
+  tentative:         { bg: "#fff7e0", border: "#d8b94a", text: "#7a5c00" },   // soft amber
+  selected:          { bg: "#e3e7ff", border: "#6366f1", text: "#3730a3" },   // indigo — שיעור עם תלמיד
+  disabled:          { bg: "#f1f2f4", border: "#d7dade", text: "#9aa0aa" },  // soft gray
 };
 
 export function getSlotColors(cssClass) {
-  if (!cssClass) return { bg: "#512BD4", border: "#512BD4", text: "#ffffff" };
-  return COLOR_MAP[cssClass] || { bg: "#512BD4", border: "#512BD4", text: "#ffffff" };
+  if (!cssClass) return { bg: "#4f46e5", border: "#4f46e5", text: "#ffffff" };
+  return COLOR_MAP[cssClass] || { bg: "#4f46e5", border: "#4f46e5", text: "#ffffff" };
 }
 
 export default function SlotCell({ slot, isPast, startTime, endTime, onClick, tooltip }) {
@@ -25,7 +27,7 @@ export default function SlotCell({ slot, isPast, startTime, endTime, onClick, to
       onClick={onClick}
       disabled={isPast}
       title={tooltip}
-      className="rounded-lg border p-1 text-center transition-all min-h-[48px] flex flex-col items-center justify-center w-full"
+      className="rounded-xl border p-1 text-center transition-all duration-200 min-h-[48px] flex flex-col items-center justify-center w-full hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]"
       style={{
         backgroundColor: colors.bg,
         borderColor: colors.border,
@@ -36,8 +38,8 @@ export default function SlotCell({ slot, isPast, startTime, endTime, onClick, to
         WebkitUserSelect: "none",
       }}
     >
-      <span className="text-[10px] font-medium leading-tight">{startTime}</span>
-      <span className="text-[10px] leading-tight">{endTime}</span>
+      <span className="text-[11px] font-semibold leading-tight">{startTime}</span>
+      <span className="text-[11px] leading-tight opacity-80">{endTime}</span>
     </button>
   );
 }

@@ -7,8 +7,10 @@ import GoogleIcon from "@/components/GoogleIcon";
 import GoogleAuthLoading from "@/components/GoogleAuthLoading";
 import { useGoogleAuthCallback } from "@/hooks/useGoogleAuthCallback";
 import MeshGradient from "@/components/landing/MeshGradient";
+import { isProductionDomain } from "@/lib/isProductionDomain";
 
 export default function StudentLogin() {
+  const loginDisabled = isProductionDomain();
   const [dark, setDark] = useDarkMode();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -108,11 +110,16 @@ export default function StudentLogin() {
 
         {/* Form Card */}
         <div className="app-fade-up-d1 bg-card/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-primary/5 border border-border p-6 sm:p-8 space-y-6">
+          {loginDisabled && (
+            <div className="bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 text-sm rounded-xl p-3 text-center font-body border border-amber-200 dark:border-amber-800">
+              הכניסה לחשבונות אינה זמינה מכתובת זו. ניתן להיכנס דרך כתובת המערכת הפנימית.
+            </div>
+          )}
           <button
             type="button"
             onClick={handleGoogle}
-            disabled
-            className="w-full py-3.5 bg-card border border-border text-foreground rounded-xl text-base font-heading font-semibold transition-all opacity-60 cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
+            disabled={googleLoading || loginDisabled}
+            className="w-full py-3.5 bg-card border border-border text-foreground rounded-xl text-base font-heading font-semibold hover:border-primary/40 hover:shadow-md hover:shadow-primary/10 transition-all min-h-[52px] flex items-center justify-center gap-2"
           >
             {googleLoading ? (
               <>
@@ -182,8 +189,8 @@ export default function StudentLogin() {
 
             <button
               type="submit"
-              disabled
-              className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-heading font-semibold shadow-lg shadow-primary/25 transition-all opacity-60 cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
+              disabled={loading || loginDisabled}
+              className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all min-h-[52px] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {loading ? (
                 <>

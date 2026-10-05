@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { GraduationCap, BookOpen, ArrowLeft, ShieldCheck, CalendarClock, BadgeCheck } from "lucide-react";
 import MeshGradient from "@/components/landing/MeshGradient";
+import { isProductionDomain } from "@/lib/isProductionDomain";
 
 const trustPills = [
   { icon: ShieldCheck, label: "תשלום מאובטח", tone: "indigo" },
@@ -10,6 +11,7 @@ const trustPills = [
 ];
 
 export default function LoginChoice() {
+  const loginDisabled = isProductionDomain();
   return (
     <div dir="rtl" className="landing relative min-h-screen overflow-hidden flex items-center justify-center p-4 sm:p-8">
       {/* Animated mesh gradient (same as Hero) */}
@@ -30,7 +32,7 @@ export default function LoginChoice() {
         {/* Brand mark */}
         <div className="app-fade-up flex flex-col items-center mb-10">
           <img
-            src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/0cf1a42dc_Logo_UNICLASS_2_PNG.png"
+            src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c40751db9_Logo_UNICLASS_purple_PNG.png"
             alt="UniClass"
             className="h-12 w-auto mb-5"
           />
@@ -40,12 +42,17 @@ export default function LoginChoice() {
           <p className="text-muted-foreground font-body font-light text-center">בחרו סוג משתמש לכניסה</p>
         </div>
 
+        {loginDisabled && (
+          <div className="app-fade-up-d1 mb-5 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 text-sm rounded-xl p-3 text-center font-body border border-amber-200 dark:border-amber-800">
+            הכניסה לחשבונות אינה זמינה מכתובת זו. ניתן להיכנס דרך כתובת המערכת הפנימית.
+          </div>
+        )}
         {/* Two large side-by-side choice cards */}
         <div className="grid sm:grid-cols-2 gap-5 sm:gap-6 app-fade-up-d1">
           {/* Teacher — indigo accent */}
           <Link
             to="/teacher-login"
-            className="group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden pointer-events-none opacity-60 cursor-not-allowed"
+            className={`group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden ${loginDisabled ? "pointer-events-none opacity-60 cursor-not-allowed" : "hover:-translate-y-1 hover:shadow-xl hover:border-primary/40"}`}
           >
             <div
               className="absolute -top-16 -right-16 w-48 h-48 rounded-full blur-[90px] opacity-[0.13] pointer-events-none"
@@ -66,7 +73,7 @@ export default function LoginChoice() {
           {/* Student — mint accent */}
           <Link
             to="/student-login"
-            className="group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden pointer-events-none opacity-60 cursor-not-allowed"
+            className={`group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden ${loginDisabled ? "pointer-events-none opacity-60 cursor-not-allowed" : "hover:-translate-y-1 hover:shadow-xl hover:border-mint/40"}`}
           >
             <div
               className="absolute -top-16 -left-16 w-48 h-48 rounded-full blur-[90px] opacity-[0.13] pointer-events-none"

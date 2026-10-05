@@ -7,6 +7,10 @@ export default function LandingFooter() {
     { label: "אודות", action: () => scrollTo("about") },
     { label: "תכונות", action: () => scrollTo("features") },
     { label: "הצטרפות", action: () => scrollTo("register") },
+    { label: "מדיניות פרטיות", to: "/privacy" },
+    { label: "תנאי שימוש", to: "/terms" },
+    { label: "הצהרת נגישות", to: "/accessibility" },
+    { label: "הסרה מדיוור", to: "/unsubscribe" },
     { label: "כניסת מורים", to: "/teacher-login", disabled: true },
     { label: "כניסת תלמידים", to: "/student-login", disabled: true },
   ];
@@ -25,7 +29,7 @@ export default function LandingFooter() {
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-body font-light">
             {links.map((link) =>
               link.to ? (
-                <Link key={link.label} to={link.to} aria-disabled={link.disabled} className={`transition-colors ${link.disabled ? "text-muted-foreground/50 pointer-events-none cursor-not-allowed" : "text-muted-foreground hover:text-primary"}`}>
+                <Link key={link.label} to={link.to} aria-disabled={link.disabled} tabIndex={link.disabled ? -1 : undefined} className={`transition-colors ${link.disabled ? "text-muted-foreground/50 pointer-events-none cursor-not-allowed" : "text-muted-foreground hover:text-primary"}`}>
                   {link.label}
                 </Link>
               ) : link.action ? (
@@ -40,7 +44,12 @@ export default function LandingFooter() {
             )}
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-border/60 text-center text-sm text-muted-foreground font-body font-light">
+        <div className="mt-6 text-center text-sm text-muted-foreground font-body">
+          <Link to="/accessibility" className="underline underline-offset-2 hover:text-primary transition-colors">
+            האתר הונגש לאנשים עם מוגבלות — להצהרת הנגישות
+          </Link>
+        </div>
+        <div className="mt-4 pt-6 border-t border-border/60 text-center text-sm text-muted-foreground font-body font-light">
           © {new Date().getFullYear()} UniClass. כל הזכויות שמורות.
         </div>
       </div>

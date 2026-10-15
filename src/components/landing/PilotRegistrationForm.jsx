@@ -13,6 +13,8 @@ export default function PilotRegistrationForm() {
   const [phoneError, setPhoneError] = useState("");
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [consentPrivacy, setConsentPrivacy] = useState(false);
+  const [consentMarketing, setConsentMarketing] = useState(false);
+  const [confirmNoMarketing, setConfirmNoMarketing] = useState(false);
 
   useEffect(() => {
     try {
@@ -59,10 +61,15 @@ export default function PilotRegistrationForm() {
       return;
     }
     setError("");
+    if (!consentMarketing) {
+      setConfirmNoMarketing(true);
+      return;
+    }
     doSubmit();
   };
 
   const doSubmit = async () => {
+    setConfirmNoMarketing(false);
     setLoading(true);
     setError("");
     try {
@@ -152,11 +159,35 @@ export default function PilotRegistrationForm() {
               <span className="sr-only"> (שדה חובה)</span>
             </label>
           </div>
+          <div className="flex items-start gap-3">
+            <input
+              id="consent-marketing"
+              type="checkbox"
+              checked={consentMarketing}
+              onChange={(e) => setConsentMarketing(e.target.checked)}
+              className="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-2 focus:ring-primary/30 focus:outline-none shrink-0"
+            />
+            <label htmlFor="consent-marketing" className="text-sm font-body text-foreground leading-relaxed">
+              אני מאשר/ת קבלת הודעות SMS ודוא"ל על השקת השירות, ומבין/ה שאפשר להסיר את ההסכמה בכל עת.
+            </label>
+          </div>
         </fieldset>
+        {confirmNoMarketing && (
+          <div role="alert" className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 space-y-3">
+            <p className="text-sm text-destructive font-body text-center leading-relaxed">לא סימנתם את ההסכמה לקבלת עדכונים ב-SMS ובמייל על השקת האתר. האם אתם בטוחים שברצונכם להגיש את הטופס מבלי לקבל עדכונים?</p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <button type="button" onClick={doSubmit} disabled={loading} className="px-5 py-2.5 bg-destructive text-destructive-foreground rounded-full text-sm font-body font-semibold shadow-sm hover:opacity-90 transition-opacity disabled:opacity-60 min-h-[44px] flex items-center justify-center gap-2">
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> שולח...</> : "כן, המשך ללא עדכונים"}
+              </button>
+              <button type="button" onClick={() => setConfirmNoMarketing(false)} className="px-5 py-2.5 border border-border rounded-full text-sm font-body font-semibold text-foreground hover:bg-muted/50 transition-colors min-h-[44px]">
+                חזרה לטופס
+              </button>
+            </div>
+          </div>
+        )}
         <button type="submit" disabled={loading || !consentAccepted} className="w-full py-3.5 bg-primary text-primary-foreground rounded-full text-base font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2">
           {loading ? <><Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> שולח...</> : "שמרו לי מקום בפיילוט"}
         </button>
-        <p className="text-xs text-muted-foreground text-center font-body leading-relaxed">בלחיצה על "שמרו לי מקום בפיילוט" אני מאשר/ת קבלת הודעת SMS ודוא"ל על השקת השירות.</p>
         {!consentAccepted && (
           <p className="text-xs text-destructive text-center font-body">כדי לשלוח את הטופס יש לאשר תחילה את השימוש בעוגיות ובאחסון מקומי בבאנר למטה.</p>
         )}

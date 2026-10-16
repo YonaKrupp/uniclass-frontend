@@ -48,6 +48,9 @@ import Terms from './pages/Terms';
 import Unsubscribe from './pages/Unsubscribe';
 import AccessibilityStatement from './pages/AccessibilityStatement';
 import AdminInterface from './pages/AdminInterface';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
+import AdminBlog from './pages/AdminBlog';
 
 function App() {
   return (
@@ -101,6 +104,9 @@ function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/accessibility" element={<AccessibilityStatement />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/admin/blog" element={<AdminBlog />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Router>

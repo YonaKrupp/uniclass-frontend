@@ -29,8 +29,8 @@ export default function LandingHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
-        <img src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c40751db9_Logo_UNICLASS_purple_PNG.png" alt="UniClass" className="h-7 sm:h-8 w-auto" />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14 md:h-16">
+        <img src="https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c40751db9_Logo_UNICLASS_purple_PNG.png" alt="UniClass" className="h-6 md:h-8 w-auto" />
         <nav className="hidden md:flex items-center gap-1" aria-label="ניווט ראשי">
           {navLinks.map((link) =>
             link.route ? (
@@ -51,7 +51,7 @@ export default function LandingHeader() {
           <Link to="/login-choice" aria-disabled="true" tabIndex={-1} className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm font-body font-medium text-muted-foreground/50 transition-colors pointer-events-none cursor-not-allowed">
             <LogIn className="w-4 h-4" aria-hidden="true" /> כניסה
           </Link>
-          <button onClick={() => scrollTo("register")} className="hidden sm:inline-flex items-center px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all">
+          <button onClick={() => scrollTo("register")} className="inline-flex items-center px-3.5 py-2 md:px-5 md:py-2.5 bg-primary text-primary-foreground rounded-full text-xs md:text-sm font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 md:hover:-translate-y-0.5 transition-all whitespace-nowrap">
             הצטרפו לפיילוט
           </button>
           <button onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label={menuOpen ? "סגירת תפריט" : "פתיחת תפריט"} className="md:hidden p-2 rounded-full text-foreground hover:bg-muted transition-colors">

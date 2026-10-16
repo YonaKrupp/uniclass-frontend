@@ -113,21 +113,21 @@ export default function PilotRegistrationForm() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-6 sm:p-8 border border-border shadow-sm space-y-5">
+      <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-5 md:p-8 border border-border shadow-sm space-y-4 md:space-y-5">
         <FormField label="שם מלא" icon={User} value={form.fullName} onChange={update("fullName")} placeholder="הכניסו את שמכם המלא" required autoComplete="name" />
         <div className="grid sm:grid-cols-2 gap-5">
           <div className="space-y-1">
-            <FormField label="אימייל" icon={Mail} type="email" value={form.email} onChange={handleEmailChange} placeholder="you@example.com" required autoComplete="email" describedBy={emailError ? "email-error" : undefined} />
+            <FormField label="אימייל" icon={Mail} type="email" inputMode="email" value={form.email} onChange={handleEmailChange} placeholder="you@example.com" required autoComplete="email" describedBy={emailError ? "email-error" : undefined} />
             {emailError && <p id="email-error" role="alert" className="text-xs text-destructive font-body">{emailError}</p>}
           </div>
           <div className="space-y-1">
-            <FormField label="טלפון" icon={Phone} value={form.phone} onChange={handlePhoneChange} placeholder="050-1234567" required autoComplete="tel" describedBy={phoneError ? "phone-error" : undefined} />
+            <FormField label="טלפון" icon={Phone} inputMode="tel" value={form.phone} onChange={handlePhoneChange} placeholder="050-1234567" required autoComplete="tel" describedBy={phoneError ? "phone-error" : undefined} />
             {phoneError && <p id="phone-error" role="alert" className="text-xs text-destructive font-body">{phoneError}</p>}
           </div>
         </div>
         <FormField label="מוסד לימודי / מקום עבודה" icon={Building2} value={form.institution} onChange={update("institution")} placeholder="לדוגמה: אוניברסיטה, מכללה או הוראה פרטית" required autoComplete="organization" />
         <FormField label="תואר / תחום הוראה" icon={BookMarked} value={form.subjects} onChange={update("subjects")} placeholder="לדוגמה: מדעי המחשב, מתמטיקה, הנדסה" required />
-        <div className="space-y-2">
+        <div className="hidden md:block space-y-2">
           <label htmlFor="pilot-notes" className="text-sm font-heading font-semibold text-foreground block">הערות</label>
           <textarea
             id="pilot-notes"
@@ -153,7 +153,7 @@ export default function PilotRegistrationForm() {
               aria-required="true"
               className="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-2 focus:ring-primary/30 focus:outline-none shrink-0"
             />
-            <label htmlFor="consent-privacy" className="text-sm font-body text-foreground leading-relaxed">
+            <label htmlFor="consent-privacy" className="text-xs md:text-sm font-body text-foreground leading-relaxed">
               קראתי ואני מסכים/ה ל<a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">מדיניות הפרטיות</a> ול<a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">תנאי השימוש</a>.
               <span aria-hidden="true" className="text-primary mr-1">*</span>
               <span className="sr-only"> (שדה חובה)</span>
@@ -167,7 +167,7 @@ export default function PilotRegistrationForm() {
               onChange={(e) => setConsentMarketing(e.target.checked)}
               className="mt-1 w-5 h-5 rounded border-border text-primary focus:ring-2 focus:ring-primary/30 focus:outline-none shrink-0"
             />
-            <label htmlFor="consent-marketing" className="text-sm font-body text-foreground leading-relaxed">
+            <label htmlFor="consent-marketing" className="text-xs md:text-sm font-body text-foreground leading-relaxed">
               אני מאשר/ת קבלת הודעות SMS ודוא"ל על השקת השירות, ומבין/ה שאפשר להסיר את ההסכמה בכל עת.
             </label>
           </div>
@@ -188,6 +188,9 @@ export default function PilotRegistrationForm() {
         <button type="submit" disabled={loading || !consentAccepted} className="w-full py-3.5 bg-primary text-primary-foreground rounded-full text-base font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2">
           {loading ? <><Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> שולח...</> : "שמרו לי מקום בפיילוט"}
         </button>
+        <p className="md:hidden text-xs text-muted-foreground text-center font-body leading-snug">
+          מיד אחרי ההרשמה נשלח לכם מייל עם כל הפרטים — ללא עלות וללא התחייבות.
+        </p>
         {!consentAccepted && (
           <p className="text-xs text-destructive text-center font-body">כדי לשלוח את הטופס יש לאשר תחילה את השימוש בעוגיות ובאחסון מקומי בבאנר למטה.</p>
         )}

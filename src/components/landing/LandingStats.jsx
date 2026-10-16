@@ -15,20 +15,20 @@ const stats = [
  */
 export default function LandingStats() {
   return (
-    <section aria-label="נתונים מרכזיים" className="relative py-24 sm:py-32 overflow-hidden" style={{ background: "hsl(240 10% 6%)" }}>
+    <section aria-label="נתונים מרכזיים" className="order-2 relative py-8 md:py-32 overflow-hidden" style={{ background: "hsl(240 10% 6%)" }}>
       {/* brand glow */}
       <div
-        className="absolute top-1/2 right-[8%] -translate-y-1/2 w-[520px] h-[520px] rounded-full blur-[150px] opacity-30 pointer-events-none"
+        className="hidden md:block absolute top-1/2 right-[8%] -translate-y-1/2 w-[520px] h-[520px] rounded-full blur-[150px] opacity-30 pointer-events-none"
         style={{ background: "radial-gradient(circle, hsl(266, 64%, 38%), transparent 70%)" }}
       />
       <div
-        className="absolute bottom-0 left-[14%] w-[360px] h-[360px] rounded-full blur-[130px] opacity-20 pointer-events-none"
+        className="hidden md:block absolute bottom-0 left-[14%] w-[360px] h-[360px] rounded-full blur-[130px] opacity-20 pointer-events-none"
         style={{ background: "radial-gradient(circle, hsl(32, 85%, 52%), transparent 70%)" }}
       />
 
       {/* data viz behind the numbers */}
       <svg
-        className="absolute inset-0 w-full h-full opacity-50 pointer-events-none"
+        className="absolute inset-0 w-full h-full opacity-30 md:opacity-50 pointer-events-none"
         viewBox="0 0 1200 400"
         preserveAspectRatio="none"
         aria-hidden="true"
@@ -77,16 +77,16 @@ export default function LandingStats() {
       </svg>
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-4 text-center">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10 lg:gap-4 text-center">
           {stats.map((s) => (
             <div key={s.label}>
               <p
-                className="text-4xl sm:text-5xl font-heading font-extrabold mb-3 text-white"
+                className="text-2xl md:text-5xl font-heading font-extrabold mb-1 md:mb-3 text-white"
                 style={s.accent ? { color: "hsl(32, 85%, 62%)" } : undefined}
               >
                 {s.value}
               </p>
-              <p className="text-sm text-white/80 font-body font-light leading-snug">{s.label}</p>
+              <p className="text-xs md:text-sm text-white/80 font-body font-light leading-snug">{s.label}</p>
             </div>
           ))}
         </div>

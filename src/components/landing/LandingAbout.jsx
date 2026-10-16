@@ -11,7 +11,7 @@ const ABOUT_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6
 
 export default function LandingAbout() {
   return (
-    <section id="about" aria-labelledby="about-title" className="relative bg-background py-20 sm:py-28">
+    <section id="about" aria-labelledby="about-title" className="hidden md:block relative bg-background py-20 sm:py-28">
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Text + large image */}
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-16">

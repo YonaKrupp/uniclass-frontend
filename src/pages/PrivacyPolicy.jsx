@@ -4,104 +4,190 @@ import { ArrowRight } from "lucide-react";
 
 const LOGO = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c40751db9_Logo_UNICLASS_purple_PNG.png";
 
+const DOC = `# מדיניות פרטיות – יוניקלאס (uniclass.co.il)
+
+עודכן לאחרונה: 15 באוקטובר 2026 · גרסה 1.0
+
+## 1. כללי
+
+1.1. מדיניות פרטיות זו מסבירה כיצד "יוניקלאס" (להלן: "אנחנו" או "המפעיל"), המופעלת על ידי עידן משלי, עוסק מורשה, אוספת, משתמשת ומגנה על מידע אישי של המשתמשים באתר uniclass.co.il (להלן: "האתר"), בהתאם לחוק הגנת הפרטיות, התשמ"א-1981 ותקנותיו.
+
+1.2. מדיניות זו מהווה חלק בלתי נפרד מתנאי השימוש של האתר ומשלימה את סעיף 15 שבהם. במקרה של סתירה בין השניים, תחול ההוראה המיטיבה עם המשתמש.
+
+1.3. השימוש באתר מהווה הסכמה למדיניות זו. אם אינך מסכים לה, אנא אל תשתמש באתר.
+
+1.4. מסירת מידע אישי אינה חובה על פי דין. עם זאת, בלי מסירת מידע בסיסי לא נוכל להפעיל חשבון, לתאם שיעורים או לבצע תשלום.
+
+## 2. איזה מידע אנו אוספים
+
+2.1. **פרטי זיהוי וקשר:** שם, כתובת דוא"ל, מספר טלפון, תפקיד באתר (תלמיד, הורה או מורה) ופרטי התחברות.
+
+2.2. **מידע על תלמידים:** שם התלמיד, גיל או שכבת גיל, מקצועות, רמה לימודית וצרכים לימודיים שנמסרו. כאשר מדובר בקטין, המידע נמסר על ידי הוריו.
+
+2.3. **מידע על מורים:** השכלה, ניסיון, תעודות, תמונה, תיאור אישי, מחירים, וכן פרטים הנדרשים לצורך תשלום והתחשבנות.
+
+2.4. **מידע על שיעורים ותקשורת:** מועדי שיעורים, הודעות בין משתמשים, ביקורות, פניות ותלונות.
+
+2.5. **מידע על תשלומים:** סכום, מועד ומצב העסקה. פרטי כרטיס האשראי המלאים מוזנים אצל ספק התשלום ואינם נשמרים אצלנו.
+
+2.6. **מידע טכני:** כתובת IP, סוג מכשיר ודפדפן, עמודים שנצפו וזמני גלישה, ונתונים הנאספים באמצעות עוגיות.
+
+## 3. למה אנו משתמשים במידע
+
+אנו משתמשים במידע למטרות הבאות בלבד:
+
+(א) הפעלת האתר והשירותים: יצירת חשבון, חיבור בין תלמיד למורה, תיאום שיעורים וביצוע תשלומים;
+
+(ב) תקשורת איתך: אישורים, תזכורות, הודעות שירות ומענה לפניות;
+
+(ג) אבטחה, מניעת הונאה והתעללות, בירור תלונות ואכיפת התנאים;
+
+(ד) עמידה בחובות חוקיות, לרבות חשבונאות ומיסוי;
+
+(ה) שיפור האתר וניתוח סטטיסטי של השימוש בו;
+
+(ו) שליחת תוכן שיווקי, אך ורק אם נתת הסכמה מפורשת. ניתן להסיר את ההסכמה בכל עת, בפנייה אלינו או בקישור ההסרה בהודעה עצמה.
+
+## 4. עם מי אנו חולקים מידע
+
+4.1. **עם המורה או התלמיד הרלוונטי:** בהיקף הנדרש לקיום השיעור בלבד.
+
+4.2. **עם ספקי תשלום:** כגון חברת הסליקה HYP, ובמסלול מתאים גם ספק גבייה והפקת מסמכים חיצוני שבחר המורה (כגון "איזי תלוש"), בהיקף הנדרש לביצוע העסקה ולהעברת הכסף.
+
+4.3. **עם ספקי שירות:** אחסון ותשתיות, דוא"ל והודעות, אנליטיקה ושיחות וידאו. ספקים אלה רשאים להשתמש במידע רק לצורך מתן שירותם אלינו.
+
+4.4. **עם רשויות:** אם הדין מחייב או מתיר זאת, בצו בית משפט, או לצורך הגנה על בטיחות משתמשים, מניעת הונאה והגנה על זכויותינו.
+
+4.5. **במקרה של מכירה או מיזוג** של הפעילות, המידע עשוי לעבור לרוכש, בכפוף להמשך החלת מדיניות זו.
+
+4.6. אנו לא מוכרים מידע אישי לצדדים שלישיים לצורכי פרסום.
+
+## 5. מידע על קטינים
+
+5.1. האתר מיועד לשימוש של קטינים רק באמצעות הורה או אפוטרופוס, או בהסכמתם. אנו אוספים מידע על קטין רק במידה הנדרשת לקיום השיעורים.
+
+5.2. איננו שולחים תוכן שיווקי לקטינים.
+
+5.3. הורה רשאי בכל עת לבקש לעיין במידע על ילדו, לתקנו או למחוק אותו, בפנייה לכתובת הדוא"ל שבסעיף 10.
+
+## 6. עוגיות (Cookies)
+
+האתר משתמש בעוגיות ובטכנולוגיות דומות לצורך הפעלתו התקינה, אבטחה וניתוח סטטיסטי של השימוש. ניתן לחסום או למחוק עוגיות בהגדרות הדפדפן. חסימה עלולה לפגוע בתפקוד חלקים מהאתר.
+
+## 7. העברת מידע לחו"ל
+
+ספקי שירות שלנו עשויים לאחסן או לעבד מידע בשרתים מחוץ לישראל. אנו פועלים לכך שהעברה כזו תיעשה בכפוף להגנות מתאימות ובהתאם לדין החל.
+
+## 8. שמירת מידע ואבטחה
+
+8.1. נשמור מידע כל עוד חשבונך פעיל, ולאחר מכן רק כל עוד נדרש לצורך המטרות שלעיל ולפי הדין. מסמכי חשבונאות וחשבוניות נשמרים למשך 7 שנים. עם מחיקת חשבון נמחק או נסיר זיהוי ממידע שאינו נחוץ עוד, בכפוף לחובות חוק, להגנה מפני תביעות ולמניעת הונאה.
+
+8.2. אנו נוקטים אמצעי אבטחה סבירים ומקובלים, בהתאם לתקנות הגנת הפרטיות (אבטחת מידע), התשע"ז-2017. עם זאת, לא ניתן להבטיח הגנה מוחלטת מפני חדירה או דליפת מידע.
+
+8.3. אם יתרחש אירוע אבטחה שמחייב דיווח לך או לרשות להגנת הפרטיות, נדווח כנדרש בדין.
+
+## 9. זכויותיך
+
+9.1. בהתאם לחוק, יש לך זכות לעיין במידע האישי שנשמר עליך, לבקש לתקנו אם אינו נכון, ולבקש למחוק אותו בתנאים שנקבעו בחוק, וכן להתנגד לשימוש בו לצורכי שיווק.
+
+9.2. לצורך מימוש הזכויות, פנה אלינו בדוא"ל. ייתכן שנבקש לאמת את זהותך. נשתדל להשיב בתוך 30 ימים.
+
+9.3. אם אינך מרוצה מהטיפול בפנייתך, תוכל לפנות לרשות להגנת הפרטיות.
+
+## 10. יצירת קשר ושינויים
+
+10.1. לשאלות, בקשות לעיון, תיקון או מחיקת מידע, ולכל עניין הקשור לפרטיות: idan@uniclass.co.il.
+
+10.2. אנו רשאים לעדכן מדיניות זו מעת לעת. שינוי מהותי יפורסם באתר ויישלח בדוא"ל למשתמשים רשומים לפחות 14 ימים לפני כניסתו לתוקף, ולא יחול על מידע שנאסף קודם לכן באופן שפוגע בזכויותיך. תאריך העדכון האחרון מופיע בראש המסמך.`;
+
+function renderInline(text, keyPrefix) {
+  const parts = [];
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let lastIndex = 0;
+  let match;
+  let i = 0;
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
+    const token = match[0];
+    if (token.startsWith("**")) {
+      parts.push(<strong key={`${keyPrefix}-b${i++}`} className="font-semibold text-foreground">{token.slice(2, -2)}</strong>);
+    } else {
+      parts.push(<em key={`${keyPrefix}-i${i++}`} className="text-muted-foreground">{token.slice(1, -1)}</em>);
+    }
+    lastIndex = match.index + token.length;
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return parts;
+}
+
+function renderDoc(doc) {
+  const blocks = [];
+  let list = [];
+  let key = 0;
+
+  const flushList = () => {
+    if (!list.length) return;
+    const current = list;
+    const listKey = key++;
+    blocks.push(
+      <ul key={`ul-${listKey}`} className="list-disc pr-6 space-y-2">
+        {current.map((item, idx) => (
+          <li key={idx}>{renderInline(item, `ul-${listKey}-${idx}`)}</li>
+        ))}
+      </ul>
+    );
+    list = [];
+  };
+
+  doc.split("\n").forEach((raw) => {
+    const line = raw.trim();
+    if (!line) {
+      flushList();
+      return;
+    }
+    if (line.startsWith("- ")) {
+      list.push(line.slice(2));
+      return;
+    }
+    flushList();
+    if (line.startsWith("## ")) {
+      const k = key++;
+      blocks.push(
+        <h2 key={`h2-${k}`} className="text-xl sm:text-2xl font-heading font-bold text-foreground pt-4">
+          {renderInline(line.slice(3), `h2-${k}`)}
+        </h2>
+      );
+    } else if (line.startsWith("# ")) {
+      const k = key++;
+      blocks.push(
+        <h1 key={`h1-${k}`} className="text-3xl sm:text-4xl font-heading font-bold text-foreground">
+          {renderInline(line.slice(2), `h1-${k}`)}
+        </h1>
+      );
+    } else if (line === "---") {
+      blocks.push(<hr key={`hr-${key++}`} className="border-border" />);
+    } else {
+      const k = key++;
+      blocks.push(<p key={`p-${k}`}>{renderInline(line, `p-${k}`)}</p>);
+    }
+  });
+
+  flushList();
+  return blocks;
+}
+
 export default function PrivacyPolicy() {
   return (
     <div dir="rtl" className="landing min-h-screen bg-background">
       <a href="#main-content" className="skip-link">דלג לתוכן הראשי</a>
-      <div id="main-content" className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <div id="main-content" className="max-w-[800px] mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <Link to="/" className="inline-flex items-center gap-2 text-sm font-body font-medium text-primary hover:underline mb-6">
           <ArrowRight className="w-4 h-4" aria-hidden="true" /> חזרה לדף הראשי
         </Link>
         <img src={LOGO} alt="UniClass" className="h-8 mb-6" />
-        <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-8">מדיניות פרטיות</h1>
 
-        <div className="space-y-6 text-sm sm:text-base text-muted-foreground font-body leading-relaxed">
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">1. מי אנחנו</h2>
-            <p>
-              מאגר המידע מוחזק על ידי [שם בעל המאגר / שם העסק], [כתובת], [דוא"ל ליצירת קשר]. לעניין מדיניות זו, "האתר" הוא אתר UniClass.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">2. איזה מידע נאסף</h2>
-            <p>בעת ההרשמה לפיילוט אנו אוספים את הפרטים הבאים:</p>
-            <ul className="list-disc pr-5 space-y-1">
-              <li>שם מלא</li>
-              <li>כתובת דוא"ל</li>
-              <li>מספר טלפון</li>
-              <li>מוסד לימודים / מקום עבודה</li>
-              <li>תואר או תחום הוראה</li>
-              <li>הערות שבחרת למסור</li>
-            </ul>
-            <p>הפלטפורמה המארחת עשויה לתעד נתונים טכניים בסיסיים ביומני שרת לצרכי אבטחה ותפעול בלבד. האתר עצמו אינו מפעיל כלי אנליטיקה או מעקב (פירוט בסעיף 8).</p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">3. מטרות האיסוף</h2>
-            <p>המידע נאסף ומשמש למטרות הבאות:</p>
-            <ul className="list-disc pr-5 space-y-1">
-              <li>הרשמה לפיילוט ויצירת קשר עמך.</li>
-              <li>שליחת הודעות על השקת השירות, וזאת אך ורק אם נתת לכך הסכמה מפורשת נפרדת.</li>
-              <li>שיפור ופיתוח השירות.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">4. האם חובה למסור את המידע</h2>
-            <p>
-              מסירת המידע אינה חובה על פי דין. עם זאת, ללא השדות שנבחרו כשדות חובה לא ניתן יהיה להשלים את ההרשמה לפיילוט.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">5. העברת מידע לספקי שירות ואחסון מחוץ לישראל</h2>
-            <p>
-              המידע עשוי להיות מועבר לספקי שירות טכניים המסייעים בהפעלת האתר, ובכלל זה שירותי אחסון, שליחת דוא"ל ו-SMS. [יש לפרט את שמות הספקים בפועל.] המידע עשוי להיות מאוחסן בשרתים הממוקמים מחוץ למדינת ישראל. המידע אינו נמכר לצדדים שלישיים.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">6. אבטחת מידע</h2>
-            <p>
-              אנו נוקטים באמצעי הגנה סבירים להגנה על המידע, לרבות העברת מידע מוצפנת בפרוטוקול HTTPS. עם זאת, אין אבטחה מוחלטת, ואיננו יכולים להבטיח הגנה מלאה מפני חדירה.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">7. שמירת המידע</h2>
-            <p>
-              המידע יישמר למשך [תקופה, למשל 24 חודשים] ממועד ההרשמה, או עד בקשת מחיקת המידע מצידך, המוקדם מביניהם.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">8. עוגיות ואחסון מקומי</h2>
-            <p>
-              האתר משתמש באחסון מקומי בדפדפן (localStorage) לצרכים טכניים בלבד, כגון שמירת אסימון כניסה והעדפות. האתר אינו משתמש בכלי אנליטיקה או בפיקסלים של צדדים שלישיים, ואינו טוען עוגיות שאינן הכרחיות לתפעולו.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">9. זכויות המשתמש</h2>
-            <p>על פי חוק הגנת הפרטיות, התשנ"ה-1981, זכאי אתה:</p>
-            <ul className="list-disc pr-5 space-y-1">
-              <li>לעיין במידע המוחזק עליך.</li>
-              <li>לבקש תיקון של מידע שגוי.</li>
-              <li>לבקש מחיקת המידע.</li>
-              <li>להסיר את עצמך מרשימת הדיוור בכל עת.</li>
-            </ul>
-            <p>
-              למימוש זכויות אלו ניתן לפנות אלינו בכתובת [דוא"ל ליצירת קשר]. להסרה מרשימת הדיוור ניתן לפנות אלינו באותה כתובת, או באמצעות הפרטים בעמוד <Link to="/unsubscribe" className="text-primary underline underline-offset-2">ההסרה מדיוור</Link>.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-heading font-semibold text-foreground">10. עדכון המדיניות</h2>
-            <p>
-              רשאים אנו לעדכן מדיניות זו מעת לעת. הגרסה המעודכנת תפורסם בעמוד זה. תאריך עדכון אחרון: [תאריך].
-            </p>
-          </section>
+        <div className="space-y-5 text-base text-muted-foreground font-body leading-8">
+          {renderDoc(DOC)}
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { useId } from "react";
 
-export default function FormField({ label, icon: Icon, type = "text", value, onChange, placeholder, required, select, options, autoComplete, describedBy }) {
+export default function FormField({ label, icon: Icon, type = "text", value, onChange, placeholder, required, select, options, autoComplete, inputMode, describedBy }) {
   const fieldId = useId();
   const inputClass = `w-full ${Icon ? "pr-10" : "pr-4"} pl-4 py-3 bg-muted/30 border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-card focus:ring-2 focus:ring-primary/30 focus:border-primary focus:shadow-sm focus:shadow-primary/10 transition-all text-base font-body min-h-[48px]`;
   return (
@@ -18,7 +18,7 @@ export default function FormField({ label, icon: Icon, type = "text", value, onC
             {options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
           </select>
         ) : (
-          <input id={fieldId} type={type} value={value} onChange={onChange} placeholder={placeholder} required={required} autoComplete={autoComplete} aria-required={required ? "true" : undefined} aria-describedby={describedBy || undefined} className={inputClass} />
+          <input id={fieldId} type={type} inputMode={inputMode} value={value} onChange={onChange} placeholder={placeholder} required={required} autoComplete={autoComplete} aria-required={required ? "true" : undefined} aria-describedby={describedBy || undefined} className={inputClass} />
         )}
       </div>
     </div>

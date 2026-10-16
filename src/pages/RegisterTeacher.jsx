@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, Eye, EyeOff, Loader2, Sun, Moon, User, Phone, ArrowRight, ShieldCheck, KeyRound } from "lucide-react";
 import { useDarkMode } from "@/lib/useDarkMode";
+import TeacherBenefits from "@/components/register-teacher/TeacherBenefits";
+import TeacherHowItWorks from "@/components/register-teacher/TeacherHowItWorks";
+import TeacherFaq from "@/components/register-teacher/TeacherFaq";
+import TeacherStickyCta from "@/components/register-teacher/TeacherStickyCta";
+import TeacherThanks from "@/components/register-teacher/TeacherThanks";
 
 const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
@@ -22,6 +27,10 @@ export default function RegisterTeacher() {
   const [resendCooldown, setResendCooldown] = useState(0);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const navigate = useNavigate();
+
+  const scrollToForm = () => {
+    document.getElementById("register-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // Restore form data if returning from terms page or Google auth redirect
   useEffect(() => {
@@ -144,7 +153,11 @@ export default function RegisterTeacher() {
       sessionStorage.setItem("authToken", token);
       sessionStorage.setItem("userData", JSON.stringify(loginData));
 
-      navigate("/teacher-profile");
+      if (window.matchMedia("(max-width: 767.98px)").matches) {
+        setStep("thanks");
+      } else {
+        navigate("/teacher-profile");
+      }
     } catch (err) {
       setError("שגיאה: " + (err.message || "בדקו את החיבור לאינטרנט ונסו שוב."));
     } finally {
@@ -178,8 +191,24 @@ export default function RegisterTeacher() {
     }
   };
 
+  const errorTarget = !error
+    ? null
+    : error.includes("סיסמאות")
+    ? "confirmPassword"
+    : error.includes("סיסמה")
+    ? "password"
+    : error.includes("טלפון")
+    ? "phone"
+    : error.includes("תנאי")
+    ? "terms"
+    : "top";
+
+  if (step === "thanks") {
+    return <TeacherThanks onContinue={() => navigate("/teacher-profile")} />;
+  }
+
   return (
-    <div dir="rtl" className="min-h-screen bg-background flex flex-col items-center justify-center px-4 overflow-x-hidden">
+    <div dir="rtl" className="min-h-screen bg-background flex flex-col items-center justify-center px-4 pb-24 md:pb-0 overflow-x-hidden">
       <button
         onClick={() => setDark(!dark)}
         className="fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm"
@@ -193,25 +222,52 @@ export default function RegisterTeacher() {
       </div>
 
       <div className="relative z-10 w-full max-w-md mx-auto">
-        <div className="text-center mb-8 space-y-3">
-          <div className="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center">
+        <div className="text-center mb-5 md:mb-8 space-y-3">
+          <div className="w-12 h-12 md:w-16 md:h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center">
             {step === "form" ? (
-              <Briefcase className="w-8 h-8 text-primary" />
+              <Briefcase className="w-6 h-6 md:w-8 md:h-8 text-primary" />
             ) : (
-              <ShieldCheck className="w-8 h-8 text-primary" />
+              <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-primary" />
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground">
-            {step === "form" ? "רישום מורה" : "אימות קוד"}
+          <h1 className="text-xl md:text-3xl font-heading font-bold text-foreground">
+            {step === "form" ? (
+              <>
+                <span className="hidden md:inline">רישום מורה</span>
+                <span className="md:hidden">אפס עלות עד שמרוויחים משיעורים פרטיים</span>
+              </>
+            ) : (
+              "אימות קוד"
+            )}
           </h1>
           <p className="text-muted-foreground font-body">
-            {step === "form" ? "צרו חשבון מורה חדש" : `קוד אימות נשלח ל-${email}`}
+            {step === "form" ? (
+              <>
+                <span className="hidden md:inline">צרו חשבון מורה חדש</span>
+                <span className="md:hidden">פתחו פרופיל מורה בחינם בדקה אחת</span>
+              </>
+            ) : (
+              `קוד אימות נשלח ל-${email}`
+            )}
           </p>
+          {step === "form" && (
+            <button
+              type="button"
+              onClick={scrollToForm}
+              className="md:hidden w-full min-h-[52px] rounded-xl bg-primary text-primary-foreground text-base font-heading font-semibold shadow-lg shadow-primary/25 active:scale-[0.98] transition-transform mt-2"
+            >
+              הרשמה
+            </button>
+          )}
         </div>
 
-        <div className="bg-card rounded-2xl shadow-xl border border-border p-6 sm:p-8 space-y-6">
+        <div id="register-form" className="bg-card rounded-2xl shadow-xl border border-border p-6 sm:p-8 space-y-6 scroll-mt-4">
           {error && (
-            <div className="bg-destructive/10 text-destructive text-sm rounded-xl p-3 text-center font-body">
+            <div
+              className={`bg-destructive/10 text-destructive text-sm rounded-xl p-3 text-center font-body ${
+                errorTarget === "top" ? "" : "hidden md:block"
+              }`}
+            >
               {error}
             </div>
           )}
@@ -229,12 +285,14 @@ export default function RegisterTeacher() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="הכניסו את האימייל שלכם"
                     required
+                    autoComplete="email"
+                    inputMode="email"
                     className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <label className="text-sm font-heading font-medium text-foreground">שם פרטי</label>
                   <div className="relative">
@@ -245,6 +303,7 @@ export default function RegisterTeacher() {
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="שם פרטי"
                       required
+                      autoComplete="given-name"
                       className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                     />
                   </div>
@@ -260,6 +319,7 @@ export default function RegisterTeacher() {
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="שם משפחה"
                       required
+                      autoComplete="family-name"
                       className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                     />
                   </div>
@@ -276,9 +336,14 @@ export default function RegisterTeacher() {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="050-1234567"
                     required
+                    inputMode="tel"
+                    autoComplete="tel"
                     className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
                 </div>
+                {errorTarget === "phone" && (
+                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -290,6 +355,7 @@ export default function RegisterTeacher() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="לפחות 6 תווים"
+                    autoComplete="new-password"
                     required
                     className="w-full pr-10 pl-12 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
@@ -301,6 +367,9 @@ export default function RegisterTeacher() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {errorTarget === "password" && (
+                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -312,6 +381,7 @@ export default function RegisterTeacher() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="הזינו שוב את הסיסמה"
+                    autoComplete="new-password"
                     required
                     className="w-full pr-10 pl-12 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
@@ -323,6 +393,9 @@ export default function RegisterTeacher() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {errorTarget === "confirmPassword" && (
+                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
+                )}
               </div>
 
               {/* Terms of Service */}
@@ -351,6 +424,9 @@ export default function RegisterTeacher() {
                     </a>
                   </span>
                 </label>
+                {errorTarget === "terms" && (
+                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
+                )}
               </div>
 
               <button
@@ -365,7 +441,8 @@ export default function RegisterTeacher() {
                   </>
                 ) : (
                   <>
-                    שלח קוד אימות
+                    <span className="hidden md:inline">שלח קוד אימות</span>
+                    <span className="md:hidden">הצטרף כמורה</span>
                     <ArrowRight className="w-5 h-5 rotate-180" />
                   </>
                 )}
@@ -448,12 +525,28 @@ export default function RegisterTeacher() {
           )}
         </div>
 
+        {step === "form" && (
+          <div className="md:hidden mt-10 space-y-8">
+            <TeacherBenefits />
+            <TeacherHowItWorks />
+            <TeacherFaq />
+            <button
+              type="button"
+              onClick={scrollToForm}
+              className="w-full min-h-[52px] rounded-xl bg-primary text-primary-foreground text-base font-heading font-semibold shadow-lg shadow-primary/25 active:scale-[0.98] transition-transform"
+            >
+              הרשמה
+            </button>
+          </div>
+        )}
+
         <div className="text-center mt-6">
           <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors font-body">
             ← חזרה לדף הראשי
           </Link>
         </div>
       </div>
+      {step === "form" && <TeacherStickyCta targetId="register-form" />}
     </div>
   );
 }

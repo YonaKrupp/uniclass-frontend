@@ -12,17 +12,30 @@ const steps = [
 export default function LandingHowItWorks() {
   const [featured, ...rest] = steps;
   return (
-    <section id="how-it-works" aria-labelledby="how-title" className="relative bg-background py-20 sm:py-28">
+    <section id="how-it-works" aria-labelledby="how-title" className="order-4 relative bg-background py-10 md:py-28">
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <h2 id="how-title" className="text-4xl sm:text-5xl font-heading font-bold tracking-tight text-foreground mb-4">
+        <div className="text-center mb-6 md:mb-12">
+          <h2 id="how-title" className="text-2xl md:text-5xl font-heading font-bold tracking-tight text-foreground mb-2 md:mb-4">
             איך זה עובד?
           </h2>
-          <p className="text-lg text-muted-foreground font-body font-light">שלבים פשוטים להתחיל להרוויח מהידע שלכם</p>
+          <p className="text-sm md:text-lg text-muted-foreground font-body font-light">שלבים פשוטים להתחיל להרוויח מהידע שלכם</p>
         </div>
 
+        {/* Mobile: compact steps */}
+        <ul className="md:hidden space-y-2.5">
+          {steps.map((step, i) => (
+            <li key={step.title} className="flex items-start gap-3 bg-card rounded-xl border border-border px-3.5 py-3">
+              <span className="w-7 h-7 shrink-0 rounded-lg flex items-center justify-center font-heading font-bold text-xs text-primary-foreground bg-primary">{i + 1}</span>
+              <div className="min-w-0">
+                <h3 className="font-heading font-semibold text-sm text-foreground">{step.title}</h3>
+                <p className="text-xs text-muted-foreground font-body font-light leading-snug mt-0.5">{step.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
         {/* Full-width image with step 1 overlay */}
-        <div className="relative rounded-2xl overflow-hidden border border-border shadow-lg mb-8">
+        <div className="hidden md:block relative rounded-2xl overflow-hidden border border-border shadow-lg mb-8">
           <img src={STUDENT_IMG} alt="סטודנט לומד" className="w-full aspect-[21/9] object-cover" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to left, hsl(240 10% 6% / 0.82) 0%, hsl(240 10% 6% / 0.1) 55%, transparent 100%)" }} />
           <div className="absolute bottom-7 right-7 max-w-sm">
@@ -36,7 +49,7 @@ export default function LandingHowItWorks() {
         </div>
 
         {/* Steps 2 & 3 */}
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="hidden md:grid sm:grid-cols-2 gap-6">
           {rest.map((step, i) => (
             <div key={step.title} className="bg-card rounded-2xl border border-border p-7">
               <div className="flex items-center gap-3 mb-3">

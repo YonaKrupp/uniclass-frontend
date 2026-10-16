@@ -18,7 +18,7 @@ const FEATURES_MOCKUP = "https://media.base44.com/images/public/6a37f1517bf59551
 
 export default function LandingFeatures() {
   return (
-    <section id="features" aria-labelledby="features-title" className="relative bg-background py-20 sm:py-28">
+    <section id="features" aria-labelledby="features-title" className="hidden md:block relative bg-background py-20 sm:py-28">
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Centered intro */}
         <div className="text-center mb-10">

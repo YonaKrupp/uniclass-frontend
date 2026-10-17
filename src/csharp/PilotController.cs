@@ -76,7 +76,9 @@ namespace MyApi.Controllers
                         // parameter is a plain int and the table column is not nullable.
                         cmd.Parameters.AddWithValue("@gn32_read_and_agree", request.gn32_read_and_agree);
                         cmd.Parameters.AddWithValue("@gn32_accept_mail_sms", request.gn32_accept_mail_sms);
-                        cmd.Parameters.AddWithValue("@gn32_utm_source", (object)request.gn32_utm_source ?? DBNull.Value);
+                        // מקור ההגעה: תמיד מחרוזת (גם ריקה) — אף פעם לא DBNull,
+                        // כדי שעמודה NOT NULL לא תחזיר "Nullable object must have a value".
+                        cmd.Parameters.AddWithValue("@gn32_utm_source", request.gn32_utm_source ?? string.Empty);
 
                         await cmd.ExecuteNonQueryAsync();
                     }
@@ -93,7 +95,7 @@ namespace MyApi.Controllers
                     // אבחון — מזהה הגרסה שענתה לבקשה.
                     // אם השדה הזה לא מופיע בתשובה שהאפליקציה מקבלת,
                     // השרת מריץ build ישן ולא את הקוד הזה.
-                    build = "2026-10-17-consent-fix",
+                    build = "2026-10-17-utm-fix",
                     message = "פרטי הפיילוט נשמרו בהצלחה"
                 });
             }
@@ -135,7 +137,8 @@ namespace MyApi.Controllers
         public int gn32_accept_mail_sms { get; set; }
 
         // מקור ההגעה מהכתובת של דף הנחיתה (?utm_source=...).
+        // ברירת מחדל למחרוזת ריקה — אם השדה חסר ב-JSON הוא לא יהיה null.
         [JsonPropertyName("gn32_utm_source")]
-        public string gn32_utm_source { get; set; }
+        public string gn32_utm_source { get; set; } = string.Empty;
     }
 }

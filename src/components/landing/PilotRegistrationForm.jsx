@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, CheckCircle2, User, Mail, Phone, BookMarked, Building2 } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import FormField from "./FormField";
-
-const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
 export default function PilotRegistrationForm() {
   const [loading, setLoading] = useState(false);
@@ -72,28 +71,27 @@ export default function PilotRegistrationForm() {
     setConfirmNoMarketing(false);
     setLoading(true);
     setError("");
+    const payload = {
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      educationalInstitution: form.institution,
+      academicDegree: form.subjects,
+      gn32_Notes: form.notes,
+      gn32_read_and_agree: consentPrivacy ? 1 : 0,
+      gn32_accept_mail_sms: consentMarketing ? 1 : 0,
+    };
     try {
-      const response = await fetch(`${API_BASE}/pilotInsertProxy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          email: form.email,
-          phone: form.phone,
-          educationalInstitution: form.institution,
-          academicDegree: form.subjects,
-          gn32_Notes: form.notes,
-        }),
-      });
-      const res = await response.json();
-      if (res?.error || res?._status >= 400) {
+      const response = await base44.functions.invoke("pilotInsertProxy", payload);
+      const res = response?.data ?? response;
+      if (res?.error) {
         setError(res?.error || "שגיאה בשליחת הטופס. נסו שוב.");
       } else {
         setSuccess(true);
       }
     } catch (err) {
       console.error("Pilot registration error:", err);
-      setError("שגיאה בשליחת הטופס. נסו שוב.");
+      setError(err?.response?.data?.error || "שגיאה בשליחת הטופס. נסו שוב.");
     } finally {
       setLoading(false);
     }

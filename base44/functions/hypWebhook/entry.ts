@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
-import { getApiBaseFromAppUrl } from '../../shared/apiBase.ts';
+import { getApiBaseFromAppUrl, PRODUCTION_BASE } from '../../shared/apiBase.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -26,7 +26,9 @@ Deno.serve(async (req) => {
     console.log("[hypWebhook] Processing payment: Order=" + Order + ", CCode=" + CCode + ", Amount=" + Amount);
 
     // Look up the saved appBaseUrl by order to determine which C# API to call
-    let apiBase = 'https://hacking-frighten-dandy.ngrok-free.dev';
+    // Production is the only API the app talks to; the saved appBaseUrl is kept
+    // for backwards compatibility with orders created before this change.
+    let apiBase = PRODUCTION_BASE;
     try {
       const base44 = createClientFromRequest(req);
       if (Order) {

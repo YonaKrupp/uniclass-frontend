@@ -25,7 +25,7 @@ export default function LandingHero() {
             
 
             <h1 id="hero-title" className="app-fade-up text-3xl md:text-6xl font-heading font-extrabold tracking-tight mb-3 md:mb-6 leading-[1.15] md:leading-[1.1] text-foreground" style={{ animationDelay: "0.05s" }}>
-              הידע שלכם שווה כסף...
+              הידע שלכם שווה כסף
               <br />
               אתם קובעים מתי וכמה.
             </h1>

@@ -101,6 +101,8 @@ export default function TeacherLayout() {
               <div className="w-px h-5 bg-border mx-2" />
               <button
                 onClick={() => setDark(!dark)}
+                aria-label={dark ? "מעבר למצב בהיר" : "מעבר למצב כהה"}
+                aria-pressed={dark ? "true" : "false"}
                 className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 title={dark ? "מצב בהיר" : "מצב כהה"}
               >
@@ -118,6 +120,8 @@ export default function TeacherLayout() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? "סגירת תפריט הניווט" : "פתיחת תפריט הניווט"}
+              aria-expanded={menuOpen}
               className="lg:hidden p-2 rounded-md text-foreground hover:bg-muted transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

@@ -254,6 +254,7 @@ export default function StudentPayment() {
           <button
             onClick={() => fetchData(true)}
             disabled={refreshing}
+            aria-label="רענון הנתונים"
             className="p-2 hover:bg-muted rounded-lg transition-colors disabled:opacity-50"
             title="רענן נתונים"
           >

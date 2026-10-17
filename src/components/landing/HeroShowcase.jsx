@@ -44,7 +44,7 @@ export default function HeroShowcase() {
       <div className="absolute top-20 left-0 w-[230px] sm:w-[280px]">
         <div className="bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
           <div className="relative">
-            <img src={VIDEO_TEACHER} alt="שיעור וידאו חי" className="w-full h-36 sm:h-40 object-cover" />
+            <img src={VIDEO_TEACHER} alt="שיעור מתמטיקה אונליין בשידור חי" className="w-full h-36 sm:h-40 object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute top-2 right-2 flex items-center gap-1 bg-red-500/90 text-white text-[9px] font-body font-semibold px-2 py-0.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> שידור חי
@@ -71,7 +71,7 @@ export default function HeroShowcase() {
       <div className="absolute bottom-0 right-4 w-[190px] sm:w-[220px]">
         <div className="bg-card rounded-2xl border border-border shadow-lg p-4 text-center">
           <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-2 ring-2 ring-primary/15">
-            <img src={TEACHER_PORTRAIT} alt="פרופיל מורה" className="w-full h-full object-cover" />
+            <img src={TEACHER_PORTRAIT} alt="תמונת הפרופיל של המורה דנה לוי" className="w-full h-full object-cover" />
           </div>
           <div className="flex items-center justify-center gap-0.5 mb-1">
             {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 text-primary fill-primary" />)}

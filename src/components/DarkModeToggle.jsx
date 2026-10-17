@@ -7,6 +7,7 @@ export default function DarkModeToggle() {
   return (
     <button
       onClick={() => setDark(!dark)}
+      aria-label={dark ? "מעבר למצב בהיר" : "מעבר למצב כהה"}
       className="fixed top-3 left-3 z-[9999] p-2 rounded-full bg-card border border-border shadow-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
       title={dark ? "מצב בהיר" : "מצב כהה"}
     >

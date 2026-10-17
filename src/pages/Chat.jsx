@@ -228,6 +228,7 @@ export default function Chat() {
           </button>
           <button
             onClick={() => { setShowNewChat(false); setNewChatEmail(""); }}
+            aria-label="סגירת חלון שיחה חדשה"
             className="p-2.5 rounded-xl text-muted-foreground hover:bg-muted"
           >
             <X className="w-5 h-5" />
@@ -284,6 +285,7 @@ export default function Chat() {
               <div className="px-4 py-3 border-b border-border flex items-center gap-2">
                 <button
                   onClick={() => { setSelectedEmail(null); setMessages([]); }}
+                  aria-label="חזרה לרשימת השיחות"
                   className="sm:hidden p-1 rounded-lg hover:bg-muted"
                 >
                   <ArrowRight className="w-5 h-5 text-foreground" />
@@ -345,6 +347,7 @@ export default function Chat() {
                 <button
                   onClick={handleSendMessage}
                   disabled={!messageInput.trim() || sending}
+                  aria-label="שליחת הודעה"
                   className="bg-primary text-primary-foreground rounded-xl p-2.5 hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-5 h-5" />

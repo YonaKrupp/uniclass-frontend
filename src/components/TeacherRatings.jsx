@@ -23,6 +23,7 @@ export default function TeacherRatings({ ratings }) {
           <button
             type="button"
             onClick={goPrev}
+            aria-label="הדירוג הקודם"
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
           >
             <ChevronRight className="w-5 h-5" />
@@ -56,6 +57,7 @@ export default function TeacherRatings({ ratings }) {
           <button
             type="button"
             onClick={goNext}
+            aria-label="הדירוג הבא"
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
           >
             <ChevronLeft className="w-5 h-5" />

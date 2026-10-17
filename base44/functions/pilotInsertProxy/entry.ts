@@ -5,7 +5,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const {
       fullName, email, phone, educationalInstitution, academicDegree, gn32_Notes,
-      gn32_read_and_agree, gn32_accept_mail_sms,
+      gn32_read_and_agree, gn32_accept_mail_sms, gn32_utm_source,
     } = body;
 
     const API_BASE = getApiBase(req);
@@ -18,6 +18,7 @@ Deno.serve(async (req) => {
       fullName, email, phone, educationalInstitution, academicDegree, gn32_Notes: gn32_Notes ?? '',
       gn32_read_and_agree: gn32_read_and_agree ? 1 : 0,
       gn32_accept_mail_sms: gn32_accept_mail_sms ? 1 : 0,
+      gn32_utm_source: gn32_utm_source ?? '',
     };
 
     const apiRes = await fetch(`${API_BASE}/api/Pilot/insert_pilot`, {

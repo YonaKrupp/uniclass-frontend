@@ -381,14 +381,14 @@ export default function StudentSchedule() {
 
       {/* Week navigation */}
       <div className="flex items-center justify-between bg-card rounded-2xl border border-border p-3">
-        <button onClick={handlePrevWeek} className="p-2 rounded-lg hover:bg-muted transition-colors">
+        <button onClick={handlePrevWeek} aria-label="שבוע קודם" className="p-2 rounded-lg hover:bg-muted transition-colors">
           <ChevronRight className="w-5 h-5" />
         </button>
         <span className="font-heading font-medium text-foreground text-sm sm:text-base">{weekRange}</span>
-        <button onClick={handleNextWeek} className="p-2 rounded-lg hover:bg-muted transition-colors">
+        <button onClick={handleNextWeek} aria-label="שבוע הבא" className="p-2 rounded-lg hover:bg-muted transition-colors">
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <button onClick={loadWeekSlots} className="p-2 rounded-lg hover:bg-muted transition-colors">
+        <button onClick={loadWeekSlots} aria-label="רענון היומן" className="p-2 rounded-lg hover:bg-muted transition-colors">
           <RefreshCw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>

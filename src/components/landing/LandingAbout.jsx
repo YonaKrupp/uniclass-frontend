@@ -26,7 +26,7 @@ export default function LandingAbout() {
 
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden border border-border shadow-lg">
-              <img src={ABOUT_IMG} alt="שיעור אונליין ב-UniClass" className="w-full aspect-[4/3] object-cover" />
+              <img src={ABOUT_IMG} alt="שיעור פרטי אונליין בין מורה לתלמיד" className="w-full aspect-[4/3] object-cover" />
               <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-card/95 backdrop-blur border border-border rounded-lg px-3 py-2 shadow-sm">
                 <span className="flex items-center justify-center w-7 h-7 rounded-md bg-primary/10 text-primary text-xs font-heading font-bold">AI</span>
                 <span className="text-xs font-body font-medium text-foreground">סיכום שיעור אוטומטי</span>

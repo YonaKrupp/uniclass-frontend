@@ -60,6 +60,7 @@ export default function SubjectsFreeAllList({ items, onSelect, saving }) {
           <button
             type="button"
             onClick={() => setQuery("")}
+            aria-label="ניקוי החיפוש"
             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
           >
             <X className="w-4 h-4 pointer-events-none" />

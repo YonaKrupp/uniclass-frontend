@@ -177,7 +177,7 @@ export default function TeacherPicture() {
           ) : pictureUrl ? (
             <img
               src={pictureUrl}
-              alt="תמונת מורה"
+              alt="תמונת הפרופיל שלך"
               className="w-[150px] h-[200px] object-cover rounded-xl border border-border shadow-md"
             />
           ) : (
@@ -197,7 +197,7 @@ export default function TeacherPicture() {
           {previewUrl ? (
             <img
               src={previewUrl}
-              alt="תצוגה מקדימה"
+              alt="תצוגה מקדימה של תמונת הפרופיל החדשה"
               className="w-[150px] h-[200px] object-cover rounded-xl border border-border shadow-md"
             />
           ) : (

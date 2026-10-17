@@ -118,7 +118,7 @@ export default function BlogPost() {
         {article.cover_image && (
           <img
             src={article.cover_image}
-            alt={article.cover_image_alt || ""}
+            alt={article.cover_image_alt || article.title || ""}
             className="w-full rounded-2xl border border-border mb-8"
           />
         )}

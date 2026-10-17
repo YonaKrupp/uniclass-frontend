@@ -163,6 +163,8 @@ export default function RegisterStudent() {
     <div dir="rtl" className="min-h-screen bg-background flex flex-col items-center justify-center px-4 overflow-x-hidden">
       <button
         onClick={() => setDark(!dark)}
+        aria-label={dark ? "מעבר למצב בהיר" : "מעבר למצב כהה"}
+        aria-pressed={dark ? "true" : "false"}
         className="fixed top-4 left-4 z-50 p-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm"
         title={dark ? "מצב בהיר" : "מצב כהה"}
       >
@@ -277,6 +279,7 @@ export default function RegisterStudent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "הסתרת הסיסמה" : "הצגת הסיסמה"}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -299,6 +302,7 @@ export default function RegisterStudent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "הסתרת הסיסמה" : "הצגת הסיסמה"}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}

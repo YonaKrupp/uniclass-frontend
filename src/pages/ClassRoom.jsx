@@ -363,6 +363,7 @@ export default function ClassRoom() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={toggleFullscreen}
+                    aria-label={isFullscreen ? "יציאה ממצב מסך מלא" : "מעבר למצב מסך מלא"}
                     className={isFullscreen
                       ? "p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
                       : "p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"

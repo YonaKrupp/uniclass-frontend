@@ -467,7 +467,7 @@ export default function TeacherProfile() {
               {profilePictureSrc ? (
                 <img
                   src={profilePictureSrc}
-                  alt="תמונת פרופיל"
+                  alt="תמונת הפרופיל שלי"
                   className="w-[100px] h-[130px] object-cover rounded-xl border border-border shadow"
                 />
               ) : (
@@ -569,6 +569,7 @@ export default function TeacherProfile() {
                     <button
                       type="button"
                       onClick={() => { setAboutText(String(value ?? "")); setEditingAbout(true); }}
+                      aria-label="עריכת טקסט אודות"
                       className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-muted transition-colors shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
                       title="עריכת אודות"
                     >
@@ -585,6 +586,7 @@ export default function TeacherProfile() {
                         setHourlyValue(clamped);
                         setEditingHourly(true);
                       }}
+                      aria-label="עריכת שכר לשיעור"
                       className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-muted transition-colors shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
                       title="עריכת שכר לשיעור"
                     >
@@ -739,6 +741,7 @@ export default function TeacherProfile() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setRatingIndex((i) => (i - 1 + ratings.length) % ratings.length)}
+                    aria-label="הדירוג הקודם"
                     className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -765,6 +768,7 @@ export default function TeacherProfile() {
 
                   <button
                     onClick={() => setRatingIndex((i) => (i + 1) % ratings.length)}
+                    aria-label="הדירוג הבא"
                     className="p-2 rounded-lg border border-border hover:bg-muted transition-colors"
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -840,6 +844,7 @@ export default function TeacherProfile() {
               <button
                 type="button"
                 onClick={() => setDocumentPreview(null)}
+                aria-label="סגירת התצוגה המקדימה של התעודה"
                 className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -847,11 +852,11 @@ export default function TeacherProfile() {
             </div>
             <div className="flex-1 overflow-auto p-4 flex items-center justify-center">
               {typeof documentPreview === "string" && documentPreview.startsWith("data:") ? (
-                <img src={documentPreview} alt="תעודה" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
+                <img src={documentPreview} alt="תעודת הסמכה של המורה" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
               ) : typeof documentPreview === "string" && documentPreview.startsWith("data:image") ? (
-                <img src={documentPreview} alt="תעודה" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
+                <img src={documentPreview} alt="תעודת הסמכה של המורה" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
               ) : typeof documentPreview === "string" ? (
-                <img src={`data:image/jpeg;base64,${documentPreview}`} alt="תעודה" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
+                <img src={`data:image/jpeg;base64,${documentPreview}`} alt="תעודת הסמכה של המורה" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
               ) : (
                 <pre className="text-xs font-mono text-muted-foreground whitespace-pre-wrap break-all">{JSON.stringify(documentPreview, null, 2)}</pre>
               )}

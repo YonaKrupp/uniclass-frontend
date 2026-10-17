@@ -76,6 +76,7 @@ namespace MyApi.Controllers
                         // parameter is a plain int and the table column is not nullable.
                         cmd.Parameters.AddWithValue("@gn32_read_and_agree", request.gn32_read_and_agree);
                         cmd.Parameters.AddWithValue("@gn32_accept_mail_sms", request.gn32_accept_mail_sms);
+                        cmd.Parameters.AddWithValue("@gn32_utm_source", (object)request.gn32_utm_source ?? DBNull.Value);
 
                         await cmd.ExecuteNonQueryAsync();
                     }
@@ -132,5 +133,9 @@ namespace MyApi.Controllers
 
         [JsonPropertyName("gn32_accept_mail_sms")]
         public int gn32_accept_mail_sms { get; set; }
+
+        // מקור ההגעה מהכתובת של דף הנחיתה (?utm_source=...).
+        [JsonPropertyName("gn32_utm_source")]
+        public string gn32_utm_source { get; set; }
     }
 }

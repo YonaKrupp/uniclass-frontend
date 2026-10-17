@@ -15,6 +15,8 @@ export default function StarRating({ value = 0, onChange, readOnly = false, size
           onClick={() => !readOnly && onChange?.(star)}
           onMouseEnter={() => !readOnly && setHover(star)}
           onMouseLeave={() => !readOnly && setHover(0)}
+          aria-label={`דירוג ${star} מתוך 5`}
+          aria-pressed={value === star}
           className={`transition-transform ${readOnly ? "cursor-default" : "cursor-pointer"} min-w-[44px] min-h-[44px] flex items-center justify-center`}
         >
           <Star

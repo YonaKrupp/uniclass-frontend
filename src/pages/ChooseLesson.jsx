@@ -510,6 +510,7 @@ export default function ChooseLesson() {
                 <button
                   type="button"
                   onClick={() => { setTypedQuery(""); setSelectedSubject(null); }}
+                  aria-label="ניקוי החיפוש"
                   className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-4 h-4" />
@@ -524,6 +525,7 @@ export default function ChooseLesson() {
                 <button
                   type="button"
                   onClick={() => setSelectedSubject(null)}
+                  aria-label="הסרת המקצוע שנבחר"
                   className="text-muted-foreground hover:text-destructive"
                 >
                   <X className="w-4 h-4" />

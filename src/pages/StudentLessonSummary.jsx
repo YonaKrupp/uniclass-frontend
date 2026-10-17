@@ -120,7 +120,7 @@ export default function StudentLessonSummary() {
                   {picSrc ? (
                     <img
                       src={picSrc}
-                      alt={item.teacherName || "מורה"}
+                      alt={item.teacherName ? `תמונת הפרופיל של ${item.teacherName}` : "תמונת הפרופיל של המורה"}
                       className="w-12 h-12 rounded-full object-cover border border-border shrink-0"
                     />
                   ) : (

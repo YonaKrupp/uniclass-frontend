@@ -56,7 +56,9 @@ Deno.serve(async (req) => {
     let data;
     try { data = JSON.parse(text); } catch { data = { raw: text }; }
 
-    return Response.json({ ...data, _status: apiRes.status });
+    // Forward the API server's own status code and body unchanged, so a 401/403
+    // from the server reaches the client as 401/403 instead of a wrapped 200.
+    return Response.json(data, { status: apiRes.status });
   } catch (error) {
     console.error('getAllStudentDataProxy error:', error);
     return Response.json({ error: error.message }, { status: 500 });

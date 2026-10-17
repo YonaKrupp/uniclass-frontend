@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
       gn32_accept_mail_sms: gn32_accept_mail_sms ? 1 : 0,
     };
 
-    const apiRes = await fetch(`${API_BASE}/api/Pilot/insert_pilot`, {
+    const apiRes = await fetch(`${API_BASE}/api/Pilot/insert_pilot_v2`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

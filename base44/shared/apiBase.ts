@@ -16,21 +16,34 @@ export function getApiBaseFromAppUrl(appUrl: string): string {
   return PRODUCTION_BASE;
 }
 
+const isHttpUrl = (value: string): boolean => value.startsWith('http');
+
 /**
  * Resolves the C# API base URL from the incoming request.
- * Checks the platform-injected X-Base44-App-Url header first,
- * then the browser Referer, then the Origin header.
+ *
+ * The caller's OWN origin decides: a request coming from the production site
+ * (uniclass.co.il) must reach the production API, while one coming from Base44
+ * (builder / preview) keeps using the ngrok tunnel.
+ *
+ * The browser Origin / Referer is therefore checked BEFORE the platform-injected
+ * X-Base44-App-Url header, because that header carries the app's Base44 URL even
+ * when the page is served on the custom domain.
+ *
  * Defaults to ngrok (Base44 builder/preview environment).
  */
 export function getApiBase(req: Request): string {
-  const appUrlHeader = req.headers.get('X-Base44-App-Url') || '';
-  if (appUrlHeader) return getApiBaseFromAppUrl(appUrlHeader);
-
-  const referer = req.headers.get('Referer') || req.headers.get('referer') || '';
-  if (referer) return getApiBaseFromAppUrl(referer);
-
   const origin = req.headers.get('Origin') || req.headers.get('origin') || '';
-  if (origin) return getApiBaseFromAppUrl(origin);
+  const referer = req.headers.get('Referer') || req.headers.get('referer') || '';
+  const appUrlHeader = req.headers.get('X-Base44-App-Url') || '';
+  const callerOrigins = [origin, referer].filter(isHttpUrl);
+
+  // 1) A non-Base44 caller origin wins — the real site always talks to production.
+  const nonBase44Origin = callerOrigins.find((value) => !value.includes('base44'));
+  if (nonBase44Origin) return getApiBaseFromAppUrl(nonBase44Origin);
+
+  // 2) Base44 builder / preview — platform header, then the Base44 caller origin.
+  if (appUrlHeader) return getApiBaseFromAppUrl(appUrlHeader);
+  if (callerOrigins.length > 0) return getApiBaseFromAppUrl(callerOrigins[0]);
 
   return NGROK_BASE;
 }

@@ -80,6 +80,8 @@ export default function PilotRegistrationForm() {
     setLoading(true);
     setError("");
     const payload = {
+      // The domain the form was submitted on — tells the server which API to use.
+      originUrl: window.location.origin,
       fullName: form.fullName,
       email: form.email,
       phone: form.phone,

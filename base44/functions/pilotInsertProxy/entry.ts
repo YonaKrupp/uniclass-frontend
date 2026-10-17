@@ -1,4 +1,4 @@
-import { getApiBase } from '../../shared/apiBase.ts';
+import { getApiBase, getApiBaseFromAppUrl } from '../../shared/apiBase.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -8,7 +8,12 @@ Deno.serve(async (req) => {
       gn32_read_and_agree, gn32_accept_mail_sms,
     } = body;
 
-    const API_BASE = getApiBase(req);
+    // The page the user is actually on decides the API server: the browser sends
+    // its own origin with every call (originUrl), so a form submitted on
+    // uniclass.co.il always reaches the production API. Header-based detection
+    // stays as a fallback for callers that don't send it.
+    const API_BASE = body.originUrl ? getApiBaseFromAppUrl(body.originUrl) : getApiBase(req);
+    console.log('pilotInsertProxy API_BASE:', API_BASE, '| originUrl:', body.originUrl ?? '(none)');
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });

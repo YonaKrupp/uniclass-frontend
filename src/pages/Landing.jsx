@@ -32,7 +32,7 @@ export default function Landing() {
         <LandingFAQ />
         <section id="register" aria-labelledby="register-title" className="order-6 relative bg-background py-10 md:py-28">
           <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center mb-6 md:mb-10">
-            <h2 id="register-title" className="text-2xl md:text-5xl font-heading font-bold tracking-tight text-foreground mb-2 md:mb-4">הצטרפו כמורים מייסדים</h2>
+            <h2 id="register-title" className="text-2xl md:text-5xl font-heading font-bold tracking-tight text-foreground mb-2 md:mb-4">הצטרפו כמורים מייסדים.</h2>
             <p className="text-sm md:text-lg text-muted-foreground font-body font-light">הירשמו עכשיו והיו בין המורים הראשונים ב-UniClass.</p>
           </div>
           <div className="relative max-w-5xl mx-auto px-4 sm:px-6 grid lg:grid-cols-5 gap-8 items-start">

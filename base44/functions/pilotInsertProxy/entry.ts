@@ -33,6 +33,18 @@ Deno.serve(async (req) => {
     let data;
     try { data = JSON.parse(text); } catch { data = { raw: text }; }
 
+    if (!apiRes.ok) {
+      const message = data?.error || data?.message || `שגיאה בשמירת הפרטים (${apiRes.status})`;
+      console.error('insert_pilot upstream error:', apiRes.status, message);
+      return Response.json({ error: message }, { status: apiRes.status });
+    }
+
+    if (data?.success === false) {
+      const message = data?.error || data?.message || 'שגיאה בשמירת הפרטים';
+      console.error('insert_pilot failed:', message);
+      return Response.json({ error: message });
+    }
+
     return Response.json(data);
   } catch (error) {
     console.error('insert_pilot error:', error.message);

@@ -18,21 +18,24 @@ export function getApiBaseFromAppUrl(appUrl: string): string {
 
 /**
  * Resolves the C# API base URL from the incoming request.
- * Checks the platform-injected X-Base44-App-Url header first,
- * then the browser Referer, then the Origin header.
- * Defaults to the tunnel (Base44 builder/preview environment).
+ *
+ * The browser-facing origin decides first (Referer, then Origin): it is the
+ * deployment the user is actually on, so a request from uniclass.co.il always
+ * reaches production even though the platform injects a base44.app app URL.
+ * The platform-injected X-Base44-App-Url header is only a fallback for calls
+ * with no browser origin at all. Defaults to production.
  */
 export function getApiBase(req: Request): string {
-  const appUrlHeader = req.headers.get('X-Base44-App-Url') || '';
-  if (appUrlHeader) return getApiBaseFromAppUrl(appUrlHeader);
-
   const referer = req.headers.get('Referer') || req.headers.get('referer') || '';
   if (referer) return getApiBaseFromAppUrl(referer);
 
   const origin = req.headers.get('Origin') || req.headers.get('origin') || '';
   if (origin) return getApiBaseFromAppUrl(origin);
 
-  return TUNNEL_BASE;
+  const appUrlHeader = req.headers.get('X-Base44-App-Url') || '';
+  if (appUrlHeader) return getApiBaseFromAppUrl(appUrlHeader);
+
+  return PRODUCTION_BASE;
 }
 
 /**

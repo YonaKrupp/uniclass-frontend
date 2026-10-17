@@ -75,15 +75,6 @@ export default function PilotRegistrationForm() {
     doSubmit();
   };
 
-  // מקור ההגעה (utm_source) מהכתובת שבה נפתח דף הנחיתה — נשלח רק אם קיים.
-  const getUtmSource = () => {
-    try {
-      return new URLSearchParams(window.location.search).get("utm_source") || "";
-    } catch {
-      return "";
-    }
-  };
-
   const doSubmit = async () => {
     setConfirmNoMarketing(false);
     setLoading(true);
@@ -98,8 +89,6 @@ export default function PilotRegistrationForm() {
       gn32_read_and_agree: consentPrivacy ? 1 : 0,
       gn32_accept_mail_sms: consentMarketing ? 1 : 0,
     };
-    // תמיד נשלח את השדה (גם כמחרוזת ריקה) כדי שהשרת לא יקבל null.
-    payload.gn32_utm_source = getUtmSource();
     try {
       const response = await base44.functions.invoke("pilotInsertProxy", payload);
       const res = response?.data ?? response;

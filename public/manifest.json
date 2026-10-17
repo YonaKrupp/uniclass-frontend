@@ -1,0 +1,17 @@
+{
+  "name": "UniClass",
+  "short_name": "UniClass",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#481890",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

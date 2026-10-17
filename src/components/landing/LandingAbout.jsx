@@ -2,9 +2,9 @@ import React from "react";
 import { GraduationCap, Heart, Target } from "lucide-react";
 
 const values = [
-  { icon: Target, title: "המטרה שלנו", text: "להעניק לכל מלמד — סטודנט או מורה פרטי — עצמאות פיננסית מלאה, בזמן שלו." },
-  { icon: Heart, title: "הדרך שלנו", text: "מערכת טכנולוגית שמנהלת עבורכם את הלו\"ז, התשלומים והשיעורים." },
-  { icon: GraduationCap, title: "החזון שלנו", text: "עבודה גמישה, מתגמלת ונגישה לכל מי שרוצה ללמד." },
+  { icon: Target, title: "המטרה שלנו", text: "לאפשר לכל מורה פרטי וסטודנט להרוויח בכבוד על הידע שלהם, בזמנים שנוחים להם." },
+  { icon: Heart, title: "הדרך שלנו", text: "מערכת אחת שמנהלת עבורכם את ההזמנות, היומן, התשלומים והשיעורים עצמם." },
+  { icon: GraduationCap, title: "החזון שלנו", text: "הוראה פרטית כמקצוע גמיש, מתגמל ונגיש לכל מי שיש לו מה ללמד." },
 ];
 
 const ABOUT_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/aa21c278c_generated_image.png";
@@ -17,10 +17,10 @@ export default function LandingAbout() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-16">
           <div>
             <h2 id="about-title" className="text-4xl sm:text-5xl font-heading font-bold tracking-tight text-foreground mb-6">
-              מה זה UniClass?
+              על UniClass
             </h2>
             <p className="text-lg text-muted-foreground font-body font-light leading-relaxed">
-              UniClass היא פלטפורמה חכמה המחברת בין מלמדים — סטודנטים ומורים פרטיים — לבין תלמידים שזקוקים לחיזוק. אנחנו מאמינים שכל מי שיודע חומר יכול להרוויח בכבוד על הידע שלו, תוך שמירה מלאה על לוח הזמנים שלו. בלי בוס, בלי משמרות חובה — אתם הקובעים.
+              UniClass היא פלטפורמה ישראלית לשיעורים פרטיים, שמחברת בין סטודנטים ומורים פרטיים לבין תלמידים שמחפשים עזרה בלימודים. אנחנו מאמינים שמי שיודע חומר צריך להיות מסוגל להרוויח ממנו בכבוד, בלי לוותר על הזמן שלו. אתם קובעים את המחיר, את השעות ואת התלמידים. אנחנו דואגים לכל השאר.
             </p>
           </div>
 

@@ -6,9 +6,9 @@ import HeroRibbon from "./HeroRibbon";
 const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
 const trustPills = [
-  { icon: CalendarClock, label: "גמישות מלאה" },
+  { icon: CalendarClock, label: "ללא מכסת שעות" },
   { icon: ShieldCheck, label: "תשלום מאובטח" },
-  { icon: BadgeCheck, label: "ללא התחייבות" },
+  { icon: BadgeCheck, label: "גמישות בשעות" },
 ];
 
 export default function LandingHero() {
@@ -19,21 +19,21 @@ export default function LandingHero() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="max-w-xl">
             <h1 id="hero-title" className="app-fade-up text-3xl md:text-6xl font-heading font-extrabold tracking-tight mb-3 md:mb-6 leading-[1.15] md:leading-[1.1] text-foreground" style={{ animationDelay: "0.05s" }}>
-              תלמדו מתי שנוח לכם,
+              הידע שלכם שווה כסף.
               <br />
-              תרוויחו כמה שאתם מבקשים
+              אתם קובעים מתי וכמה.
             </h1>
 
             <p className="app-fade-up text-sm md:text-xl text-muted-foreground font-body font-light leading-relaxed mb-5 md:mb-9 max-w-xl" style={{ animationDelay: "0.12s" }}>
-              UniClass מזמינה סטודנטים ומורים פרטיים להפוך את הידע שלהם למקור הכנסה משתלם וגמיש. ללא התחייבות למכסת שעות, עם תשלום מאובטח וניהול יומן חכם — הכל במקום אחד.
+              UniClass היא הפלטפורמה שמחברת בין סטודנטים לתלמידים הזקוקים לעזרה בלימודים. מלמדים בשעות שנוחות לכם, בלי מכסת שעות מינימלית, ומקבלים תשלום מאובטח על כל שיעור. ההזמנות, היומן והתשלומים מנוהלים עבורכם במקום אחד.
             </p>
 
             <div className="app-fade-up flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-6 md:mb-10" style={{ animationDelay: "0.18s" }}>
               <a href="#register" onClick={(e) => { e.preventDefault(); scrollTo("register"); }} className="flex items-center justify-center px-7 py-3.5 bg-primary text-primary-foreground rounded-full text-base font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-[0.98]">
-                הצטרפו לפיילוט
+                הצטרפו כמורים מייסדים
               </a>
-              <a href="#about" onClick={(e) => { e.preventDefault(); scrollTo("about"); }} className="hidden md:flex items-center justify-center px-7 py-3.5 text-foreground border border-border rounded-full text-base font-body font-semibold hover:bg-muted/50 hover:border-primary/30 transition-all">
-                למדו עוד
+              <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollTo("how-it-works"); }} className="hidden md:flex items-center justify-center px-7 py-3.5 text-foreground border border-border rounded-full text-base font-body font-semibold hover:bg-muted/50 hover:border-primary/30 transition-all">
+                איך זה עובד
               </a>
             </div>
 

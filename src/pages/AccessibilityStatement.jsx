@@ -34,6 +34,13 @@ export default function AccessibilityStatement() {
             </p>
           </section>
 
+          <section className="space-y-2">
+            <h2 className="text-lg font-heading font-semibold text-foreground">רכיבים שעדיין אינם נגישים במלואם</h2>
+            <p>
+              נכון למועד עדכון ההצהרה, ייתכן שחלק מהאיורים והמחשות הממשק בדף הבית אינם מתוארים במלואם לקוראי מסך. אנו פועלים לתקן זאת.
+            </p>
+          </section>
+
           <section className="space-y-4">
             <h2 className="text-lg font-heading font-semibold text-foreground">כלי הנגישות באתר</h2>
             <p>
@@ -89,6 +96,7 @@ export default function AccessibilityStatement() {
             <ul className="list-disc pr-5 space-y-1">
               <li>שם איש הקשר: עידן משלי</li>
               <li>דוא"ל: idan@uniclass.co.il</li>
+              <li>טלפון: 055-6657560</li>
             </ul>
             <p>
               בפנייתך, אנא ציין את תיאור הקושי, את כתובת העמוד שבו נתקלת בו, ואת סוג הדפדפן והמכשיר שבו השתמשת, כדי שנוכל לטפל בפנייה ביעילות.
@@ -106,6 +114,9 @@ export default function AccessibilityStatement() {
             <h2 className="text-lg font-heading font-semibold text-foreground">עדכון ההצהרה</h2>
             <p>
               הצהרה זו עודכנה לאחרונה בתאריך שמופיע בראשה, ותעודכן מעת לעת בהתאם לשינויים באתר ובכלי הנגישות.
+            </p>
+            <p>
+              בדיקת הנגישות האחרונה באתר בוצעה ב-17 באוקטובר 2026.
             </p>
           </section>
         </div>

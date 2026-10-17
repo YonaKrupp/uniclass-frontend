@@ -39,7 +39,10 @@ const base44 = createClient({
   requiresAuth: false,
   appBaseUrl: 'https://app.base44.com',
   token: '',  // Always empty — no automatic auth attempts
-  skipServiceRole: true
+  skipServiceRole: true,
+  // Base44 built-in analytics fully disabled: no events are sent and no
+  // base44_analytics_session_id is written to the browser.
+  analytics: { enabled: false }
 });
 
 // Suppress 401 errors from attempted base44.auth.me() calls when using custom auth

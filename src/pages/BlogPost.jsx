@@ -82,7 +82,7 @@ export default function BlogPost() {
     );
   }
 
-  const canonical = `https://uniclass.co.il/blog/${article.slug}`;
+  const canonical = `https://www.uniclass.co.il/blog/${article.slug}`;
   const seoTitle = article.seo_title || article.title;
   const jsonLd = {
     "@context": "https://schema.org",

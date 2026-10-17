@@ -1,10 +1,10 @@
 import React from "react";
-import { Clock, ShieldCheck, Sparkles, CheckCircle2 } from "lucide-react";
+import { Clock, ShieldCheck, Sparkles } from "lucide-react";
 
 const points = [
-  { icon: Clock, text: "ישלח אליכם מייל לאחר ההצטרפות, ומייל נוסף בעת ההשקה" },
-  { icon: ShieldCheck, text: "ההרשמה ללא עלות וללא שום התחייבות" },
-  { icon: Sparkles, text: "תהיו מהמורים הראשונים בפלטפורמה" },
+  { icon: Clock, text: "תקבלו מייל אישור מיד לאחר ההרשמה, ועדכון נוסף לפני ההשקה." },
+  { icon: ShieldCheck, text: "ההרשמה ללא עלות וללא כל התחייבות." },
+  { icon: Sparkles, text: "תהיו בין המורים הראשונים בפלטפורמה." },
 ];
 
 export default function RegisterAside() {
@@ -13,10 +13,7 @@ export default function RegisterAside() {
       <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
         <Sparkles className="w-6 h-6 text-primary" />
       </div>
-      <h3 className="text-xl font-heading font-semibold text-foreground mb-2">מה קורה אחרי ההרשמה?</h3>
-      <p className="text-sm text-muted-foreground font-body font-light leading-relaxed mb-6">
-        מילאתם את הטופס — אנחנו כבר עובדים על זה. הנה מה שתקבלו:
-      </p>
+      <h3 className="text-xl font-heading font-semibold text-foreground mb-6">מה קורה אחרי ההרשמה?</h3>
       <ul className="space-y-4">
         {points.map((p) => (
           <li key={p.text} className="flex items-start gap-3">
@@ -27,12 +24,6 @@ export default function RegisterAside() {
           </li>
         ))}
       </ul>
-      <div className="mt-7 pt-6 border-t border-border">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground font-body">
-          <CheckCircle2 className="w-4 h-4 text-primary" />
-          <span>תודה על ההרשמה, נתראה בקרוב !</span>
-        </div>
-      </div>
     </div>
   );
 }

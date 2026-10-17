@@ -4,12 +4,15 @@ import { Mic, Video, Users, Star } from "lucide-react";
 const TEACHER_PORTRAIT = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/92da16e4b_generated_image.png";
 const VIDEO_TEACHER = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/9ac5c08b9_generated_image.png";
 
-const days = ["א", "ב", "ג", "ד", "ה"];
+const days = ["א׳", "ב׳", "ג׳", "ד׳", "ה׳"];
 const lessons = [
-  { day: "ראשון", time: "16:00" },
-  { day: "שלישי", time: "18:30" },
-  { day: "חמישי", time: "10:00" },
+  { time: "16:00", subject: "מתמטיקה" },
+  { time: "18:30", subject: "פיזיקה" },
+  { time: "10:00", subject: "אנגלית" },
 ];
+
+const now = new Date();
+const monthLabel = `${new Intl.DateTimeFormat("he-IL", { month: "short" }).format(now)} ${String(now.getFullYear()).slice(2)}`;
 
 export default function HeroShowcase() {
   return (
@@ -18,8 +21,8 @@ export default function HeroShowcase() {
       <div className="absolute top-0 right-0 w-[180px] sm:w-[210px]">
         <div className="bg-card rounded-2xl border border-border shadow-lg p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-heading font-semibold text-foreground">יומן שבועי</span>
-            <span className="text-[10px] text-muted-foreground font-body">אוג׳ 26</span>
+            <span className="text-xs font-heading font-semibold text-foreground">היומן שלי</span>
+            <span className="text-[10px] text-muted-foreground font-body">{monthLabel}</span>
           </div>
           <div className="grid grid-cols-5 gap-1 mb-3">
             {days.map((d) => (
@@ -30,8 +33,7 @@ export default function HeroShowcase() {
             {lessons.map((l, i) => (
               <div key={i} className="flex items-center gap-2 rounded-md bg-primary/10 px-2 py-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                <span className="text-[10px] font-body text-foreground flex-1">{l.day}</span>
-                <span className="text-[10px] font-body font-medium text-primary">{l.time}</span>
+                <span className="text-[10px] font-body text-foreground flex-1">{l.time} · {l.subject}</span>
               </div>
             ))}
           </div>
@@ -45,7 +47,7 @@ export default function HeroShowcase() {
             <img src={VIDEO_TEACHER} alt="שיעור וידאו חי" className="w-full h-36 sm:h-40 object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute top-2 right-2 flex items-center gap-1 bg-red-500/90 text-white text-[9px] font-body font-semibold px-2 py-0.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> LIVE
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> שידור חי
             </div>
             <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
               <div className="flex items-center gap-1.5">
@@ -75,10 +77,13 @@ export default function HeroShowcase() {
             {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 text-primary fill-primary" />)}
           </div>
           <p className="text-sm font-heading font-semibold text-foreground">דנה לוי</p>
-          <p className="text-[11px] text-muted-foreground font-body mb-3">מתמטיקה · תואר ראשון</p>
+          <p className="text-[11px] text-muted-foreground font-body mb-3">מתמטיקה · סטודנטית לתואר ראשון</p>
           <button tabIndex={-1} className="w-full py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-body font-medium">הזמנת שיעור</button>
         </div>
       </div>
+
+      {/* Discreet label marking the card group as a product demo */}
+      <span className="absolute bottom-1 left-2 text-[9px] font-body text-muted-foreground/70 tracking-wide">הדגמת ממשק</span>
     </div>
   );
 }

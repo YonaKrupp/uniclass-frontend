@@ -1,12 +1,12 @@
 import React from "react";
 import { UserPlus, MailCheck, Rocket } from "lucide-react";
 
-const STUDENT_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/36cf222ec_generated_image.png";
+const STUDENT_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/13693adc5_generated_image.png";
 
 const steps = [
-  { icon: UserPlus, title: "הירשמו לפיילוט", text: "ממלאים את הפרטים ואתם בפנים." },
-  { icon: MailCheck, title: "קבלו הזמנה", text: "נשלח אליכם הודעה כאשר המערכת תהיה פעילה וניתן יהיה לקבוע שיעורים." },
-  { icon: Rocket, title: "התחילו ללמוד או ללמד", text: "מלמדים ומרוויחים — מעבירים שיעורים איכותיים בזמן שנוח לכם ומקבלים תשלום מובטח." },
+  { icon: UserPlus, title: "הירשמו", text: "ממלאים טופס קצר ואתם בפנים." },
+  { icon: MailCheck, title: "קבלו הזמנה", text: "נעדכן אתכם במייל ברגע שהמערכת תיפתח ואפשר יהיה לקבוע שיעורים." },
+  { icon: Rocket, title: "התחילו ללמד", text: "מגדירים מחיר ושעות, מעבירים שיעורים ומקבלים תשלום דרך הפלטפורמה." },
 ];
 
 export default function LandingHowItWorks() {
@@ -18,7 +18,7 @@ export default function LandingHowItWorks() {
           <h2 id="how-title" className="text-2xl md:text-5xl font-heading font-bold tracking-tight text-foreground mb-2 md:mb-4">
             איך זה עובד?
           </h2>
-          <p className="text-sm md:text-lg text-muted-foreground font-body font-light">שלבים פשוטים להתחיל להרוויח מהידע שלכם</p>
+          <p className="text-sm md:text-lg text-muted-foreground font-body font-light">שלושה שלבים פשוטים להתחיל להרוויח מהידע שלכם</p>
         </div>
 
         {/* Mobile: compact steps */}
@@ -36,7 +36,7 @@ export default function LandingHowItWorks() {
 
         {/* Full-width image with step 1 overlay */}
         <div className="hidden md:block relative rounded-2xl overflow-hidden border border-border shadow-lg mb-8">
-          <img src={STUDENT_IMG} alt="סטודנט לומד" className="w-full aspect-[21/9] object-cover" />
+          <img src={STUDENT_IMG} alt="מורה מעביר שיעור וידאו פרטי" className="w-full aspect-[21/9] object-cover" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to left, hsl(240 10% 6% / 0.82) 0%, hsl(240 10% 6% / 0.1) 55%, transparent 100%)" }} />
           <div className="absolute bottom-7 right-7 max-w-sm">
             <div className="flex items-center gap-3 mb-3">

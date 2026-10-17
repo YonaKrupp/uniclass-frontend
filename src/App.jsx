@@ -41,7 +41,6 @@ import StudentLessonSummary from './pages/StudentLessonSummary';
 import Chat from './pages/Chat';
 import RateTeacher from './pages/RateTeacher';
 import Contact from './pages/Contact';
-import PilotRegistrationsExport from './pages/PilotRegistrationsExport';
 import LoginChoice from './pages/LoginChoice';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
@@ -98,7 +97,6 @@ function App() {
             <Route path="/teacher-terms" element={<TeacherTerms />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-failed" element={<PaymentFailed />} />
-            <Route path="/pilot-export" element={<PilotRegistrationsExport />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />

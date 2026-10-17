@@ -6,7 +6,7 @@ import BlogShell from "@/components/blog/BlogShell";
 import Seo from "@/components/blog/Seo";
 import { publishedArticleFilter } from "@/lib/blogDates";
 
-const CANONICAL = "https://uniclass.co.il/blog";
+const CANONICAL = "https://www.uniclass.co.il/blog";
 const DESCRIPTION = "מאמרים ומדריכים על שיעורים פרטיים, בחירת מורה, למידה לבגרות וללימודים אקדמיים — מבית Uniclass.";
 
 function formatDate(value) {

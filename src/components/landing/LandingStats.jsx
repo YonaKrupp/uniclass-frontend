@@ -1,10 +1,10 @@
 import React from "react";
 
 const stats = [
-  { value: "100%", label: "גמישות בזמנים — אתם קובעים" },
-  { value: "0₪", label: "עלות הרשמה לפיילוט", accent: true },
-  { value: "24/7", label: "זמינות מערכתית מלאה" },
-  { value: "AI", label: "סיכום שיעור אוטומטי" },
+  { value: "₪0", label: "דמי הרשמה", accent: true },
+  { value: "0", label: "שעות הוראה מחייבות" },
+  { value: "100%", label: "שליטה במחיר ובשעות" },
+  { value: "AI", label: "סיכום אוטומטי לכל שיעור" },
 ];
 
 /**

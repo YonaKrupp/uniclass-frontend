@@ -3,18 +3,18 @@ import { Users, ClipboardList, ShieldCheck, MessageCircle } from "lucide-react";
 import { VideoCallMockup, ScheduleMockup } from "./FeatureMockups";
 
 const primaryFeatures = [
-  { title: "שיעורי וידאו חיים", text: "כניסה לכיתה וירטואלית בלחיצת כפתור — ללא הורדות, ללא התקנות.", mockup: "video" },
-  { title: "ניהול שיעורים חכם", text: "תזמון גמיש לפי היומן שלכם, מעקב אחר שיעורים ותזכורות אוטומטיות לתלמידים.", mockup: "schedule" },
+  { title: "שיעורי וידאו חיים", text: "כיתה וירטואלית שנפתחת בלחיצה אחת, ישירות מהדפדפן. בלי הורדות ובלי התקנות.", mockup: "video" },
+  { title: "ניהול שיעורים חכם", text: "היומן מתעדכן לפי הזמינות שלכם, והתלמידים מקבלים תזכורות אוטומטיות לפני כל שיעור.", mockup: "schedule" },
 ];
 
 const secondaryFeatures = [
-  { icon: Users, title: "התאמה אישית", text: "תלמידים מוצאים אתכם לפי מקצוע ורמה — מקסימום פניות רלוונטיות." },
-  { icon: ClipboardList, title: "סיכום תקציר מנהלים אוטומטי", text: "תקציר מנהלים מהקלטת השיעור באמצעות בינה מלאכותית AI." },
-  { icon: ShieldCheck, title: "תשלום מאובטח", text: "בלי לרדוף אחרי תשלומים — גבייה בטוחה ואוטומטית עבור כל שיעור." },
-  { icon: MessageCircle, title: "צ'אט ישיר", text: "תקשורת ישירה ובטוחה עם התלמידים שלכם לפני ואחרי השיעור." },
+  { icon: Users, title: "התאמה אישית", text: "תלמידים מוצאים את המורה המתאים להם לפי מקצוע, מחיר וזמינות." },
+  { icon: ClipboardList, title: "סיכום שיעור אוטומטי", text: "בסיום כל שיעור מופק סיכום מסודר בעזרת בינה מלאכותית." },
+  { icon: ShieldCheck, title: "תשלום מאובטח", text: "בלי לרדוף אחרי תשלומים. התשלום נגבה באופן מאובטח ואוטומטי על כל שיעור." },
+  { icon: MessageCircle, title: "צ'אט ישיר", text: "תקשורת ישירה ומאובטחת עם התלמידים, לפני השיעור ואחריו." },
 ];
 
-const FEATURES_MOCKUP = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/ba326d5b5_generated_image.png";
+const FEATURES_MOCKUP = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/651104762_generated_image.png";
 
 export default function LandingFeatures() {
   return (
@@ -23,14 +23,14 @@ export default function LandingFeatures() {
         {/* Centered intro */}
         <div className="text-center mb-10">
           <h2 id="features-title" className="text-4xl sm:text-5xl font-heading font-bold tracking-tight text-foreground mb-4">
-            כל הכלים להצלחה במקום אחד
+            כל מה שצריך כדי ללמד ברצינות
           </h2>
-          <p className="text-lg text-muted-foreground font-body font-light">כל מה שצריך כדי ללמוד וללמד — בפלטפורמה אחת</p>
+          <p className="text-lg text-muted-foreground font-body font-light">שיעורים, יומן, תשלומים ותקשורת עם תלמידים, בפלטפורמה אחת.</p>
         </div>
 
         {/* Full-width edge-to-edge image */}
         <div className="relative rounded-2xl overflow-hidden border border-border shadow-lg mb-12">
-          <img src={FEATURES_MOCKUP} alt="סטודנטים בשיחת וידאו" className="w-full aspect-[21/9] object-cover" />
+          <img src={FEATURES_MOCKUP} alt="שיעור פרטי בווידאו בין מורה לתלמיד" className="w-full aspect-[21/9] object-cover" />
         </div>
 
         {/* Primary features — real product mockups */}
@@ -53,8 +53,8 @@ export default function LandingFeatures() {
               <div className="w-9 h-9 rounded-md flex items-center justify-center mb-4 bg-primary/10">
                 <f.icon className="w-4 h-4 text-primary" />
               </div>
-              <h3 className="font-heading font-semibold text-sm text-foreground mb-1.5">{f.title}</h3>
-              <p className="text-xs text-muted-foreground font-body font-light leading-relaxed">{f.text}</p>
+              <h3 className="font-heading font-semibold text-base text-foreground mb-1.5">{f.title}</h3>
+              <p className="text-sm text-foreground/80 font-body leading-relaxed">{f.text}</p>
             </div>
           ))}
         </div>

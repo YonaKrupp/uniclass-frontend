@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Sun, Moon, Menu, X, LogIn } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import { useDarkMode } from "@/lib/useDarkMode";
 
 export default function LandingHeader() {
@@ -18,8 +18,7 @@ export default function LandingHeader() {
     { label: "אודות", target: "about" },
     { label: "תכונות", target: "features" },
     { label: "איך זה עובד", target: "how-it-works" },
-    { label: "הצטרפות", target: "register" },
-    { label: "הצהרת נגישות", to: "/accessibility", route: true },
+    { label: "שאלות נפוצות", target: "faq" },
   ];
 
   const scrollTo = (id) => {
@@ -48,11 +47,8 @@ export default function LandingHeader() {
           <button onClick={() => setDark(!dark)} aria-label={dark ? "הפעלת מצב בהיר" : "הפעלת מצב כהה"} aria-pressed={dark ? "true" : "false"} className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-2">
             {dark ? <Sun className="w-5 h-5" aria-hidden="true" /> : <Moon className="w-5 h-5" aria-hidden="true" />}
           </button>
-          <Link to="/login-choice" aria-disabled="true" tabIndex={-1} className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-sm font-body font-medium text-muted-foreground/50 transition-colors pointer-events-none cursor-not-allowed">
-            <LogIn className="w-4 h-4" aria-hidden="true" /> כניסה
-          </Link>
           <button onClick={() => scrollTo("register")} className="inline-flex items-center px-3.5 py-2 md:px-5 md:py-2.5 bg-primary text-primary-foreground rounded-full text-xs md:text-sm font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 md:hover:-translate-y-0.5 transition-all whitespace-nowrap">
-            הצטרפו לפיילוט
+            הצטרפו כמורים מייסדים
           </button>
           <button onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="mobile-menu" aria-label={menuOpen ? "סגירת תפריט" : "פתיחת תפריט"} className="md:hidden p-2 rounded-full text-foreground hover:bg-muted transition-colors">
             {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -72,9 +68,6 @@ export default function LandingHeader() {
               </button>
             )
           )}
-          <Link to="/login-choice" aria-disabled="true" tabIndex={-1} className="block px-4 py-2.5 text-sm font-body font-medium text-muted-foreground/50 pointer-events-none cursor-not-allowed rounded-xl transition-colors">
-            כניסה
-          </Link>
         </div>
       )}
     </header>

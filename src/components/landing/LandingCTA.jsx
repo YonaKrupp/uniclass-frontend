@@ -2,9 +2,9 @@ import React from "react";
 import { Rocket, Megaphone, Gift } from "lucide-react";
 
 const benefits = [
-  { icon: Rocket, title: "גישה מוקדמת", text: "היו מהמורים הראשונים בפלטפורמה ויצרו לעצמכם מוניטין וקהל תלמידים נאמן." },
-  { icon: Megaphone, title: "הקול שלכם נשמע", text: "המשוב שלכם מעצב את פיצ'ר ההוראה והניהול של המערכת." },
-  { icon: Gift, title: "בחינם לגמרי", text: "הרשמו בחינם לגמרי לפיילוט.", accent: true },
+  { icon: Rocket, title: "גישה מוקדמת", text: "היו בין המורים הראשונים בפלטפורמה, ובנו לעצמכם מוניטין וקהל תלמידים נאמן." },
+  { icon: Megaphone, title: "הקול שלכם נשמע", text: "המשוב שלכם יעצב את כלי ההוראה והניהול של המערכת." },
+  { icon: Gift, title: "ללא עלות", text: "ההרשמה לפיילוט חינמית לגמרי.", accent: true },
 ];
 
 export default function LandingCTA() {
@@ -25,10 +25,10 @@ export default function LandingCTA() {
       />
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-32 text-center">
         <h2 id="cta-title" className="text-2xl md:text-5xl font-heading font-bold tracking-tight text-white mb-2 md:mb-4 drop-shadow-sm">
-          למה להצטרף וללמד בפיילוט?
+          למה להצטרף כבר עכשיו?
         </h2>
         <p className="text-sm md:text-lg text-white/85 font-body font-light mb-5 md:mb-14 drop-shadow-sm">
-          הזדמנות לקחת חלק במיזם שנבנה עבור סטודנטים ומורים פרטיים כאחד
+          הזדמנות להשפיע על הפלטפורמה כבר מהשלב הראשון.
         </p>
         {/* Mobile: compact benefit list */}
         <ul className="md:hidden space-y-2.5 text-right">

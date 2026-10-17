@@ -16,7 +16,11 @@ Deno.serve(async (req) => {
     console.log('pilotInsertProxy API_BASE:', API_BASE, '| originUrl:', body.originUrl ?? '(none)');
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
-      return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });
+      return Response.json({
+        error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)',
+        _api: API_BASE,
+        _v: 3,
+      }, { status: 400 });
     }
 
     const payload = {

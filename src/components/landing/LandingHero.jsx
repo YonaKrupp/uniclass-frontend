@@ -6,10 +6,10 @@ import HeroRibbon from "./HeroRibbon";
 const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
 const trustPills = [
-{ icon: CalendarClock, label: "ללא מכסת שעות" },
-{ icon: ShieldCheck, label: "תשלום מאובטח" },
-{ icon: BadgeCheck, label: "גמישות בשעות" }];
-
+  { icon: CalendarClock, label: "ללא מכסת שעות" },
+  { icon: ShieldCheck, label: "תשלום מאובטח" },
+  { icon: BadgeCheck, label: "גמישות בשעות" },
+];
 
 export default function LandingHero() {
   return (
@@ -18,14 +18,8 @@ export default function LandingHero() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="max-w-xl">
-            
-
-
-
-            
-
             <h1 id="hero-title" className="app-fade-up text-3xl md:text-6xl font-heading font-extrabold tracking-tight mb-3 md:mb-6 leading-[1.15] md:leading-[1.1] text-foreground" style={{ animationDelay: "0.05s" }}>
-              הידע שלכם שווה כסף
+              הידע שלכם שווה כסף.
               <br />
               אתם קובעים מתי וכמה.
             </h1>
@@ -35,10 +29,10 @@ export default function LandingHero() {
             </p>
 
             <div className="app-fade-up flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-6 md:mb-10" style={{ animationDelay: "0.18s" }}>
-              <a href="#register" onClick={(e) => {e.preventDefault();scrollTo("register");}} className="flex items-center justify-center px-7 py-3.5 bg-primary text-primary-foreground rounded-full text-base font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-[0.98]">
+              <a href="#register" onClick={(e) => { e.preventDefault(); scrollTo("register"); }} className="flex items-center justify-center px-7 py-3.5 bg-primary text-primary-foreground rounded-full text-base font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-[0.98]">
                 הצטרפו כמורים מייסדים
               </a>
-              <a href="#how-it-works" onClick={(e) => {e.preventDefault();scrollTo("how-it-works");}} className="hidden md:flex items-center justify-center px-7 py-3.5 text-foreground border border-border rounded-full text-base font-body font-semibold hover:bg-muted/50 hover:border-primary/30 transition-all">
+              <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollTo("how-it-works"); }} className="hidden md:flex items-center justify-center px-7 py-3.5 text-foreground border border-border rounded-full text-base font-body font-semibold hover:bg-muted/50 hover:border-primary/30 transition-all">
                 איך זה עובד
               </a>
             </div>
@@ -52,8 +46,8 @@ export default function LandingHero() {
                       <Icon className="w-4 h-4" />
                     </span>
                     {pill.label}
-                  </li>);
-
+                  </li>
+                );
               })}
             </ul>
           </div>
@@ -63,6 +57,6 @@ export default function LandingHero() {
           </div>
         </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }

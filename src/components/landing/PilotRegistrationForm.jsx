@@ -80,8 +80,6 @@ export default function PilotRegistrationForm() {
     setLoading(true);
     setError("");
     const payload = {
-      // The domain the form was submitted on — tells the server which API to use.
-      originUrl: window.location.origin,
       fullName: form.fullName,
       email: form.email,
       phone: form.phone,
@@ -94,16 +92,14 @@ export default function PilotRegistrationForm() {
     try {
       const response = await base44.functions.invoke("pilotInsertProxy", payload);
       const res = response?.data ?? response;
-      const apiError = res?.error || (res?.success === false ? res?.message : "");
-      if (apiError) {
-        setError(apiError || "שגיאה בשליחת הטופס. נסו שוב.");
+      if (res?.error) {
+        setError(res?.error || "שגיאה בשליחת הטופס. נסו שוב.");
       } else {
         setSuccess(true);
       }
     } catch (err) {
       console.error("Pilot registration error:", err);
-      const data = err?.response?.data;
-      setError(data?.error || data?.message || "שגיאה בשליחת הטופס. נסו שוב.");
+      setError(err?.response?.data?.error || "שגיאה בשליחת הטופס. נסו שוב.");
     } finally {
       setLoading(false);
     }
@@ -161,6 +157,9 @@ export default function PilotRegistrationForm() {
           />
           <p className="text-xs text-muted-foreground font-body">נא לא לכלול מידע רפואי או פיננסי.</p>
         </div>
+        {error && (
+          <div role="alert" className="bg-destructive/10 border border-destructive/30 rounded-xl p-3 text-sm text-destructive font-body text-center">{error}</div>
+        )}
         <fieldset className="space-y-3 pt-1">
           <legend className="sr-only">הסכמות</legend>
           <div className="flex items-start gap-3">
@@ -203,9 +202,6 @@ export default function PilotRegistrationForm() {
               </button>
             </div>
           </div>
-        )}
-        {error && (
-          <div role="alert" aria-live="assertive" className="bg-destructive/10 border border-destructive/30 rounded-xl p-3 text-sm text-destructive font-body text-center">{error}</div>
         )}
         <button type="submit" disabled={loading || !consentAccepted} className="w-full py-3.5 bg-primary text-primary-foreground rounded-full text-base font-body font-semibold shadow-sm hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2">
           {loading ? <><Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> שולח...</> : "שמרו לי מקום"}

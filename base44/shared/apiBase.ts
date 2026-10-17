@@ -1,25 +1,38 @@
-// Shared API base resolver.
-//
-// The app talks to the production C# API from every environment — the live
-// site (uniclass.co.il), the published app domain and the builder preview.
-// There is no development tunnel anymore: nothing in the app may reach a
-// staging/ngrok server, so no request can depend on which domain it came from.
+// Shared API base resolver — determines whether to route C# API calls
+// to the ngrok tunnel (Base44 builder/preview) or the production server (uniclass.co.il).
 
-export const PRODUCTION_BASE = 'http://corewebapi-env.il-central-1.elasticbeanstalk.com';
+const NGROK_BASE = 'https://hacking-frighten-dandy.ngrok-free.dev';
+const PRODUCTION_BASE = 'http://corewebapi-env.il-central-1.elasticbeanstalk.com';
 
 /**
  * Resolves the C# API base URL from a known app/frontend URL string.
- * Kept so existing callers keep working — the production server always wins.
+ * Routes to NGROK_BASE only when the caller is Base44 (builder/preview domain);
+ * any other origin (uniclass.co.il or anywhere else) uses PRODUCTION_BASE.
  */
-export function getApiBaseFromAppUrl(_appUrl?: string): string {
+export function getApiBaseFromAppUrl(appUrl: string): string {
+  if (appUrl && appUrl.includes('base44')) {
+    return NGROK_BASE;
+  }
   return PRODUCTION_BASE;
 }
 
 /**
  * Resolves the C# API base URL from the incoming request.
+ * Checks the platform-injected X-Base44-App-Url header first,
+ * then the browser Referer, then the Origin header.
+ * Defaults to ngrok (Base44 builder/preview environment).
  */
-export function getApiBase(_req?: Request): string {
-  return PRODUCTION_BASE;
+export function getApiBase(req: Request): string {
+  const appUrlHeader = req.headers.get('X-Base44-App-Url') || '';
+  if (appUrlHeader) return getApiBaseFromAppUrl(appUrlHeader);
+
+  const referer = req.headers.get('Referer') || req.headers.get('referer') || '';
+  if (referer) return getApiBaseFromAppUrl(referer);
+
+  const origin = req.headers.get('Origin') || req.headers.get('origin') || '';
+  if (origin) return getApiBaseFromAppUrl(origin);
+
+  return NGROK_BASE;
 }
 
 /**

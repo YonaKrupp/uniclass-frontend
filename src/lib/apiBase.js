@@ -16,7 +16,5 @@ const LOCAL_DEV_HOSTS = ["localhost", "127.0.0.1"];
 export function resolveApiBase() {
   if (typeof window === "undefined") return PRODUCTION_API_BASE;
   const host = window.location.hostname || "";
-  const isLocal = LOCAL_DEV_HOSTS.some((local) => host.includes(local));
-  const isBase44 = host.includes("base44");
-  return isLocal || isBase44 ? NGROK_API_BASE : PRODUCTION_API_BASE;
+  return LOCAL_DEV_HOSTS.some((local) => host.includes(local)) ? NGROK_API_BASE : PRODUCTION_API_BASE;
 }

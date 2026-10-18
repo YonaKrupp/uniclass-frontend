@@ -1,4 +1,4 @@
-import { getApiBase, NGROK_BASE, PRODUCTION_BASE } from '../../shared/apiBase.ts';
+import { PRODUCTION_BASE } from '../../shared/apiBase.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -8,21 +8,15 @@ Deno.serve(async (req) => {
       gn32_read_and_agree, gn32_accept_mail_sms,
     } = body;
 
-    // The page the visitor is on decides: Base44 builder/preview → the developer's
-    // tunnel, the live site → production.
+    // Pilot registrations ALWAYS go to the production server.
     //
-    // Two independent sources are used, and production always wins:
-    // 1. `apiBase` — the environment the page declares for itself (only the two
-    //    known servers are accepted, anything else is ignored).
-    // 2. the request's own origin signals (X-Client-Origin / Origin / Referer).
-    // A real visitor can therefore never be routed to the developer's machine,
-    // whatever a browser, a proxy or an older cached page happens to send.
-    const signalBase = getApiBase(req);
-    const declared = body.apiBase === NGROK_BASE || body.apiBase === PRODUCTION_BASE ? body.apiBase : '';
-    const API_BASE = declared === PRODUCTION_BASE || signalBase === PRODUCTION_BASE
-      ? PRODUCTION_BASE
-      : (declared || signalBase);
-    console.log('[pilotInsertProxy] API_BASE=', API_BASE, '| declared=', body.apiBase || '(none)', '| signals=', signalBase);
+    // The landing page is reachable from several hosts (the custom domain, the
+    // published Base44 address, the builder preview) and the developer's tunnel
+    // must never receive a real visitor's details — so this endpoint does not
+    // route by host, by header or by anything the page sends. There is no path
+    // that can end up on a laptop.
+    const API_BASE = PRODUCTION_BASE;
+    console.log('[pilotInsertProxy] API_BASE=', API_BASE);
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });

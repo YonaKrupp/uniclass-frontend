@@ -1,10 +1,12 @@
 import React from "react";
 import { Users, ClipboardList, ShieldCheck, MessageCircle } from "lucide-react";
-import { VideoCallMockup, ScheduleMockup } from "./FeatureMockups";
+
+const VIDEO_ROOM_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/10e791e22_generated_image.png";
+const DASHBOARD_IMG = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/a63529eb6_6a70c9d3-e06a-44f7-9eca-86d073a3f2d1.jpg";
 
 const primaryFeatures = [
-  { title: "שיעורי וידאו חיים", text: "כיתה וירטואלית שנפתחת בלחיצה אחת, ישירות מהדפדפן. בלי הורדות ובלי התקנות.", mockup: "video" },
-  { title: "ניהול שיעורים חכם", text: "היומן מתעדכן לפי הזמינות שלכם, והתלמידים מקבלים תזכורות אוטומטיות לפני כל שיעור.", mockup: "schedule" },
+  { title: "שיעורי וידאו חיים", text: "כיתה וירטואלית שנפתחת בלחיצה אחת, ישירות מהדפדפן. בלי הורדות ובלי התקנות.", image: VIDEO_ROOM_IMG, alt: "מסך הכנה לשיחת וידאו עם אפשרות הצטרפות לשיעורים מתוזמנים" },
+  { title: "ניהול שיעורים חכם", text: "היומן מתעדכן לפי הזמינות שלכם, והתלמידים מקבלים תזכורות אוטומטיות לפני כל שיעור.", image: DASHBOARD_IMG, alt: "לוח בקרה למורה עם נתוני שיעורים, תלמידים וגרף פעילות שבועי" },
 ];
 
 const secondaryFeatures = [
@@ -30,15 +32,15 @@ export default function LandingFeatures() {
 
         {/* Full-width edge-to-edge image */}
         <div className="relative rounded-2xl overflow-hidden border border-border shadow-lg mb-12">
-          <img src={FEATURES_MOCKUP} alt="שיעור פרטי בווידאו בין מורה לתלמיד" className="w-full aspect-[21/9] object-cover" />
+          <img src={FEATURES_MOCKUP} alt="אישה עם אוזניות מקיימת שיחת וידאו עם תלמידה מול המחשב בבית" className="w-full aspect-[21/9] object-cover" />
         </div>
 
-        {/* Primary features — real product mockups */}
+        {/* Primary features */}
         <div className="grid sm:grid-cols-2 gap-5 mb-6">
           {primaryFeatures.map((f) => (
             <div key={f.title} className="bg-card rounded-2xl p-6 border border-border h-full">
-              <div className="mb-5" aria-hidden="true">
-                {f.mockup === "video" ? <VideoCallMockup /> : <ScheduleMockup />}
+              <div className="mb-5 rounded-xl overflow-hidden border border-border bg-muted/30">
+                <img src={f.image} alt={f.alt} className="w-full h-auto block" />
               </div>
               <h3 className="font-heading font-bold text-lg text-foreground mb-1.5">{f.title}</h3>
               <p className="text-sm text-muted-foreground font-body font-light leading-relaxed">{f.text}</p>

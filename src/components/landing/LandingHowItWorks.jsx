@@ -36,7 +36,7 @@ export default function LandingHowItWorks() {
 
         {/* Full-width image with step 1 overlay */}
         <div className="hidden md:block relative rounded-2xl overflow-hidden border border-border shadow-lg mb-8">
-          <img src={STUDENT_IMG} alt="מורה מעביר שיעור וידאו פרטי" className="w-full aspect-[21/9] object-cover" />
+          <img src={STUDENT_IMG} alt="גבר עם אוזניות יושב ליד שולחן ומדבר בשיחת וידאו במחשב נייד" className="w-full aspect-[21/9] object-cover" />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to left, hsl(240 10% 6% / 0.82) 0%, hsl(240 10% 6% / 0.1) 55%, transparent 100%)" }} />
           <div className="absolute bottom-7 right-7 max-w-sm">
             <div className="flex items-center gap-3 mb-3">

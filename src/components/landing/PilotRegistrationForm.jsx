@@ -147,8 +147,8 @@ export default function PilotRegistrationForm() {
             {phoneError && <p id="phone-error" role="alert" className="text-xs text-destructive font-body">{phoneError}</p>}
           </div>
         </div>
-        <FormField label="מוסד לימודי / מקום עבודה" icon={Building2} value={form.institution} onChange={update("institution")} placeholder="לדוגמה: אוניברסיטה, מכללה או הוראה פרטית" required autoComplete="organization" />
-        <FormField label="תואר / תחום הוראה" icon={BookMarked} value={form.subjects} onChange={update("subjects")} placeholder="לדוגמה: מדעי המחשב, מתמטיקה, הנדסה" required />
+        <FormField label="איפה אתה לומד או למדת בעבר?" icon={Building2} value={form.institution} onChange={update("institution")} placeholder="לדוגמה: אוניברסיטת תל אביב, מכללה או תיכון" required autoComplete="organization" />
+        <FormField label="מה אתה לומד או למדת בעבר?" icon={BookMarked} value={form.subjects} onChange={update("subjects")} placeholder="לדוגמה: מדעי המחשב, מתמטיקה, הנדסה" required />
         <div className="hidden md:block space-y-2">
           <label htmlFor="pilot-notes" className="text-sm font-heading font-semibold text-foreground block">הערות</label>
           <textarea

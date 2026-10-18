@@ -2,6 +2,7 @@ import React from "react";
 import { CalendarClock, ShieldCheck, BadgeCheck } from "lucide-react";
 import HeroShowcase from "./HeroShowcase";
 import HeroRibbon from "./HeroRibbon";
+import PilotApiLink from "./PilotApiLink";
 
 const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -36,6 +37,8 @@ export default function LandingHero() {
                 איך זה עובד
               </a>
             </div>
+
+            <PilotApiLink />
 
             <ul className="app-fade-up flex flex-wrap items-center gap-x-3 gap-y-2 md:gap-x-6 md:gap-y-3" style={{ animationDelay: "0.24s" }}>
               {trustPills.map((pill) => {

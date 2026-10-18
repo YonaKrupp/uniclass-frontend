@@ -52,7 +52,7 @@ namespace MyApi.Controllers
                 _logger.LogInformation($"InsertPilot called with Email={request.Email}, Name={request.FullName}");
                 // אבחון — האם שני הערכים של הצ'קבוקסים נקלטו מה-JSON.
                 // אם זה NULL בלוג — ה-binding נכשל; אם זה 1/0 והעמודה NULL — הבעיה בפרוצדורה.
-                _logger.LogInformation($"InsertPilot consent flags received: read_and_agree={request.gn32_read_and_agree}, accept_mail_sms={request.gn32_accept_mail_sms}");
+                _logger.LogInformation($"InsertPilot consent flags received: read_and_agree={InsertPilotRequest.ToFlag(request.gn32_read_and_agree)}, accept_mail_sms={InsertPilotRequest.ToFlag(request.gn32_accept_mail_sms)}");
 
                 string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
@@ -74,15 +74,23 @@ namespace MyApi.Controllers
                         // 1 = agreed, 0 = not agreed.
                         // Always send an int — never DBNull — because the procedure
                         // parameter is a plain int and the table column is not nullable.
-                        cmd.Parameters.AddWithValue("@gn32_read_and_agree", request.gn32_read_and_agree);
-                        cmd.Parameters.AddWithValue("@gn32_accept_mail_sms", request.gn32_accept_mail_sms);
+                        cmd.Parameters.AddWithValue("@gn32_read_and_agree", InsertPilotRequest.ToFlag(request.gn32_read_and_agree));
+                        cmd.Parameters.AddWithValue("@gn32_accept_mail_sms", InsertPilotRequest.ToFlag(request.gn32_accept_mail_sms));
 
                         await cmd.ExecuteNonQueryAsync();
                     }
                 }
 
-                // שליחת מייל ברוכים הבאים
-                await _emailService.SendWelcomeEmailAsync(request.Email, request.FullName);
+                // שליחת מייל ברוכים הבאים — הרישום כבר נשמר, ולכן כשלון בשליחת המייל
+                // לא אמור להפוך רישום מוצלח להודעת שגיאה מול המשתמש.
+                try
+                {
+                    await _emailService.SendWelcomeEmailAsync(request.Email, request.FullName);
+                }
+                catch (Exception mailEx)
+                {
+                    _logger.LogError($"InsertPilot: welcome email failed for Email={request.Email}: {mailEx.Message}");
+                }
 
                 _logger.LogInformation($"Pilot registration successful for Email={request.Email}");
 
@@ -92,7 +100,7 @@ namespace MyApi.Controllers
                     // אבחון — מזהה הגרסה שענתה לבקשה.
                     // אם השדה הזה לא מופיע בתשובה שהאפליקציה מקבלת,
                     // השרת מריץ build ישן ולא את הקוד הזה.
-                    build = "2026-10-17-consent-fix",
+                    build = "2026-10-18-consent-flexible",
                     message = "פרטי הפיילוט נשמרו בהצלחה"
                 });
             }
@@ -127,10 +135,37 @@ namespace MyApi.Controllers
         // The property names match the incoming JSON keys EXACTLY, so binding works
         // under System.Text.Json AND Newtonsoft. A [JsonPropertyName] attribute alone
         // is silently ignored when the project is configured with AddNewtonsoftJson().
+        //
+        // Kept as object so BOTH shapes bind: 1/0 (current frontend) and true/false
+        // (an older build of the frontend still cached in a browser). A boolean that
+        // could not bind left the property at 0 — which is how a checked consent was
+        // saved as 0.
         [JsonPropertyName("gn32_read_and_agree")]
-        public int gn32_read_and_agree { get; set; }
+        public object gn32_read_and_agree { get; set; }
 
         [JsonPropertyName("gn32_accept_mail_sms")]
-        public int gn32_accept_mail_sms { get; set; }
+        public object gn32_accept_mail_sms { get; set; }
+
+        // 1 = agreed, 0 = not agreed — whatever shape the value arrived in.
+        public static int ToFlag(object value)
+        {
+            if (value == null) return 0;
+            if (value is bool b) return b ? 1 : 0;
+            if (value is string s) return (s == "1" || s.Equals("true", StringComparison.OrdinalIgnoreCase)) ? 1 : 0;
+            if (value is System.Text.Json.JsonElement je)
+            {
+                switch (je.ValueKind)
+                {
+                    case System.Text.Json.JsonValueKind.True: return 1;
+                    case System.Text.Json.JsonValueKind.False: return 0;
+                    case System.Text.Json.JsonValueKind.Number: return je.GetDouble() != 0 ? 1 : 0;
+                    case System.Text.Json.JsonValueKind.String:
+                        var str = je.GetString();
+                        return (str == "1" || (str != null && str.Equals("true", StringComparison.OrdinalIgnoreCase))) ? 1 : 0;
+                    default: return 0;
+                }
+            }
+            try { return Convert.ToInt32(value) != 0 ? 1 : 0; } catch { return 0; }
+        }
     }
 }

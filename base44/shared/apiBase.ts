@@ -1,8 +1,8 @@
 // Shared API base resolver — determines whether to route C# API calls
 // to the ngrok tunnel (Base44 builder/preview) or the production server (uniclass.co.il).
 
-const NGROK_BASE = 'https://hacking-frighten-dandy.ngrok-free.dev';
-const PRODUCTION_BASE = 'http://corewebapi-env.il-central-1.elasticbeanstalk.com';
+export const NGROK_BASE = 'https://hacking-frighten-dandy.ngrok-free.dev';
+export const PRODUCTION_BASE = 'http://corewebapi-env.il-central-1.elasticbeanstalk.com';
 
 /**
  * Resolves the C# API base URL from a known app/frontend URL string.

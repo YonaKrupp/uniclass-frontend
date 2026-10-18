@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
     // that can end up on a laptop.
     const API_BASE = PRODUCTION_BASE;
     console.log('[pilotInsertProxy] API_BASE=', API_BASE);
-
+ 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });
     }

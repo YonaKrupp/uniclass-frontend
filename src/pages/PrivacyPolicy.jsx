@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import AccessibilityToolbar from "@/components/landing/AccessibilityToolbar";
 
 const LOGO = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c40751db9_Logo_UNICLASS_purple_PNG.png";
 
@@ -192,6 +193,7 @@ export default function PrivacyPolicy() {
           {renderDoc(DOC)}
         </div>
       </div>
+      <AccessibilityToolbar />
     </div>
   );
 }

@@ -16,7 +16,7 @@ import AccessibilityToolbar from "@/components/landing/AccessibilityToolbar";
 
 export default function Landing() {
   return (
-    <div dir="rtl" className="landing min-h-screen bg-background overflow-x-hidden">
+    <div dir="rtl" className="landing min-h-screen bg-background overflow-x-clip">
       <a href="#main-content" className="skip-link">דלג לתוכן הראשי</a>
       <LandingHeader />
       <main id="main-content" className="flex flex-col md:block">

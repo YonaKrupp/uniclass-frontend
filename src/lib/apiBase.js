@@ -13,8 +13,15 @@ export const PRODUCTION_API_BASE = "http://corewebapi-env.il-central-1.elasticbe
 
 const LOCAL_DEV_HOSTS = ["localhost", "127.0.0.1"];
 
+// The builder/preview is served from a Base44 host; local development from
+// localhost. Both talk to the tunnel. Any other address — uniclass.co.il above
+// all — is a real visitor and talks to the production server.
+export function isTunnelHost(host) {
+  return LOCAL_DEV_HOSTS.some((local) => host.includes(local)) || host.includes("base44");
+}
+
 export function resolveApiBase() {
   if (typeof window === "undefined") return PRODUCTION_API_BASE;
   const host = window.location.hostname || "";
-  return LOCAL_DEV_HOSTS.some((local) => host.includes(local)) ? NGROK_API_BASE : PRODUCTION_API_BASE;
+  return isTunnelHost(host) ? NGROK_API_BASE : PRODUCTION_API_BASE;
 }

@@ -1,13 +1,15 @@
 // Pilot (teacher) registration proxy.
 //
-// Every registration is written to the PRODUCTION server. The address is
-// hard-coded right here: this endpoint does not route by host, by header or by
-// anything the page sends, so a real visitor's details can never end up on the
-// developer's machine.
-const API_BASE = 'http://corewebapi-env.il-central-1.elasticbeanstalk.com';
+// The page the visitor is on decides where the registration is written: the
+// Base44 builder/preview writes to the developer's tunnel, every other origin
+// (uniclass.co.il above all) writes to the production server. The shared
+// resolver reads the caller origin, so a real visitor's details never end up on
+// the developer's machine.
+import { getApiBase } from '../../shared/apiBase.ts';
 
 export default async function (req: Request): Promise<Response> {
   try {
+    const API_BASE = getApiBase(req);
     const body = await req.json();
     const {
       fullName, email, phone, educationalInstitution, academicDegree, gn32_Notes,
@@ -25,7 +27,7 @@ export default async function (req: Request): Promise<Response> {
       gn32_read_and_agree: gn32_read_and_agree ? 1 : 0,
       gn32_accept_mail_sms: gn32_accept_mail_sms ? 1 : 0,
     };  
-
+ 
     const apiRes = await fetch(`${API_BASE}/api/Pilot/insert_pilot`, {
       method: 'POST',
       headers: {

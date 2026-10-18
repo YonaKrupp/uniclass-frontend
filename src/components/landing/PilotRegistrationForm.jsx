@@ -88,6 +88,9 @@ export default function PilotRegistrationForm() {
       gn32_Notes: form.notes,
       gn32_read_and_agree: consentPrivacy ? 1 : 0,
       gn32_accept_mail_sms: consentMarketing ? 1 : 0,
+      // Tells the proxy which environment this page runs on, so the request goes to
+      // the same API base the page displays (Base44 preview → ngrok, site → production).
+      clientOrigin: window.location.origin,
     };
     try {
       const response = await base44.functions.invoke("pilotInsertProxy", payload);

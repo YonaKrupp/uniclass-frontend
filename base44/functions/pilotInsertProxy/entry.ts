@@ -8,7 +8,9 @@ Deno.serve(async (req) => {
       gn32_read_and_agree, gn32_accept_mail_sms,
     } = body;
 
-    const API_BASE = getApiBase(req);
+    // The frontend sends the origin the form was submitted from, so the request
+    // always lands on the same API the page advertises (production vs ngrok).
+    const API_BASE = getApiBase(req, body.clientOrigin);
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });

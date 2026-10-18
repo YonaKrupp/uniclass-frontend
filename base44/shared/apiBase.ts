@@ -31,11 +31,20 @@ const isHttpUrl = (value: string): boolean => value.startsWith('http');
  *
  * Defaults to ngrok (Base44 builder/preview environment).
  */
-export function getApiBase(req: Request): string {
+export function getApiBase(req: Request, clientOrigin?: string): string {
   const origin = req.headers.get('Origin') || req.headers.get('origin') || '';
   const referer = req.headers.get('Referer') || req.headers.get('referer') || '';
   const appUrlHeader = req.headers.get('X-Base44-App-Url') || '';
+  const headerOrigin = req.headers.get('X-Client-Origin') || '';
   const callerOrigins = [origin, referer].filter(isHttpUrl);
+
+  // 0) The page the user is actually on is the most reliable signal: the platform
+  //    gateway does not forward the browser's Origin/Referer to the function, so the
+  //    frontend sends its own origin explicitly (body.clientOrigin / X-Client-Origin).
+  const declaredOrigin = clientOrigin || headerOrigin;
+  if (declaredOrigin && isHttpUrl(declaredOrigin)) {
+    return getApiBaseFromAppUrl(declaredOrigin);
+  }
 
   // 1) A non-Base44 caller origin wins — the real site always talks to production.
   const nonBase44Origin = callerOrigins.find((value) => !value.includes('base44'));

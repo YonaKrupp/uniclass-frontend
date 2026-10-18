@@ -63,3 +63,12 @@ export function getApiBase(req: Request, clientOrigin?: string): string {
 export function isProductionBase(apiBase: string): boolean {
   return apiBase === PRODUCTION_BASE;
 }
+
+/**
+ * True when the given value is one of the two API bases we own. The frontend
+ * resolves the base itself (so the request always matches the address shown on
+ * screen) and sends it along — anything else is ignored.
+ */
+export function isKnownApiBase(value?: string): boolean {
+  return value === NGROK_BASE || value === PRODUCTION_BASE;
+}

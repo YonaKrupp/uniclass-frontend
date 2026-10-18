@@ -1,4 +1,4 @@
-import { getApiBase } from '../../shared/apiBase.ts';
+import { getApiBase, isKnownApiBase } from '../../shared/apiBase.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -10,7 +10,13 @@ Deno.serve(async (req) => {
 
     // The frontend sends the origin the form was submitted from, so the request
     // always lands on the same API the page advertises (production vs ngrok).
-    const API_BASE = getApiBase(req, body.clientOrigin);
+    // The form sends the API base it displays on screen; fall back to the
+    // request-based resolution only when it is missing or unknown.
+    const API_BASE = isKnownApiBase(body.apiBase) ? body.apiBase : getApiBase(req, body.clientOrigin);
+    console.log('[pilotInsertProxy] API_BASE=', API_BASE,
+      '| apiBase=', body.apiBase || '(none)',
+      '| clientOrigin=', body.clientOrigin || '(none)',
+      '| appUrl=', req.headers.get('X-Base44-App-Url') || '(none)');
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Loader2, CheckCircle2, User, Mail, Phone, BookMarked, Building2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { resolveApiBase } from "@/lib/apiBase";
 import FormField from "./FormField";
 
 export default function PilotRegistrationForm() {
@@ -88,9 +89,8 @@ export default function PilotRegistrationForm() {
       gn32_Notes: form.notes,
       gn32_read_and_agree: consentPrivacy ? 1 : 0,
       gn32_accept_mail_sms: consentMarketing ? 1 : 0,
-      // Tells the proxy which environment this page runs on, so the request goes to
-      // the same API base the page displays (Base44 preview → ngrok, site → production).
-      clientOrigin: window.location.origin,
+      // Same base the page shows on screen, so the request can never drift from it.
+      apiBase: resolveApiBase(),
     };
     try {
       const response = await base44.functions.invoke("pilotInsertProxy", payload);

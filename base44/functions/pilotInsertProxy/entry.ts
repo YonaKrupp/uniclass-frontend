@@ -1,6 +1,12 @@
-import { PRODUCTION_BASE } from '../../shared/apiBase.ts';
+// Pilot (teacher) registration proxy.
+//
+// Every registration is written to the PRODUCTION server. The address is
+// hard-coded right here: this endpoint does not route by host, by header or by
+// anything the page sends, so a real visitor's details can never end up on the
+// developer's machine.
+const API_BASE = 'http://corewebapi-env.il-central-1.elasticbeanstalk.com';
 
-Deno.serve(async (req) => {
+export default async function (req: Request): Promise<Response> {
   try {
     const body = await req.json();
     const {
@@ -8,16 +14,8 @@ Deno.serve(async (req) => {
       gn32_read_and_agree, gn32_accept_mail_sms,
     } = body;
 
-    // Pilot registrations ALWAYS go to the production server.
-    //
-    // The landing page is reachable from several hosts (the custom domain, the
-    // published Base44 address, the builder preview) and the developer's tunnel
-    // must never receive a real visitor's details — so this endpoint does not
-    // route by host, by header or by anything the page sends. There is no path
-    // that can end up on a laptop.
-    const API_BASE = PRODUCTION_BASE;
     console.log('[pilotInsertProxy] API_BASE=', API_BASE);
- 
+
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });
     }
@@ -28,13 +26,14 @@ Deno.serve(async (req) => {
       gn32_accept_mail_sms: gn32_accept_mail_sms ? 1 : 0,
     };
 
-    const apiRes = await fetch(`${API_BASE}/api/Pilot/insert_pilot`,  {
+    const apiRes = await fetch(`${API_BASE}/api/Pilot/insert_pilot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
       },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(20000),
     });
 
     const text = await apiRes.text();
@@ -50,4 +49,4 @@ Deno.serve(async (req) => {
     console.error('insert_pilot error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

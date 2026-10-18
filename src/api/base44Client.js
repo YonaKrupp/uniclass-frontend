@@ -40,6 +40,9 @@ const base44 = createClient({
   appBaseUrl: 'https://app.base44.com',
   token: '',  // Always empty — no automatic auth attempts
   skipServiceRole: true,
+  // The origin the page is actually served from, sent on every call so the backend
+  // proxies can pick the right C# API (Base44 preview → tunnel, custom domain → production).
+  headers: { 'X-Client-Origin': typeof window !== 'undefined' ? window.location.origin : '' },
   // Base44 built-in analytics fully disabled: no events are sent and no
   // base44_analytics_session_id is written to the browser.
   analytics: { enabled: false }

@@ -1,4 +1,4 @@
-import { isKnownApiBase, PRODUCTION_BASE } from '../../shared/apiBase.ts';
+import { PRODUCTION_BASE } from '../../shared/apiBase.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -8,11 +8,11 @@ Deno.serve(async (req) => {
       gn32_read_and_agree, gn32_accept_mail_sms,
     } = body;
 
-    // The form sends the API base it displays on screen. When it does not
-    // (an older deployed page), the registration still goes to production —
-    // never to the developer's ngrok tunnel.
-    const API_BASE = isKnownApiBase(body.apiBase) ? body.apiBase : PRODUCTION_BASE;
-    console.log('[pilotInsertProxy] API_BASE=', API_BASE, '| apiBase=', body.apiBase || '(none)');
+    // Pilot registration ALWAYS goes to the production server: the tunnel on the
+    // developer's machine must never take part in a real visitor's signup, and
+    // ignoring whatever base the caller sends removes any way to reach it.
+    const API_BASE = PRODUCTION_BASE;
+    console.log('[pilotInsertProxy] API_BASE=', API_BASE, '| ignored apiBase=', body.apiBase || '(none)');
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });

@@ -46,7 +46,7 @@ export default function Unsubscribe() {
         </Link>
         <div className="bg-card rounded-2xl border border-border shadow-sm p-8">
           <img src={LOGO} alt="UniClass" className="h-8 mx-auto mb-4" />
-          <h1 className="text-2xl font-heading font-bold text-foreground text-center mb-4">הסרה מרשימת התפוצה.</h1>
+          <h1 className="text-2xl font-heading font-bold text-foreground text-center mb-4">הסרה מרשימת התפוצה</h1>
           <div className="flex justify-center mb-4" aria-hidden="true">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
               <Mail className="w-6 h-6 text-primary" />

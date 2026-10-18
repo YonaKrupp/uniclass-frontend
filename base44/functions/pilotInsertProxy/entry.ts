@@ -1,4 +1,4 @@
-import { PRODUCTION_BASE } from '../../shared/apiBase.ts';
+import { getApiBase } from '../../shared/apiBase.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -8,10 +8,11 @@ Deno.serve(async (req) => {
       gn32_read_and_agree, gn32_accept_mail_sms,
     } = body;
 
-    // Pilot registration ALWAYS goes to the production server: the tunnel on the
-    // developer's machine must never take part in a real visitor's signup, and
-    // ignoring whatever base the caller sends removes any way to reach it.
-    const API_BASE = PRODUCTION_BASE;
+    // The page the visitor is on decides, exactly like every other proxy:
+    // Base44 preview/builder → the developer's tunnel, the live site → production.
+    // Whatever base the caller sends in the body is ignored — only the request's
+    // own origin signals count, so a request can never be steered by its payload.
+    const API_BASE = getApiBase(req);
     console.log('[pilotInsertProxy] API_BASE=', API_BASE, '| ignored apiBase=', body.apiBase || '(none)');
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {

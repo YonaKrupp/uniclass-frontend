@@ -1,4 +1,4 @@
-import { getApiBase } from '../../shared/apiBase.ts';
+import { getApiBase, NGROK_BASE, PRODUCTION_BASE } from '../../shared/apiBase.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -8,12 +8,21 @@ Deno.serve(async (req) => {
       gn32_read_and_agree, gn32_accept_mail_sms,
     } = body;
 
-    // The page the visitor is on decides, exactly like every other proxy:
-    // Base44 preview/builder → the developer's tunnel, the live site → production.
-    // Whatever base the caller sends in the body is ignored — only the request's
-    // own origin signals count, so a request can never be steered by its payload.
-    const API_BASE = getApiBase(req);
-    console.log('[pilotInsertProxy] API_BASE=', API_BASE, '| ignored apiBase=', body.apiBase || '(none)');
+    // The page the visitor is on decides: Base44 builder/preview → the developer's
+    // tunnel, the live site → production.
+    //
+    // Two independent sources are used, and production always wins:
+    // 1. `apiBase` — the environment the page declares for itself (only the two
+    //    known servers are accepted, anything else is ignored).
+    // 2. the request's own origin signals (X-Client-Origin / Origin / Referer).
+    // A real visitor can therefore never be routed to the developer's machine,
+    // whatever a browser, a proxy or an older cached page happens to send.
+    const signalBase = getApiBase(req);
+    const declared = body.apiBase === NGROK_BASE || body.apiBase === PRODUCTION_BASE ? body.apiBase : '';
+    const API_BASE = declared === PRODUCTION_BASE || signalBase === PRODUCTION_BASE
+      ? PRODUCTION_BASE
+      : (declared || signalBase);
+    console.log('[pilotInsertProxy] API_BASE=', API_BASE, '| declared=', body.apiBase || '(none)', '| signals=', signalBase);
 
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });

@@ -7,7 +7,7 @@
 export const NGROK_API_BASE = "https://hacking-frighten-dandy.ngrok-free.dev";
 export const PRODUCTION_API_BASE = "http://corewebapi-env.il-central-1.elasticbeanstalk.com";
 
-const LOCAL_DEV_HOSTS = ["localhost", "127.0.0.1", "ngrok"];
+const LOCAL_DEV_HOSTS = ["localhost", "127.0.0.1"];
 
 export function resolveApiBase() {
   if (typeof window === "undefined") return PRODUCTION_API_BASE;

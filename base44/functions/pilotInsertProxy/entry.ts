@@ -37,7 +37,11 @@ Deno.serve(async (req) => {
     let data;
     try { data = JSON.parse(text); } catch { data = { raw: text }; }
 
-    return Response.json(data);
+    // Forward the server's REAL status: a failed insert must reach the form as a
+    // failure, never as a silent success.
+    console.log('[pilotInsertProxy] API status:', apiRes.status, '| body:', text.slice(0, 500));
+
+    return Response.json(data, { status: apiRes.status });
   } catch (error) {
     console.error('insert_pilot error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });

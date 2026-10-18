@@ -95,14 +95,15 @@ export default function PilotRegistrationForm() {
     try {
       const response = await base44.functions.invoke("pilotInsertProxy", payload);
       const res = response?.data ?? response;
-      if (res?.error) {
-        setError(res?.error || "שגיאה בשליחת הטופס. נסו שוב.");
+      if (res?.success === false || res?.error) {
+        setError(res?.message || res?.error || "שגיאה בשליחת הטופס. נסו שוב.");
       } else {
         setSuccess(true);
       }
     } catch (err) {
       console.error("Pilot registration error:", err);
-      setError(err?.response?.data?.error || "שגיאה בשליחת הטופס. נסו שוב.");
+      const serverData = err?.response?.data;
+      setError(serverData?.message || serverData?.error || "שגיאה בשליחת הטופס. נסו שוב.");
     } finally {
       setLoading(false);
     }

@@ -44,7 +44,7 @@ export default function LoginChoice() {
 
         {loginDisabled && (
           <div className="app-fade-up-d1 mb-5 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 text-sm rounded-xl p-3 text-center font-body border border-amber-200 dark:border-amber-800">
-            הכניסה לחשבונות אינה זמינה מכתובת זו. ניתן להיכנס דרך כתובת המערכת הפנימית.
+            כניסת מורים אינה זמינה מכתובת זו. ניתן להיכנס דרך כתובת המערכת הפנימית.
           </div>
         )}
         {/* Two large side-by-side choice cards */}
@@ -73,7 +73,7 @@ export default function LoginChoice() {
           {/* Student — mint accent */}
           <Link
             to="/student-login"
-            className={`group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden ${loginDisabled ? "pointer-events-none opacity-60 cursor-not-allowed" : "hover:-translate-y-1 hover:shadow-xl hover:border-mint/40"}`}
+            className="group relative bg-card rounded-3xl border border-border p-7 sm:p-8 text-center shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:border-mint/40"
           >
             <div
               className="absolute -top-16 -left-16 w-48 h-48 rounded-full blur-[90px] opacity-[0.13] pointer-events-none"

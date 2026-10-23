@@ -184,6 +184,18 @@ Deno.serve(async (req) => {
       : `${appUrl}/student-schedule`;
     console.log('[hypPaymentReturn] scheduleHref:', scheduleHref);
 
+    // Payment verified — the saved params were only needed to restore the session
+    // right after the HYP redirect, so remove the record now.
+    if (isSuccess && savedScheduleParams?.id) {
+      try {
+        const base44Cleanup = createClientFromRequest(req);
+        await base44Cleanup.asServiceRole.entities.PaymentScheduleParam.delete(savedScheduleParams.id);
+        console.log('[hypPaymentReturn] Deleted PaymentScheduleParam:', savedScheduleParams.id);
+      } catch (e) {
+        console.error('[hypPaymentReturn] Failed to delete PaymentScheduleParam:', e.message);
+      }
+    }
+
     const html = `<!DOCTYPE html>
 <html dir="rtl" lang="he">
 <head>

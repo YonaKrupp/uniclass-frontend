@@ -201,11 +201,11 @@ export default function StudentHome() {
                       ההחזר: {formatShekel(cancelRefund.refund)}
                     </p>
                   </>
-                ) : (
+                ) : !cancelRefund.fullRefund ? (
                   <p className="text-xs font-body text-muted-foreground leading-relaxed">
                     דמי הביטול הם 5% ממחיר המורה, ולא יותר מ-100 ₪. היתרה מוחזרת.
                   </p>
-                )}
+                ) : null}
               </div>
             )}
             <div className="flex gap-2 justify-center pt-1">

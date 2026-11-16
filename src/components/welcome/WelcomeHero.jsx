@@ -56,6 +56,11 @@ export default function WelcomeHero() {
               {SUBLINE}
             </p>
 
+            <p className="wl-rise wl-rise-2 mt-3 inline-flex items-center gap-2 rounded-full border border-mint/30 bg-mint/10 px-3 py-1 text-xs font-body font-semibold text-foreground/80 md:text-sm">
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-mint" />
+              הפלטפורמה נמצאת בשלב פיילוט
+            </p>
+
             <WelcomeHeroActions />
 
             <ul className="wl-rise wl-rise-3 mt-8 flex flex-wrap gap-2">

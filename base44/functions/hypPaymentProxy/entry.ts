@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import { getApiBase } from '../../shared/apiBase.ts';
+import { docsVersionForAudience, hasCurrentConsent } from '../../shared/legalConsent.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -11,6 +12,40 @@ Deno.serve(async (req) => {
     if (!authToken && action !== 'verifyPayment') {
       console.log('[hypPaymentProxy] Missing authToken - returning 401');
       return Response.json({ error: 'Missing token' }, { status: 401 });
+    }
+
+    // אכיפה בצד השרת: אין ליצור חיוב ללא אישור תנאים תקף בגרסה העדכנית.
+    // הבדיקה מתבצעת לפני כל קריאה לסליקה ואינה משנה את תהליך התשלום עצמו.
+    if (action === 'createPayment') {
+      const studentEmailForConsent = String(params.studentEmail || '').trim().toLowerCase();
+      if (!studentEmailForConsent) {
+        console.warn('[hypPaymentProxy] createPayment rejected — missing studentEmail');
+        return Response.json({ error: 'חסר אימייל תלמיד', _status: 400 }, { status: 200 });
+      }
+      try {
+        const base44 = createClientFromRequest(req);
+        const docsVersion = await docsVersionForAudience(base44, 'student');
+        const approved = await hasCurrentConsent(
+          base44,
+          studentEmailForConsent,
+          'student_payment',
+          docsVersion,
+        );
+        if (!approved) {
+          console.warn('[hypPaymentProxy] payment blocked — no consent for', studentEmailForConsent);
+          return Response.json(
+            { error: 'יש לאשר את התנאים כדי להמשיך', needsConsent: true, _status: 403 },
+            { status: 200 },
+          );
+        }
+        console.log('[hypPaymentProxy] consent verified for', studentEmailForConsent, docsVersion);
+      } catch (consentError) {
+        console.error('[hypPaymentProxy] consent check failed:', consentError.message);
+        return Response.json(
+          { error: 'לא ניתן לאמת את אישור התנאים כעת. אנא נסו שוב.', _status: 503 },
+          { status: 200 },
+        );
+      }
     }
 
     // Save schedule params for retrieval by hypPaymentReturn after HYP redirect

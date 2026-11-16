@@ -80,6 +80,14 @@ export default function TeacherResults() {
     return ratings.filter((r) => getTeacherEmailFromRating(r) === target);
   };
 
+  // מציג את הסכום עם שתי ספרות אחרי הנקודה, בלי לעגל את הערך עצמו
+  const formatSalary = (value) => {
+    const raw = String(value ?? "").replace(/₪/g, "").replace(/[^\d.]/g, "").trim();
+    const num = Number(raw);
+    if (!raw || Number.isNaN(num)) return raw;
+    return num.toFixed(2);
+  };
+
   const getSalaryNumber = (t) => {
     const raw = (t.teacher_salary_requirement ?? "").toString().replace(/₪/g, "").replace(/[^\d.]/g, "").trim();
     return raw ? Number(raw) : null;
@@ -288,7 +296,7 @@ export default function TeacherResults() {
                       {salary && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground font-body">
                           <CreditCard className="w-4 h-4 shrink-0 text-primary/70" />
-                          <span>{salary.replace(/₪/g, "").trim()} ₪</span>
+                          <span>שכר מבוקש: {formatSalary(salary)} ₪</span>
                         </div>
                       )}
                       {duration && (

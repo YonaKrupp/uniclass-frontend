@@ -13,7 +13,6 @@ const COLUMNS = [
   { key: "gn04_levelName", label: "רמת לימוד" },
   { key: "pastlessonsCount", label: "שיעורים\nשנלמדו" },
   { key: "futurelessonsCount", label: "שיעורים\nמתוכננים" },
-  { key: "gn02_PhoneNumber", label: "טלפון" },
 ];
 
 export default function TeachersList() {

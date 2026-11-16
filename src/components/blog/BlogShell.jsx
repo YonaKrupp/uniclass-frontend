@@ -10,7 +10,7 @@ export default function BlogShell({ children, width = "max-w-[820px]" }) {
       <a href="#main-content" className="skip-link">דלג לתוכן הראשי</a>
       <div id="main-content" className={`${width} mx-auto px-4 sm:px-6 py-12 sm:py-16`}>
         <Link
-          to="/"
+          to="/welcome"
           className="inline-flex items-center gap-2 text-sm font-body font-medium text-primary hover:underline mb-6"
         >
           <ArrowRight className="w-4 h-4" aria-hidden="true" />

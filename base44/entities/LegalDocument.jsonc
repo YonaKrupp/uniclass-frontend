@@ -1,0 +1,75 @@
+{
+  "name": "LegalDocument",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string",
+      "title": "\u05e0\u05ea\u05d9\u05d1 (slug)"
+    },
+    "title": {
+      "type": "string",
+      "title": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05de\u05e1\u05de\u05da"
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "teacher",
+        "student",
+        "all"
+      ],
+      "default": "all",
+      "title": "\u05e7\u05d4\u05dc \u05d9\u05e2\u05d3",
+      "enumColors": [
+        "purple",
+        "blue",
+        "gray"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "title": "\u05d2\u05e8\u05e1\u05ea \u05d4\u05de\u05e1\u05de\u05da"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date",
+      "title": "\u05ea\u05d0\u05e8\u05d9\u05da \u05ea\u05d5\u05e7\u05e3"
+    },
+    "body": {
+      "type": "string",
+      "title": "\u05d2\u05d5\u05e3 \u05d4\u05de\u05e1\u05de\u05da (Markdown)"
+    },
+    "body_continuation": {
+      "type": "string",
+      "title": "\u05d4\u05de\u05e9\u05da \u05d2\u05d5\u05e3 \u05d4\u05de\u05e1\u05de\u05da (Markdown)"
+    },
+    "is_published": {
+      "type": "boolean",
+      "default": false,
+      "title": "\u05de\u05e4\u05d5\u05e8\u05e1\u05dd"
+    }
+  },
+  "required": [
+    "slug",
+    "title",
+    "audience",
+    "is_published"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

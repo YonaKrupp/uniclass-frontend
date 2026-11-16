@@ -7,12 +7,11 @@ import GoogleIcon from "@/components/GoogleIcon";
 import GoogleAuthLoading from "@/components/GoogleAuthLoading";
 import { useGoogleAuthCallback } from "@/hooks/useGoogleAuthCallback";
 import MeshGradient from "@/components/landing/MeshGradient";
-import { isProductionDomain } from "@/lib/isProductionDomain";
+
 
 const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
 export default function TeacherLogin() {
-  const loginDisabled = isProductionDomain();
   const [dark, setDark] = useDarkMode();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -113,15 +112,10 @@ export default function TeacherLogin() {
 
         {/* Form Card */}
         <div className="app-fade-up-d1 bg-card/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-primary/5 border border-border p-6 sm:p-8 space-y-6">
-          {loginDisabled && (
-            <div className="bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200 text-sm rounded-xl p-3 text-center font-body border border-amber-200 dark:border-amber-800">
-              הכניסה לחשבונות אינה זמינה מכתובת זו. ניתן להיכנס דרך כתובת המערכת הפנימית.
-            </div>
-          )}
           <button
             type="button"
             onClick={handleGoogle}
-            disabled={googleLoading || loginDisabled}
+            disabled={googleLoading}
             className="w-full py-3.5 bg-card border border-border text-foreground rounded-xl text-base font-heading font-semibold hover:border-primary/40 hover:shadow-md hover:shadow-primary/10 transition-all min-h-[52px] flex items-center justify-center gap-2"
           >
             {googleLoading ? (
@@ -154,30 +148,37 @@ export default function TeacherLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-heading font-medium text-foreground">אימייל</label>
+              <label htmlFor="teacher-login-email" className="text-sm font-heading font-medium text-foreground">אימייל</label>
               <div className="relative">
                 <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
+                  id="teacher-login-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="הכניסו את האימייל שלכם"
                   required
+                  aria-required="true"
+                  autoComplete="email"
+                  inputMode="email"
                   className="w-full pr-10 pl-4 py-3 rounded-xl border border-primary/15 bg-primary/5 text-foreground placeholder:text-muted-foreground focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/40 focus:shadow-md focus:shadow-primary/10 transition-all text-base font-body min-h-[48px]"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-heading font-medium text-foreground">סיסמה</label>
+              <label htmlFor="teacher-login-password" className="text-sm font-heading font-medium text-foreground">סיסמה</label>
               <div className="relative">
                 <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
+                  id="teacher-login-password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="הכניסו את הסיסמה שלכם"
                   required
+                  aria-required="true"
+                  autoComplete="current-password"
                   className="w-full pr-10 pl-12 py-3 rounded-xl border border-primary/15 bg-primary/5 text-foreground placeholder:text-muted-foreground focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/40 focus:shadow-md focus:shadow-primary/10 transition-all text-base font-body min-h-[48px]"
                 />
                 <button
@@ -193,7 +194,7 @@ export default function TeacherLogin() {
 
             <button
               type="submit"
-              disabled={loading || loginDisabled}
+              disabled={loading}
               className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all min-h-[52px] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {loading ? (

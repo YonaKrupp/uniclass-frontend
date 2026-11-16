@@ -285,10 +285,28 @@ namespace CoreWebAPI.Controllers
                 // Step 3: Get student lessons grouped summary
                 var lessonsGrouped = await GetStudentLessonsGrouped(connection, request.StudentEmail, request.Date);
 
+                // Step 4: Student birth date (used to decide the consent wording / age declaration)
+                string studentDateOfBirth = null;
+                try
+                {
+                    using var dobCmd = new SqlCommand(
+                        @"SELECT TOP 1 [gn01_DateOfBirth]
+                          FROM [dbo].[t_gn01_registration_Students]
+                          WHERE [gn01_Email] = @Email", connection);
+                    dobCmd.Parameters.AddWithValue("@Email", request.StudentEmail);
+                    var dobValue = await dobCmd.ExecuteScalarAsync();
+                    if (dobValue is DateTime dob) studentDateOfBirth = dob.ToString("yyyy-MM-dd");
+                }
+                catch (Exception dobEx)
+                {
+                    Console.WriteLine($"[studentPayment] birth date read failed: {dobEx.Message}");
+                }
+
                 return Ok(new
                 {
                     lessonsList = lessonsList,
-                    lessonsGrouped = lessonsGrouped
+                    lessonsGrouped = lessonsGrouped,
+                    studentDateOfBirth = studentDateOfBirth
                 });
             }
             catch (Exception ex)

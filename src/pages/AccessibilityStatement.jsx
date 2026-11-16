@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import PageLogo from "@/components/PageLogo";
-import AccessibilityToolbar from "@/components/landing/AccessibilityToolbar";
 
 export default function AccessibilityStatement() {
   return (
@@ -122,7 +121,7 @@ export default function AccessibilityStatement() {
           </section>
         </div>
       </div>
-      <AccessibilityToolbar />
+
     </div>
   );
 }

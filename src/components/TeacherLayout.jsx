@@ -5,16 +5,20 @@ import { useDarkMode } from "@/lib/useDarkMode";
 import { useSessionRenewal } from "@/lib/useSessionRenewal";
 import { clearFetchGuard } from "@/lib/fetchGuard";
 import AppBackground from "@/components/AppBackground";
+import TeacherOnboarding from "@/components/teacher/onboarding/TeacherOnboarding";
+import { ONBOARDING_TOUR_STEP_EVENT } from "@/lib/teacherOnboarding";
+import { base44 } from "@/api/base44Client";
+import ConsentGate from "@/components/teacher/ConsentGate";
 
 const teacherMenuItems = [
-  { label: "דף הבית", path: "/teacher-home", icon: Home },
-  { label: "ניהול שיעורים", path: "/teacher-schedule", icon: Calendar },
-  { label: "כניסה לכיתה", path: "/teacher-video", icon: Video },
-  { label: "רשימת תלמידים", path: "/teacher-students", icon: GraduationCap },
-  { label: "סיכום שיעור", path: "/lesson-summary", icon: ClipboardList },
-  { label: "פרופיל מורה", path: "/teacher-profile", icon: User },
-  { label: "צ'אט", path: "/teacher-chat", icon: MessageCircle },
-  { label: "צור קשר", path: "/teacher-contact", icon: Mail },
+  { label: "דף הבית", path: "/teacher-home", icon: Home, tour: "home" },
+  { label: "ניהול שיעורים", path: "/teacher-schedule", icon: Calendar, tour: "schedule" },
+  { label: "כניסה לכיתה", path: "/teacher-video", icon: Video, tour: "video" },
+  { label: "רשימת תלמידים", path: "/teacher-students", icon: GraduationCap, tour: "students" },
+  { label: "סיכום שיעור", path: "/lesson-summary", icon: ClipboardList, tour: "summary" },
+  { label: "פרופיל מורה", path: "/teacher-profile", icon: User, tour: "profile" },
+  { label: "צ'אט", path: "/teacher-chat", icon: MessageCircle, tour: "chat" },
+  { label: "צור קשר", path: "/teacher-contact", icon: Mail, tour: "contact" },
 ];
 
 const ADMIN_EMAIL = "idanmichaly@gmail.com";
@@ -27,6 +31,31 @@ export default function TeacherLayout() {
   const location = useLocation();
   const hideNav = location.pathname === "/teacher-picture";
   useSessionRenewal();
+
+  const teacherEmail = (() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("userData") || sessionStorage.getItem("userData") || "{}");
+      return String(stored.teacherEmail || stored.email || "").toLowerCase();
+    } catch {
+      return "";
+    }
+  })();
+  const [consentRequired, setConsentRequired] = useState(false);
+
+  // מורה שאישר גרסת מסמכים ישנה נחסם עד לאישור מחדש.
+  useEffect(() => {
+    if (!teacherEmail) return undefined;
+    let alive = true;
+    base44.functions
+      .invoke("legalConsentProxy", { action: "status", email: teacherEmail, audience: "teacher" })
+      .then((res) => {
+        if (alive && res.data?.needsConsent) setConsentRequired(true);
+      })
+      .catch((err) => console.error("[consent] status check failed:", err));
+    return () => {
+      alive = false;
+    };
+  }, [teacherEmail]);
 
   useEffect(() => {
     // If no localStorage auth but sessionStorage has it (login without "remember me"),
@@ -42,6 +71,15 @@ export default function TeacherLayout() {
       const email = (userData.teacherEmail || userData.email || "").toLowerCase();
       setIsAdmin(email === ADMIN_EMAIL);
     } catch {}
+  }, []);
+
+  // The onboarding tour opens the collapsed menu so its current item can be highlighted
+  useEffect(() => {
+    const onTourStep = (event) => {
+      if (event.detail?.openMenu) setMenuOpen(true);
+    };
+    window.addEventListener(ONBOARDING_TOUR_STEP_EVENT, onTourStep);
+    return () => window.removeEventListener(ONBOARDING_TOUR_STEP_EVENT, onTourStep);
   }, []);
 
   const visibleMenuItems = isAdmin
@@ -73,6 +111,10 @@ export default function TeacherLayout() {
         : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
     }`;
 
+  if (consentRequired) {
+    return <ConsentGate email={teacherEmail} onAccepted={() => setConsentRequired(false)} />;
+  }
+
   return (
     <div dir="rtl" className="min-h-screen">
       <AppBackground />
@@ -91,7 +133,7 @@ export default function TeacherLayout() {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
-                  <Link key={item.path} to={item.path} className={navItemClass(isActive)}>
+                  <Link key={item.path} to={item.path} data-tour={item.tour} className={navItemClass(isActive)}>
                     <Icon className="w-3.5 h-3.5" />
                     {item.label}
                   </Link>
@@ -139,6 +181,7 @@ export default function TeacherLayout() {
                     <Link
                       key={item.path}
                       to={item.path}
+                      data-tour={item.tour}
                       onClick={() => setMenuOpen(false)}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[48px] ${
                         isActive
@@ -180,6 +223,8 @@ export default function TeacherLayout() {
       <main className="max-w-5xl mx-auto px-4 py-8 sm:py-10 app-fade-up">
         <Outlet />
       </main>
+
+      <TeacherOnboarding />
     </div>
   );
 }

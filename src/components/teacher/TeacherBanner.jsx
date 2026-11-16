@@ -7,7 +7,7 @@ import { Sparkles } from "lucide-react";
  * a "פאנל מורים" chip, and a diagonal indigo→mint gradient band with dot-grid
  * + floating blobs (no generic lifestyle photo).
  */
-export default function TeacherBanner({ name }) {
+export default function TeacherBanner({ name, pictureUrl }) {
   const safeName = (name || "מורה").trim() || "מורה";
   const parts = safeName.split(/\s+/);
   const initials = (parts[0]?.[0] || "") + (parts[1]?.[0] || "");
@@ -37,8 +37,16 @@ export default function TeacherBanner({ name }) {
       <div className="relative p-6 sm:p-8 flex items-center gap-5">
         {/* avatar */}
         <div className="relative shrink-0">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-primary to-mint flex items-center justify-center text-white text-2xl font-heading font-bold shadow-lg shadow-primary/20">
-            {initials || "מ"}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-gradient-to-br from-primary to-mint flex items-center justify-center text-white text-2xl font-heading font-bold shadow-lg shadow-primary/20">
+            {pictureUrl ? (
+              <img
+                src={pictureUrl}
+                alt={`תמונת הפרופיל של ${safeName}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              initials || "מ"
+            )}
           </div>
           <span className="absolute -bottom-0.5 -left-0.5 w-6 h-6 rounded-full bg-mint border-[3px] border-card flex items-center justify-center">
             <Sparkles className="w-3 h-3 text-white" />
@@ -50,7 +58,7 @@ export default function TeacherBanner({ name }) {
             פאנל מורים
           </span>
           <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground leading-tight truncate">
-            {`שלום, ${safeName} 👋`}
+            {`שלום, ${safeName}`}
           </h1>
           <p className="text-muted-foreground font-body">נהלו את השיעורים, התלמידים והזמינות שלכם — הכל במקום אחד</p>
         </div>

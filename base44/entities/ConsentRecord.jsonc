@@ -1,0 +1,108 @@
+{
+  "name": "ConsentRecord",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "title": "\u05de\u05d6\u05d4\u05d4 \u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "consent_type": {
+      "type": "string",
+      "enum": [
+        "teacher_signup",
+        "student_signup",
+        "student_payment"
+      ],
+      "title": "\u05e1\u05d5\u05d2 \u05d4\u05d0\u05d9\u05e9\u05d5\u05e8",
+      "enumColors": [
+        "purple",
+        "blue",
+        "green"
+      ]
+    },
+    "role_of_approver": {
+      "type": "string",
+      "enum": [
+        "teacher",
+        "student",
+        "parent"
+      ],
+      "title": "\u05de\u05d9 \u05d0\u05d9\u05e9\u05e8",
+      "enumColors": [
+        "purple",
+        "blue",
+        "yellow"
+      ]
+    },
+    "docs_version": {
+      "type": "string",
+      "title": "\u05d2\u05e8\u05e1\u05ea \u05d4\u05de\u05e1\u05de\u05db\u05d9\u05dd \u05d1\u05d6\u05de\u05df \u05d4\u05d0\u05d9\u05e9\u05d5\u05e8"
+    },
+    "accepted_terms": {
+      "type": "boolean",
+      "title": "\u05d0\u05d9\u05e9\u05d5\u05e8 \u05ea\u05e0\u05d0\u05d9\u05dd \u05d5\u05e4\u05e8\u05d8\u05d9\u05d5\u05ea"
+    },
+    "confirmed_18_plus": {
+      "type": "boolean",
+      "title": "\u05d0\u05d9\u05e9\u05d5\u05e8 \u05d2\u05d9\u05dc 18 \u05d5\u05de\u05e2\u05dc\u05d4"
+    },
+    "confirmed_parent_guardian": {
+      "type": "boolean",
+      "title": "\u05d0\u05d9\u05e9\u05d5\u05e8 \u05d4\u05d5\u05e8\u05d4 \u05d0\u05d5 \u05d0\u05e4\u05d5\u05d8\u05e8\u05d5\u05e4\u05d5\u05e1"
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "\u05de\u05d5\u05e2\u05d3 \u05d4\u05d0\u05d9\u05e9\u05d5\u05e8 (\u05e0\u05e7\u05d1\u05e2 \u05d1\u05e9\u05e8\u05ea)"
+    },
+    "ip_address": {
+      "type": "string",
+      "title": "\u05db\u05ea\u05d5\u05d1\u05ea IP"
+    },
+    "user_agent": {
+      "type": "string",
+      "title": "\u05d3\u05e4\u05d3\u05e4\u05df"
+    },
+    "document_set_version": {
+      "type": "string",
+      "title": "\u05d2\u05e8\u05e1\u05ea \u05de\u05e1\u05de\u05db\u05d9\u05dd (\u05e8\u05e9\u05d5\u05de\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05ea)"
+    },
+    "accepted_terms_privacy_conduct": {
+      "type": "boolean",
+      "title": "\u05d0\u05d9\u05e9\u05d5\u05e8 \u05ea\u05e0\u05d0\u05d9\u05dd, \u05e4\u05e8\u05d8\u05d9\u05d5\u05ea \u05d5\u05e7\u05d5\u05d3 \u05d4\u05ea\u05e0\u05d4\u05d2\u05d5\u05ea (\u05e8\u05e9\u05d5\u05de\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05ea)"
+    },
+    "accepted_recording_ai": {
+      "type": "boolean",
+      "title": "\u05d0\u05d9\u05e9\u05d5\u05e8 \u05d4\u05e7\u05dc\u05d8\u05d4 \u05d5\u05e2\u05d9\u05d1\u05d5\u05d3 \u05d1\u05d9\u05e0\u05d4 \u05de\u05dc\u05d0\u05db\u05d5\u05ea\u05d9\u05ea (\u05e8\u05e9\u05d5\u05de\u05d5\u05ea \u05d5\u05ea\u05d9\u05e7\u05d5\u05ea)"
+    }
+  },
+  "required": [
+    "user_email"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -12,7 +12,6 @@ import RegisterAside from "@/components/landing/RegisterAside";
 import MobileStickyCta from "@/components/landing/MobileStickyCta";
 import LandingFooter from "@/components/landing/LandingFooter";
 import CookieConsent from "@/components/landing/CookieConsent";
-import AccessibilityToolbar from "@/components/landing/AccessibilityToolbar";
 
 export default function Landing() {
   return (
@@ -48,7 +47,6 @@ export default function Landing() {
       </main>
       <MobileStickyCta />
       <CookieConsent />
-      <AccessibilityToolbar />
     </div>
   );
 }

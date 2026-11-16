@@ -31,6 +31,11 @@ export default function PaymentPackages() {
         },
       });
       if (response.data?.redirectUrl) {
+        try {
+          sessionStorage.setItem("lastCheckoutAmount", JSON.stringify({ value: pkg.price }));
+        } catch {
+          /* ignore */
+        }
         window.location.href = response.data.redirectUrl;
       } else {
         setError(response.data?.error || "שגיאה ביצירת קישור התשלום");

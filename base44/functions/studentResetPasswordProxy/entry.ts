@@ -37,6 +37,13 @@ Deno.serve(async (req) => {
       requestBody[field] = body[field];
     }
 
+    // ResendPasswordResetOtp validates OtpCode as a required field even though it only
+    // generates a new code from the sessionId — send a placeholder, otherwise the
+    // request is rejected with 400 and no new code is sent.
+    if (action === 'resendOtp') {
+      requestBody.otpCode = 'resend';
+    }
+
     console.log(`studentResetPasswordProxy: action=${action} → ${targetUrl}`);
 
     let apiRes;

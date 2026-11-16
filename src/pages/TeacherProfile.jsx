@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { User, Loader2, RefreshCw, ChevronLeft, ChevronRight, BookOpen, Calendar, DollarSign, Star, UserCircle, IdCard, Pencil, ChevronDown, ChevronUp, Trash2, Camera, CheckCircle2, Eye, X } from "lucide-react";
+import { User, Loader2, RefreshCw, ChevronLeft, ChevronRight, BookOpen, Calendar, DollarSign, Star, UserCircle, IdCard, Pencil, ChevronDown, ChevronUp, Trash2, Camera, CheckCircle2, Eye, X, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import SubjectsFreeAllList from "@/components/SubjectsFreeAllList";
+import EasyPayslipPanel from "@/components/teacher/EasyPayslipPanel";
 import PageLogo from "@/components/PageLogo";
+import { ONBOARDING_RESTART_EVENT, restartOnboarding } from "@/lib/teacherOnboarding";
 
 export default function TeacherProfile() {
   const userData = JSON.parse(localStorage.getItem("userData") || "{}");
@@ -24,6 +26,7 @@ export default function TeacherProfile() {
   const [editingHourly, setEditingHourly] = useState(false);
   const [hourlyValue, setHourlyValue] = useState(80);
   const [savingHourly, setSavingHourly] = useState(false);
+  const [draggingHourly, setDraggingHourly] = useState(false);
   const [showSubjectsFreeAll, setShowSubjectsFreeAll] = useState(false);
   const [savingSubject, setSavingSubject] = useState(false);
   const [removingSubjectId, setRemovingSubjectId] = useState("");
@@ -31,8 +34,25 @@ export default function TeacherProfile() {
   const [savingDocument, setSavingDocument] = useState(false);
   const [fetchingDocFor, setFetchingDocFor] = useState("");
   const [documentPreview, setDocumentPreview] = useState(null);
+  const [restartingOnboarding, setRestartingOnboarding] = useState(false);
   const fileInputRef = useRef(null);
   const aboutTextareaRef = useRef(null);
+
+  const handleRestartOnboarding = async () => {
+    if (!teacherEmail) {
+      toast.error("לא נמצא אימייל מורה");
+      return;
+    }
+    setRestartingOnboarding(true);
+    try {
+      await restartOnboarding(teacherEmail);
+      window.dispatchEvent(new CustomEvent(ONBOARDING_RESTART_EVENT));
+    } catch (err) {
+      toast.error("שגיאה בהפעלת המדריך: " + (err.message || ""));
+    } finally {
+      setRestartingOnboarding(false);
+    }
+  };
 
   const loadProfile = async () => {
     if (!teacherEmail) { setError("לא נמצא אימייל מורה"); return null; }
@@ -92,6 +112,17 @@ export default function TeacherProfile() {
   );
   const upcomingLessons = profile?.upcomingLessons || profile?.UpcomingLessons || [];
   const income = profile?.income || profile?.Income || null;
+
+  // עמודות ההכנסות שמוצגות — בלי מזהי מערכת (yyyyMM, שם המורה)
+  const HIDDEN_INCOME_COLUMNS = ["yyyyMM", "teacher_name", "Teacher_Name", "teacherName"];
+  const incomeColumns =
+    Array.isArray(income) && income[0]
+      ? Object.keys(income[0])
+          .slice(0, -1)
+          .filter((k) => !HIDDEN_INCOME_COLUMNS.includes(k))
+      : [];
+  const formatIncomeValue = (key, value) =>
+    key === "payment" || key === "Payment" ? `${String(value ?? "—")} ₪` : String(value ?? "—");
 
   const lessonColumnLabels = {
     dayInTheWeek: "יום",
@@ -440,14 +471,24 @@ export default function TeacherProfile() {
           </h1>
           <p className="text-muted-foreground font-body text-sm">תאריך: {todayDate}</p>
         </div>
-        <button
-          onClick={loadProfile}
-          disabled={loading}
-          className="px-4 py-2.5 bg-muted text-foreground rounded-xl text-sm font-heading font-medium hover:bg-accent transition-colors flex items-center gap-2 disabled:opacity-60"
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          רענון
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={handleRestartOnboarding}
+            disabled={restartingOnboarding}
+            className="px-4 py-2.5 bg-primary/10 text-primary rounded-xl text-sm font-heading font-medium hover:bg-primary/20 transition-colors flex items-center gap-2 disabled:opacity-60"
+          >
+            {restartingOnboarding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            הפעל מדריך מחדש
+          </button>
+          <button
+            onClick={loadProfile}
+            disabled={loading}
+            className="px-4 py-2.5 bg-muted text-foreground rounded-xl text-sm font-heading font-medium hover:bg-accent transition-colors flex items-center gap-2 disabled:opacity-60"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            רענון
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -526,18 +567,37 @@ export default function TeacherProfile() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground font-body">80 ₪</span>
                         <span className="text-lg font-heading font-bold text-primary">{hourlyValue} ₪</span>
-                        <span className="text-xs text-muted-foreground font-body">200 ₪</span>
+                        <span className="text-xs text-muted-foreground font-body">150 ₪</span>
                       </div>
-                      <input
-                        type="range"
-                        min={80}
-                        max={200}
-                        step={10}
-                        value={hourlyValue}
-                        onChange={(e) => setHourlyValue(parseInt(e.target.value, 10))}
-                        className="w-full accent-primary cursor-pointer"
-                        style={{ touchAction: 'none' }}
-                      />
+                      <div className="relative pt-9">
+                        {draggingHourly && (
+                          <div
+                            className="absolute bottom-full mb-1 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground px-2 py-1 text-[11px] font-body text-background shadow-md pointer-events-none"
+                            style={{ left: `${(1 - (hourlyValue - 80) / 70) * 100}%` }}
+                            role="status"
+                          >
+                            לתלמיד יוצג {(hourlyValue * 1.18).toFixed(2)} ₪
+                          </div>
+                        )}
+                        <input
+                          type="range"
+                          min={80}
+                          max={150}
+                          step={5}
+                          value={hourlyValue}
+                          onChange={(e) => setHourlyValue(parseInt(e.target.value, 10))}
+                          onPointerDown={() => setDraggingHourly(true)}
+                          onPointerUp={() => setDraggingHourly(false)}
+                          onPointerCancel={() => setDraggingHourly(false)}
+                          onBlur={() => setDraggingHourly(false)}
+                          aria-label="שכר לשיעור"
+                          className="w-full accent-primary cursor-pointer"
+                          style={{ touchAction: 'none' }}
+                        />
+                      </div>
+                      <p className="text-[11px] font-body text-muted-foreground leading-relaxed">
+                        המחיר לתלמיד כולל מע"מ (18%). הפער בין הסכום שתקבלו למחיר שיוצג לתלמיד נובע מהמע"מ.
+                      </p>
                       <div className="flex gap-2">
                         <button
                           type="button"
@@ -582,7 +642,7 @@ export default function TeacherProfile() {
                       onClick={() => {
                         const current = parseInt(String(value ?? "80"), 10);
                         let clamped = isNaN(current) ? 80 : current;
-                        clamped = Math.max(80, Math.min(200, Math.round(clamped / 10) * 10));
+                        clamped = Math.max(80, Math.min(150, Math.round(clamped / 5) * 5));
                         setHourlyValue(clamped);
                         setEditingHourly(true);
                       }}
@@ -596,6 +656,8 @@ export default function TeacherProfile() {
                 </div>
               ))}
             </div>
+
+            <EasyPayslipPanel />
           </div>
 
           {/* Subjects */}
@@ -629,9 +691,9 @@ export default function TeacherProfile() {
                     </span>
                     {typeof subject === "object" && subject.gn05_subject_id && Number(subject.gn05_Verified) ? (
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="flex items-center gap-1.5 text-green-600" title="תעודה אומתה">
+                        <span className="flex items-center gap-1.5 text-green-600" title="תעודה הועלתה">
                           <CheckCircle2 className="w-5 h-5" />
-                          <span className="text-xs font-heading font-medium">מאומת</span>
+                          <span className="text-xs font-heading font-medium">תעודה הועלתה</span>
                         </span>
                         <button
                           type="button"
@@ -699,7 +761,7 @@ export default function TeacherProfile() {
                   <table className="w-full text-sm font-body">
                     <thead>
                       <tr className="bg-muted/50 text-xs font-heading font-semibold text-muted-foreground">
-                        {income[0] && Object.keys(income[0]).slice(0, -1).map((k) => (
+                        {incomeColumns.map((k) => (
                           <th key={k} className="px-4 py-2.5 text-center border-b border-border">{incomeColumnLabels[k] || k}</th>
                         ))}
                       </tr>
@@ -707,8 +769,8 @@ export default function TeacherProfile() {
                     <tbody className="divide-y divide-border">
                       {income.map((row, i) => (
                         <tr key={i} className="hover:bg-muted/30 transition-colors">
-                          {Object.values(row).slice(0, -1).map((v, j) => (
-                            <td key={j} className="px-4 py-2.5 text-foreground text-center">{String(v ?? "—")}</td>
+                          {incomeColumns.map((k) => (
+                            <td key={k} className="px-4 py-2.5 text-foreground text-center">{formatIncomeValue(k, row[k])}</td>
                           ))}
                         </tr>
                       ))}
@@ -777,6 +839,9 @@ export default function TeacherProfile() {
                 <p className="text-xs text-center text-muted-foreground font-body">{ratingIndex + 1} / {ratings.length}</p>
               </>
             )}
+            {ratings.length === 0 && (
+              <p className="text-sm text-muted-foreground font-body text-center py-4">אין עדיין דירוגים</p>
+            )}
           </div>
           
           {/* Upcoming Lessons */}
@@ -823,6 +888,9 @@ export default function TeacherProfile() {
                   ← גלול לרוחב לצפייה בכל העמודות →
                 </div>
               </>
+            )}
+            {upcomingLessons.length === 0 && (
+              <p className="px-5 py-8 text-sm text-muted-foreground font-body text-center">אין שיעורים עתידיים</p>
             )}
           </div>
 

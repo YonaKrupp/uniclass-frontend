@@ -1,0 +1,315 @@
+/* ==========================================================================
+   Hero product mockup — ONE choreographed 12s timeline.
+
+   Base styles describe the FINAL, complete state. Every animation only takes
+   over once `.hs-play` is set (hero in view, motion allowed), so with motion
+   off, on mobile, or before playback the scene still reads as a finished
+   product shot. Only opacity / transform / colour are animated: no layout
+   shift, no overshoot.
+   ========================================================================== */
+
+@property --hs-n {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+/* ── backdrop: dot grid (masked at the edges) + glow anchored to the window ─ */
+.hs-dots {
+  position: absolute;
+  inset: -6% -5%;
+  background-image: radial-gradient(hsl(var(--wl-ink) / 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(closest-side at 52% 46%, #000 30%, transparent 78%);
+  mask-image: radial-gradient(closest-side at 52% 46%, #000 30%, transparent 78%);
+  pointer-events: none;
+}
+
+.dark .hs-dots {
+  background-image: radial-gradient(hsl(0 0% 100% / 0.15) 1px, transparent 1px);
+}
+
+.hs-glow {
+  position: absolute;
+  inset: -7% -5% -11%;
+  z-index: 0;
+  border-radius: 999px;
+  filter: blur(42px);
+  opacity: 0.62;
+  background:
+    radial-gradient(58% 58% at 32% 36%, hsl(276 78% 58% / 0.34), transparent 70%),
+    radial-gradient(50% 50% at 80% 78%, hsl(160 84% 42% / 0.24), transparent 72%);
+  pointer-events: none;
+}
+
+.dark .hs-glow {
+  opacity: 0.5;
+}
+
+/* ── dotted connectors + numbered markers ──────────────────────────────── */
+.hs-stem {
+  position: absolute;
+  pointer-events: none;
+  border-style: dotted;
+  border-color: hsl(var(--wl-purple-b) / 0.75);
+  border-width: 0;
+}
+
+.hs-stem-chat {
+  left: 26px;
+  bottom: -14px;
+  height: 14px;
+  border-left-width: 1.5px;
+  transform-origin: top center;
+}
+
+.hs-stem-booking {
+  right: -14px;
+  top: 50%;
+  width: 14px;
+  height: 0;
+  border-top-width: 1.5px;
+  transform-origin: left center;
+}
+
+.hs-stem-summary {
+  right: 26px;
+  top: -14px;
+  height: 14px;
+  border-left-width: 1.5px;
+  transform-origin: top center;
+}
+
+/* ── elements whose final state is hidden (transient parts of the demo) ── */
+.hs-typing,
+.hs-cursor,
+.hs-ripple,
+.hs-slot-off,
+.hs-status-waiting {
+  opacity: 0;
+}
+
+/* ── the single 12s timeline (1% = 0.12s) ──────────────────────────────── */
+@keyframes hs-a-student {
+  0%, 1% { opacity: 0; transform: translateY(6px); }
+  4%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes hs-a-typing {
+  0%, 4% { opacity: 0; transform: scale(0.92); }
+  7%, 10% { opacity: 1; transform: none; }
+  13%, 100% { opacity: 0; transform: none; }
+}
+
+@keyframes hs-a-teacher {
+  0%, 12% { opacity: 0; transform: translateY(6px); }
+  17%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes hs-a-stem-chat {
+  0%, 6% { transform: scaleY(0); }
+  18%, 92% { transform: scaleY(1); }
+  99%, 100% { transform: scaleY(0); }
+}
+
+@keyframes hs-a-cursor {
+  0%, 18% { opacity: 0; transform: translate(16px, 18px); }
+  21% { opacity: 1; transform: translate(10px, 11px); }
+  25%, 32% { opacity: 1; transform: translate(0, 0); }
+  36%, 100% { opacity: 0; transform: translate(0, 0); }
+}
+
+@keyframes hs-a-ripple {
+  0%, 24% { opacity: 0; transform: scale(0.5); }
+  25.5% { opacity: 0.7; transform: scale(0.6); }
+  31%, 100% { opacity: 0; transform: scale(1.55); }
+}
+
+@keyframes hs-a-slot-on {
+  0%, 26% { opacity: 0; }
+  28%, 92% { opacity: 1; }
+  99%, 100% { opacity: 0; }
+}
+
+@keyframes hs-a-slot-off {
+  0%, 26% { opacity: 1; }
+  28%, 92% { opacity: 0; }
+  99%, 100% { opacity: 1; }
+}
+
+@keyframes hs-a-confirm {
+  0%, 28% { opacity: 0; transform: translateY(4px); }
+  33%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: translateY(4px); }
+}
+
+@keyframes hs-a-stem-booking {
+  0%, 37% { transform: scaleX(0); }
+  44%, 92% { transform: scaleX(1); }
+  99%, 100% { transform: scaleX(0); }
+}
+
+@keyframes hs-a-status-waiting {
+  0%, 44% { opacity: 1; }
+  50%, 92% { opacity: 0; }
+  99%, 100% { opacity: 1; }
+}
+
+@keyframes hs-a-status-live {
+  0%, 44% { opacity: 0; }
+  50%, 92% { opacity: 1; }
+  99%, 100% { opacity: 0; }
+}
+
+@keyframes hs-a-live {
+  0%, 46% { opacity: 0; transform: scale(0.94); }
+  53%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: scale(0.94); }
+}
+
+@keyframes hs-a-wave {
+  0%, 48% { opacity: 0; }
+  56%, 92% { opacity: 1; }
+  99%, 100% { opacity: 0; }
+}
+
+@keyframes hs-a-ring {
+  0%, 48% { opacity: 0; }
+  56%, 92% { opacity: 1; }
+  99%, 100% { opacity: 0; }
+}
+
+@keyframes hs-a-timer {
+  0%, 46% { opacity: 0; }
+  54%, 92% { opacity: 1; }
+  99%, 100% { opacity: 0; }
+}
+
+@keyframes hs-a-count {
+  0%, 53% { --hs-n: 0; }
+  100% { --hs-n: 7; }
+}
+
+@keyframes hs-a-summary {
+  0%, 58% { opacity: 0; transform: translateY(14px); }
+  65%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: translateY(14px); }
+}
+
+@keyframes hs-a-stem-summary {
+  0%, 58% { transform: scaleY(0); }
+  65%, 92% { transform: scaleY(1); }
+  99%, 100% { transform: scaleY(0); }
+}
+
+@keyframes hs-a-check-1 {
+  0%, 65% { opacity: 0; transform: scale(0.55); }
+  68%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: scale(0.55); }
+}
+
+@keyframes hs-a-check-2 {
+  0%, 69% { opacity: 0; transform: scale(0.55); }
+  72%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: scale(0.55); }
+}
+
+@keyframes hs-a-check-3 {
+  0%, 73% { opacity: 0; transform: scale(0.55); }
+  76%, 92% { opacity: 1; transform: none; }
+  99%, 100% { opacity: 0; transform: scale(0.55); }
+}
+
+/* waveform bars breathe only while the call is connected */
+@keyframes hs-a-bar {
+  0%, 100% { transform: scaleY(0.45); }
+  50% { transform: scaleY(1); }
+}
+
+/* avatar speaking ring */
+@keyframes hs-a-ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.14); opacity: 0.15; }
+}
+
+/* ── playback ──────────────────────────────────────────────────────────── */
+.hs-play .hs-bub-student { animation: hs-a-student 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-typing { animation: hs-a-typing 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-bub-teacher { animation: hs-a-teacher 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-stem-chat { animation: hs-a-stem-chat 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-cursor { animation: hs-a-cursor 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-ripple { animation: hs-a-ripple 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-slot-on { animation: hs-a-slot-on 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-slot-off { animation: hs-a-slot-off 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-confirm { animation: hs-a-confirm 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-stem-booking { animation: hs-a-stem-booking 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-status-waiting { animation: hs-a-status-waiting 12s linear infinite; }
+.hs-play .hs-status-live { animation: hs-a-status-live 12s linear infinite; }
+.hs-play .hs-live { animation: hs-a-live 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-wave { animation: hs-a-wave 12s linear infinite; }
+.hs-play .hs-speak-ring { animation: hs-a-ring 12s linear infinite; }
+.hs-play .hs-timer { animation: hs-a-timer 12s linear infinite; }
+.hs-play .hs-count { animation: hs-a-count 12s linear infinite; }
+.hs-play .hs-summary { animation: hs-a-summary 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-stem-summary { animation: hs-a-stem-summary 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-check-1 { animation: hs-a-check-1 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-check-2 { animation: hs-a-check-2 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-check-3 { animation: hs-a-check-3 12s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.hs-play .hs-wave-bar { animation: hs-a-bar 1.1s ease-in-out infinite; }
+.hs-play .hs-ring-pulse { animation: hs-a-ring-pulse 2.4s ease-in-out infinite; }
+
+.hs-play.hs-paused .hs-bub-student,
+.hs-play.hs-paused .hs-typing,
+.hs-play.hs-paused .hs-bub-teacher,
+.hs-play.hs-paused .hs-stem-chat,
+.hs-play.hs-paused .hs-cursor,
+.hs-play.hs-paused .hs-ripple,
+.hs-play.hs-paused .hs-slot-on,
+.hs-play.hs-paused .hs-slot-off,
+.hs-play.hs-paused .hs-confirm,
+.hs-play.hs-paused .hs-stem-booking,
+.hs-play.hs-paused .hs-status-waiting,
+.hs-play.hs-paused .hs-status-live,
+.hs-play.hs-paused .hs-live,
+.hs-play.hs-paused .hs-wave,
+.hs-play.hs-paused .hs-speak-ring,
+.hs-play.hs-paused .hs-timer,
+.hs-play.hs-paused .hs-count,
+.hs-play.hs-paused .hs-summary,
+.hs-play.hs-paused .hs-stem-summary,
+.hs-play.hs-paused .hs-check-1,
+.hs-play.hs-paused .hs-check-2,
+.hs-play.hs-paused .hs-check-3,
+.hs-play.hs-paused .hs-wave-bar,
+.hs-play.hs-paused .hs-ring-pulse {
+  animation-play-state: paused;
+}
+
+/* ── lesson timer digits (CSS counter, no JS clock) ────────────────────── */
+.hs-count {
+  --hs-n: 7;
+  counter-reset: hs-n var(--hs-n);
+}
+
+.hs-count::after {
+  content: "00:" counter(hs-n, decimal-leading-zero);
+}
+
+/* ── mobile / tablet: the composition is simplified to a static product shot ── */
+@media (max-width: 1023px) {
+  .hs-stage *,
+  .hs-stage {
+    animation: none !important;
+  }
+}
+
+/* ── reduced motion: final static state, nothing moves ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hs-stage *,
+  .hs-stage {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { trackGaEvent } from "@/lib/gtagEvents";
 
 export default function PaymentSuccess() {
   const [verifyState, setVerifyState] = useState("idle"); // idle | verifying | done
@@ -48,6 +49,31 @@ export default function PaymentSuccess() {
   const orderId = urlParams.Order || urlParams.order || "";
   const ccode = urlParams.CCode || urlParams.ccode || "";
   const isSuccess = ccode === "0" || ccode === "600" || ccode === "700" || ccode === "800";
+  const wixOrderId = urlParams.orderId || urlParams.checkoutId || "";
+
+  // GA4 purchase — sent once, only after the payment itself was confirmed.
+  // (HYP approval code, or a Wix checkout return with its order/checkout id.)
+  const purchaseTracked = useRef(false);
+  useEffect(() => {
+    if (purchaseTracked.current) return;
+    if (!isSuccess && !wixOrderId) return;
+
+    let storedValue;
+    try {
+      storedValue = JSON.parse(sessionStorage.getItem("lastCheckoutAmount") || "null")?.value;
+    } catch {
+      storedValue = undefined;
+    }
+    const amount = Number(urlParams.Amount ?? urlParams.amount ?? storedValue);
+    const txId = transactionId || wixOrderId || orderId;
+
+    purchaseTracked.current = true;
+    trackGaEvent("purchase", {
+      value: Number.isFinite(amount) ? amount : 0,
+      currency: "ILS",
+      transaction_id: String(txId || ""),
+    });
+  }, [isSuccess, wixOrderId, transactionId, orderId, urlParams]);
 
   const scheduleUrl = (() => {
     const p = new URLSearchParams();

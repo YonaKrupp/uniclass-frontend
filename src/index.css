@@ -325,6 +325,45 @@ html.a11y-stop-animations *::after {
   scroll-behavior: auto !important;
 }
 
+/* === /welcome page — motion layer (transform / opacity only) === */
+@keyframes welcome-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -18px, 0) rotate(-7deg); }
+}
+@keyframes welcome-blob {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(26px, -20px, 0) scale(1.07); }
+  66% { transform: translate3d(-20px, 16px, 0) scale(0.95); }
+}
+@keyframes welcome-step-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes welcome-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.welcome-float {
+  animation: welcome-float var(--float-dur, 9s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+  will-change: transform;
+}
+.welcome-blob { animation: welcome-blob 24s ease-in-out infinite; }
+.welcome-blob-slow { animation: welcome-blob 32s ease-in-out infinite; }
+.welcome-step-in { animation: welcome-step-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.welcome-caret { animation: welcome-caret 1s step-end infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-float,
+  .welcome-blob,
+  .welcome-blob-slow,
+  .welcome-step-in,
+  .welcome-caret {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 /* Screen-reader-only utility */
 .sr-only {
   position: absolute;
@@ -336,4 +375,325 @@ html.a11y-stop-animations *::after {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ==========================================================================
+   /welcome page only — role accent system + signature motion.
+   Everything here is scoped under .welcome-page so no other page is affected.
+   ========================================================================== */
+
+.welcome-page {
+  --role: 266 64% 40%;
+  --role-fill: 266 64% 40%;
+  --role-soft: 266 64% 40% / 0.1;
+  --role-grad: linear-gradient(100deg, hsl(266 64% 45%), hsl(160 84% 30%));
+}
+.welcome-page[data-role="student"] {
+  --role: 160 84% 26%;
+  --role-fill: 160 84% 26%;
+  --role-soft: 160 84% 26% / 0.1;
+  --role-grad: linear-gradient(100deg, hsl(160 84% 28%), hsl(160 58% 44%));
+}
+.welcome-page[data-role="teacher"] {
+  --role: 266 64% 40%;
+  --role-fill: 266 64% 40%;
+  --role-soft: 266 64% 40% / 0.1;
+  --role-grad: linear-gradient(100deg, hsl(266 64% 38%), hsl(276 68% 56%));
+}
+.dark .welcome-page {
+  --role: 266 70% 72%;
+}
+.dark .welcome-page[data-role="student"] {
+  --role: 160 70% 58%;
+}
+.dark .welcome-page[data-role="teacher"] {
+  --role: 266 70% 72%;
+}
+
+.welcome-role-text {
+  color: hsl(var(--role));
+}
+.welcome-role-bg {
+  background-color: hsl(var(--role-fill));
+}
+.welcome-role-soft {
+  background-color: hsl(var(--role-soft));
+}
+.welcome-role-border {
+  border-color: hsl(var(--role-soft));
+}
+.welcome-role-grad-text {
+  background-image: var(--role-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.welcome-role-grad-bg {
+  background-image: var(--role-grad);
+}
+.welcome-role-ring:focus-visible {
+  outline: 2px solid hsl(var(--role));
+  outline-offset: 2px;
+}
+
+/* Role buttons — one colour system: student = site green, teacher = site purple */
+.welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.welcome-btn-student {
+  background-color: hsl(160 84% 26%);
+  color: #ffffff;
+  box-shadow: 0 12px 26px -16px hsl(160 84% 26% / 0.95);
+}
+.welcome-btn-teacher {
+  background-color: hsl(266 64% 40%);
+  color: #ffffff;
+  box-shadow: 0 12px 26px -16px hsl(266 64% 40% / 0.95);
+}
+.welcome-btn-student:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px -16px hsl(160 84% 26% / 1);
+}
+.welcome-btn-teacher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px -16px hsl(266 64% 40% / 1);
+}
+
+/* Role toggle pills */
+.welcome-pill-student.is-on {
+  background-color: hsl(160 84% 26%);
+  border-color: hsl(160 84% 26%);
+  color: #ffffff;
+}
+.welcome-pill-teacher.is-on {
+  background-color: hsl(266 64% 40%);
+  border-color: hsl(266 64% 40%);
+  color: #ffffff;
+}
+
+/* Subject chips */
+.welcome-chip {
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  color: hsl(var(--foreground));
+  transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+}
+.welcome-chip:hover,
+.welcome-chip:focus-visible {
+  color: hsl(var(--role));
+  border-color: hsl(var(--role) / 0.45);
+  background-color: hsl(var(--role) / 0.08);
+  transform: translateY(-2px);
+}
+.welcome-chip-symbol {
+  color: hsl(var(--role));
+}
+
+/* Two-row infinite marquee, pauses on hover / keyboard focus */
+@keyframes welcome-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.welcome-marquee-track {
+  animation: welcome-marquee var(--marquee-dur, 50s) linear infinite;
+  will-change: transform;
+}
+.welcome-marquee-track.is-reverse {
+  animation-direction: reverse;
+}
+.welcome-marquee:hover .welcome-marquee-track,
+.welcome-marquee:focus-within .welcome-marquee-track {
+  animation-play-state: paused;
+}
+
+/* Cursor spotlight */
+.welcome-spotlight {
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 40%),
+    hsl(var(--role) / 0.16),
+    transparent 72%
+  );
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Hero scene: lesson card sequence */
+@keyframes welcome-eq {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.welcome-eq {
+  animation: welcome-eq 1.1s ease-in-out infinite;
+}
+@keyframes welcome-slot-fill {
+  0%,
+  12% {
+    transform: scaleX(0);
+    opacity: 0.25;
+  }
+  32%,
+  78% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  94%,
+  100% {
+    transform: scaleX(0);
+    opacity: 0.25;
+  }
+}
+.welcome-slot-fill {
+  animation: welcome-slot-fill 6s ease-in-out infinite;
+}
+@keyframes welcome-tick {
+  0%,
+  52% {
+    transform: scale(0.94);
+    opacity: 0.25;
+  }
+  64%,
+  88% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.25;
+  }
+}
+.welcome-tick {
+  animation: welcome-tick 6s ease-in-out infinite;
+}
+
+/* Sparkle on the "payment confirmed" state */
+@keyframes welcome-sparkle {
+  0%,
+  70%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.3;
+  }
+  82% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+.welcome-sparkle {
+  animation: welcome-sparkle 3s ease-in-out infinite;
+}
+
+/* Hand-drawn underline scribble */
+@keyframes welcome-draw {
+  from {
+    stroke-dashoffset: 320;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.welcome-scribble path {
+  stroke-dasharray: 320;
+  animation: welcome-draw 1.3s 0.35s ease forwards;
+}
+
+/* Active "how it works" step icon */
+@keyframes welcome-step-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+.welcome-step-pulse {
+  animation: welcome-step-pulse 2.6s ease-in-out infinite;
+}
+
+/* Parallax wrapper */
+.welcome-shape {
+  transition: transform 0.45s ease-out;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-page .welcome-eq,
+  .welcome-page .welcome-slot-fill,
+  .welcome-page .welcome-tick,
+  .welcome-page .welcome-sparkle,
+  .welcome-page .welcome-step-pulse,
+  .welcome-page .welcome-marquee-track,
+  .welcome-page .welcome-scribble path,
+  .welcome-page .welcome-float,
+  .welcome-page .welcome-blob,
+  .welcome-page .welcome-blob-slow,
+  .welcome-page .welcome-caret,
+  .welcome-page .welcome-spotlight {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .welcome-page .welcome-scribble path {
+    stroke-dashoffset: 0 !important;
+  }
+  .welcome-page .welcome-shape {
+    transform: none !important;
+  }
+}
+
+/* === Teacher schedule board: slot feedback + guided tour highlight === */
+@keyframes slot-pop {
+  0% {
+    transform: scale(0.94);
+    box-shadow: 0 0 0 0 hsl(var(--mint) / 0.55);
+  }
+  55% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 9px hsl(var(--mint) / 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 hsl(var(--mint) / 0);
+  }
+}
+.slot-flash {
+  animation: slot-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes tour-target-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.9), 0 0 0 9px hsl(var(--primary) / 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 4px hsl(var(--primary)), 0 0 0 17px hsl(var(--primary) / 0.1);
+  }
+}
+.schedule-tour-target {
+  animation: tour-target-pulse 1.6s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot-flash,
+  .schedule-tour-target {
+    animation: none !important;
+  }
 }

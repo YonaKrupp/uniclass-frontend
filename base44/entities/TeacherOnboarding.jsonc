@@ -1,0 +1,63 @@
+{
+  "name": "TeacherOnboarding",
+  "type": "object",
+  "properties": {
+    "teacherEmail": {
+      "type": "string",
+      "title": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05de\u05d5\u05e8\u05d4"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "profile",
+        "tour"
+      ],
+      "default": "profile",
+      "title": "\u05e9\u05dc\u05d1",
+      "enumColors": [
+        "blue",
+        "purple"
+      ]
+    },
+    "profileStep": {
+      "type": "number",
+      "default": 0,
+      "title": "\u05e9\u05dc\u05d1 \u05d1\u05d0\u05e9\u05e3 \u05d4\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc"
+    },
+    "tourStep": {
+      "type": "number",
+      "default": 0,
+      "title": "\u05e9\u05dc\u05d1 \u05d1\u05e1\u05d9\u05d5\u05e8 \u05d1\u05ea\u05e4\u05e8\u05d9\u05d8"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false,
+      "title": "\u05d4\u05d5\u05e9\u05dc\u05dd"
+    },
+    "skipped": {
+      "type": "boolean",
+      "default": false,
+      "title": "\u05d3\u05d5\u05dc\u05d2"
+    },
+    "scheduleTourCompleted": {
+      "type": "boolean",
+      "default": false,
+      "title": "\u05de\u05d3\u05e8\u05d9\u05da \u05e0\u05d9\u05d4\u05d5\u05dc \u05e9\u05d9\u05e2\u05d5\u05e8\u05d9\u05dd \u05d4\u05d5\u05e9\u05dc\u05dd"
+    },
+    "experience": {
+      "type": "string",
+      "title": "\u05e0\u05d9\u05e1\u05d9\u05d5\u05df"
+    },
+    "education": {
+      "type": "string",
+      "title": "\u05d4\u05e9\u05db\u05dc\u05d4"
+    },
+    "availability": {
+      "type": "string",
+      "title": "\u05d6\u05de\u05d9\u05e0\u05d5\u05ea"
+    }
+  },
+  "required": [
+    "teacherEmail"
+  ]
+}

@@ -3,28 +3,73 @@ import { Link } from "react-router-dom";
 import { Cookie, X, Check } from "lucide-react";
 
 const STORAGE_KEY = "uniclass_cookie_consent";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+
+// קריאת הבחירה — אחסון מקומי, ואם הוא חסום/unavailable, עוגייה
+function readChoice() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return stored;
+  } catch {
+    /* ignore */
+  }
+  try {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${STORAGE_KEY}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  } catch {
+    return null;
+  }
+}
+
+// שמירת הבחירה בשני המקומות, כדי שתחזיק גם אחרי רענון
+function saveChoice(value) {
+  try {
+    localStorage.setItem(STORAGE_KEY, value);
+  } catch {
+    /* ignore */
+  }
+  try {
+    document.cookie = `${STORAGE_KEY}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  } catch {
+    /* ignore */
+  }
+}
+
+// דיווח הבחירה ל-Google Consent Mode v2 (כל ארבעת המפתחות)
+function reportConsent(value) {
+  try {
+    window.dataLayer = window.dataLayer || [];
+    const gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    const state = value === "accepted" ? "granted" : "denied";
+    gtag("consent", "update", {
+      analytics_storage: state,
+      ad_storage: state,
+      ad_user_data: state,
+      ad_personalization: state,
+    });
+  } catch {
+    /* ignore */
+  }
+}
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) setVisible(true);
-    } catch {
-      setVisible(true);
+    const saved = readChoice();
+    if (saved === "accepted" || saved === "declined") {
+      reportConsent(saved);
+      return;
     }
+    // אין בחירה שמורה — הביקור הראשון: מציגים את הבאנר
+    reportConsent("declined");
+    setVisible(true);
   }, []);
 
   const choose = (value) => {
-    if (value === "accepted") {
-      try {
-        localStorage.setItem(STORAGE_KEY, value);
-      } catch {
-        /* ignore */
-      }
-    }
+    saveChoice(value);
     setVisible(false);
+    reportConsent(value);
     window.dispatchEvent(new CustomEvent("uniclass-consent-change", { detail: value }));
   };
 

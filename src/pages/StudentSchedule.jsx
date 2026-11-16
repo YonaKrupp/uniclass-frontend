@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { ChevronRight, ChevronLeft, RefreshCw, Loader2, ArrowRight, Calendar, GraduationCap, Wallet, Eraser } from "lucide-react";
 import SlotCell from "@/components/schedule/SlotCell";
+import { trackGaEvent, anonymizeId } from "@/lib/gtagEvents";
 import {
   Select,
   SelectContent,
@@ -33,6 +34,16 @@ function formatDate(date, fmt) {
   if (fmt === "dd/MM") return `${dd}/${MM}`;
   if (fmt === "dd/MM/yyyy") return `${dd}/${MM}/${yyyy}`;
   return `${dd}/${MM}`;
+}
+
+function getSlotEndTime(hour, duration) {
+  let endHour = hour;
+  let endMinutes = duration;
+  if (endMinutes >= 60) {
+    endHour += Math.floor(endMinutes / 60);
+    endMinutes = endMinutes % 60;
+  }
+  return { endHour, endMinutes };
 }
 
 function getCurrentWeekSunday() {
@@ -108,6 +119,8 @@ export default function StudentSchedule() {
   const [debugKeys, setDebugKeys] = useState([]);
   const [totalFreeSlots, setTotalFreeSlots] = useState(0);
   const [clearLoading, setClearLoading] = useState(false);
+  // משך השיעור נקבע לפי הגדרת המורה (gn02_lessonDurationMin); ברירת מחדל 45 דקות
+  const [slotDuration, setSlotDuration] = useState(45);
 
 
 
@@ -127,6 +140,32 @@ export default function StudentSchedule() {
     const key = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}_${hour}`;
     return slotLookup[key];
   };
+
+  // טעינת משך השיעור שהמורה הגדיר בפרופיל
+  const loadTeacherDuration = useCallback(async () => {
+    if (!teacherEmail) return;
+    try {
+      const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken") || "";
+      const res = await fetch(`${FUNCTIONS_BASE}/teacherProfileProxy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: teacherEmail,
+          token,
+          todayDate: formatDate(weekStart, "yyyy-MM-dd"),
+        }),
+      }).then((r) => r.json());
+      const details = res?.details || res?.Details || res || {};
+      const duration = parseInt(details.gn02_lessonDurationMin || res?.gn02_lessonDurationMin) || 45;
+      setSlotDuration(duration);
+    } catch (e) {
+      /* נשארים בברירת המחדל */
+    }
+  }, [teacherEmail, weekStart]);
+
+  useEffect(() => {
+    loadTeacherDuration();
+  }, [loadTeacherDuration]);
 
   const loadWeekSlots = useCallback(async () => {
     // Re-auth if token is missing (e.g., after HYP redirect cleared storage)
@@ -421,11 +460,12 @@ export default function StudentSchedule() {
                 date.setDate(date.getDate() + day);
                 const slot = getSlotForCell(date, hour);
                 const startTime = `${String(hour).padStart(2, "0")}:00`;
-                const endTime = `${String(hour + 1).padStart(2, "0")}:00`;
+                const { endHour, endMinutes } = getSlotEndTime(hour, slotDuration);
+                const endTime = `${String(endHour).padStart(2, "0")}:${String(endMinutes).padStart(2, "0")}`;
                 const dayName = DAY_NAMES[day];
                 const tooltip = slot?.gn06_tooltip
                   ? slot.gn06_tooltip.replace(/;/g, " | ")
-                  : `יום ${dayName} - שעה ${startTime}`;
+                  : `יום ${dayName} - שעה ${startTime}–${endTime}`;
                 if (!slot) return <div key={`${hour}-${day}`} />;
                 const disabled = slot.gn06_1Enabled_0disabled === 0;
                 return (
@@ -441,7 +481,7 @@ export default function StudentSchedule() {
                       if (cssClass === "selected") {
                         const details = slot?.gn06_tooltip
                           ? slot.gn06_tooltip.replace(/;/g, " | ")
-                          : `יום ${dayName} - שעה ${startTime}`;
+                          : `יום ${dayName} - שעה ${startTime}–${endTime}`;
                         toast(details);
                         return;
                       }
@@ -465,6 +505,12 @@ export default function StudentSchedule() {
                         const resultCode = res.ResultCode ?? res.resultCode ?? res._status;
                         if (resultCode === 200) {
                           const newCssClass = cssClass === "available" ? "tentative" : "available";
+                          if (newCssClass === "tentative") {
+                            trackGaEvent("book_lesson", {
+                              subject: subjectName || subjectId || "",
+                              teacher_id: anonymizeId(teacherEmail),
+                            });
+                          }
                           if (res.resultTotalslotState_1free != null) {
                             setTotalFreeSlots(Number(res.resultTotalslotState_1free) || 0);
                           }

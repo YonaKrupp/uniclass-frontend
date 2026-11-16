@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
+import { computeCancelRefund, lessonPrice, formatShekel } from "@/lib/cancelRefund";
 import StudentBanner from "@/components/student/StudentBanner";
 import StudentStats from "@/components/student/StudentStats";
 import StudentLessonsBoard from "@/components/student/StudentLessonsBoard";
@@ -113,6 +114,18 @@ export default function StudentHome() {
 
   const hd = data?.homeData ?? {};
   const lessonsList = data?.lessonsList ?? [];
+
+  // השיעור שמבקשים לבטל וההחזר שיינתן בגינו (מוצג לפני אישור הביטול)
+  const lessonToCancel = confirmCancelId
+    ? lessonsList.find((l) => String(l.gn06_id) === String(confirmCancelId))
+    : null;
+  const cancelRefund = lessonToCancel
+    ? computeCancelRefund({
+        price: lessonPrice(lessonToCancel),
+        dateValue: lessonToCancel.dateInTheMonth,
+        timeRange: lessonToCancel.startEndHoure,
+      })
+    : null;
   const name = hd.studentName || userData.studentName || userData.fullName || userData.name || "תלמיד";
 
   return (
@@ -123,25 +136,33 @@ export default function StudentHome() {
         style={{ background: "radial-gradient(circle, hsl(243 75% 59%), transparent 70%)" }}
       />
       <div className="relative z-10 space-y-6">
-        <StudentBanner name={name} />
-        <StudentStats
-          loading={loading}
-          todayLessons={hd.todayLesonCount ?? "—"}
-          teachers={hd.teacherCount ?? "—"}
-          scheduledLessons={hd.scheduledLessons ?? "—"}
-          activeSubjects={hd.activeLessons ?? "—"}
-        />
-        <TeacherActivityChart lessons={lessonsList} />
-        <StudentLessonsBoard
-          loading={loading}
-          lessons={lessonsList}
-          todayDate={todayDate}
-          showCancel={showCancel}
-          setShowCancel={setShowCancel}
-          cancellingId={cancellingId}
-          onConfirmCancel={setConfirmCancelId}
-          cancelError={cancelError}
-        />
+        <div data-tour="welcome">
+          <StudentBanner name={name} />
+        </div>
+        <div data-tour="stats">
+          <StudentStats
+            loading={loading}
+            todayLessons={hd.todayLesonCount ?? "—"}
+            teachers={hd.teacherCount ?? "—"}
+            scheduledLessons={hd.scheduledLessons ?? "—"}
+            activeSubjects={hd.activeLessons ?? "—"}
+          />
+        </div>
+        <div data-tour="activity-chart">
+          <TeacherActivityChart lessons={lessonsList} />
+        </div>
+        <div data-tour="upcoming-lessons">
+          <StudentLessonsBoard
+            loading={loading}
+            lessons={lessonsList}
+            todayDate={todayDate}
+            showCancel={showCancel}
+            setShowCancel={setShowCancel}
+            cancellingId={cancellingId}
+            onConfirmCancel={setConfirmCancelId}
+            cancelError={cancelError}
+          />
+        </div>
       </div>
 
       {/* Cancel confirmation dialog — matches the site alert style */}
@@ -162,6 +183,31 @@ export default function StudentHome() {
             <p className="text-center text-base font-heading font-semibold text-foreground">
               האם אתם בטוחים שברצונכם לבטל את השיעור?
             </p>
+            {cancelRefund && (
+              <div className="rounded-2xl bg-muted/60 border border-border px-4 py-3 space-y-1 text-center">
+                <p className="text-xs font-body text-muted-foreground">
+                  {cancelRefund.fullRefund
+                    ? "נותרו 24 שעות או יותר עד השיעור — החזר מלא"
+                    : "נותרו פחות מ-24 שעות עד השיעור"}
+                </p>
+                {cancelRefund.hasPrice ? (
+                  <>
+                    {!cancelRefund.fullRefund && (
+                      <p className="text-xs font-body text-muted-foreground">
+                        דמי ביטול: {formatShekel(cancelRefund.fee)}
+                      </p>
+                    )}
+                    <p className="text-base font-heading font-semibold text-foreground">
+                      ההחזר: {formatShekel(cancelRefund.refund)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs font-body text-muted-foreground leading-relaxed">
+                    דמי הביטול הם 5% ממחיר המורה, ולא יותר מ-100 ₪. היתרה מוחזרת.
+                  </p>
+                )}
+              </div>
+            )}
             <div className="flex gap-2 justify-center pt-1">
               <button
                 onClick={() => setConfirmCancelId(null)}

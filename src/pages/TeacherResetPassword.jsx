@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { BookOpen, Mail, Lock, Eye, EyeOff, Loader2, Sun, Moon, ShieldCheck, KeyRound, ArrowRight } from "lucide-react";
 import { useDarkMode } from "@/lib/useDarkMode";
 
-const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
+import { FUNCTIONS_BASE } from "@/lib/functionsBase";
+
+const API_BASE = FUNCTIONS_BASE;
 
 export default function TeacherResetPassword() {
   const [dark, setDark] = useDarkMode();

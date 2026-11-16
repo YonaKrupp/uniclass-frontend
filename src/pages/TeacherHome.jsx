@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import TeacherBanner from "@/components/teacher/TeacherBanner";
 import TeacherStats from "@/components/teacher/TeacherStats";
 import TeacherActivityChart from "@/components/teacher/TeacherActivityChart";
@@ -24,6 +25,20 @@ export default function TeacherHome() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(false);
+  const [pictureUrl, setPictureUrl] = useState(null);
+
+  // תמונת הפרופיל של המורה (זהה לזו שמוצגת בעמוד "תמונת פרופיל")
+  useEffect(() => {
+    if (!teacherEmail) return undefined;
+    let alive = true;
+    base44.functions.invoke("teacherPictureProxy", { action: "get", email: teacherEmail, token: authToken })
+      .then((res) => {
+        const d = res.data || {};
+        if (alive && d.found && d.pictureData) setPictureUrl(`data:image/jpeg;base64,${d.pictureData}`);
+      })
+      .catch((err) => console.error("[TeacherHome] picture load failed:", err));
+    return () => { alive = false; };
+  }, [teacherEmail]);
 
   useEffect(() => {
     console.log("[TeacherHome] mount effect, email:", teacherEmail, "hasToken:", !!authToken);
@@ -103,7 +118,7 @@ export default function TeacherHome() {
   const avgRating = hv.teacherAvgRating;
   const reviewsCount = hv.ratingReviewsCount;
   const ratingLabel = avgRating != null
-    ? `${avgRating} מתוך ${reviewsCount ?? "?"} דירוגים`
+    ? `${Number(avgRating).toFixed(1)} מתוך 5 · ${reviewsCount ?? 0} דירוגים`
     : "—";
 
   const lessonsList = data?.lessonsList ?? [];
@@ -128,7 +143,7 @@ export default function TeacherHome() {
         style={{ background: "radial-gradient(circle, hsl(243 75% 59%), transparent 70%)" }}
       />
       <div className="relative z-10 space-y-6">
-        <TeacherBanner name={name} />
+        <TeacherBanner name={name} pictureUrl={pictureUrl} />
         <TeacherStats
           loading={loading}
           todayLessons={todayLessons}

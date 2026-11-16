@@ -8,10 +8,9 @@ const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c
 const COLUMNS = [
   { key: "studentName", label: "שם התלמיד" },
   { key: "gn03_subjectName", label: "מקצוע" },
-  { key: "gn04_levelName", label: "רמת לימוד" },
+  { key: "gn04_levelName", label: "תחום" },
   { key: "pastlessonsCount", label: "שיעורים\nשנלמדו" },
   { key: "futurelessonsCount", label: "שיעורים\nמתוכננים" },
-  { key: "gn01_PhoneNumber", label: "טלפון" },
 ];
 
 export default function StudentsList() {

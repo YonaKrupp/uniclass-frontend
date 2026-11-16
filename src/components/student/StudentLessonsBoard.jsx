@@ -53,7 +53,10 @@ export default function StudentLessonsBoard({
             <h2 className="text-base font-heading font-semibold text-foreground">השיעורים הבאים</h2>
             <p className="text-xs text-muted-foreground font-body">נהלו את לוח השיעורים שלכם</p>
           </div>
-          <label className="mr-auto flex items-center gap-2 text-sm font-body text-destructive font-semibold cursor-pointer select-none">
+          <label
+            data-tour="show-cancel"
+            className="mr-auto flex items-center gap-2 text-sm font-body text-destructive font-semibold cursor-pointer select-none"
+          >
             <input
               type="checkbox"
               checked={showCancel}

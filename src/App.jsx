@@ -9,7 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 
 // Page imports - student-schedule route fix
-import Landing from './pages/Landing';
+import Welcome from './pages/Welcome';
 import TeacherLogin from './pages/TeacherLogin';
 import StudentLogin from './pages/StudentLogin';
 import RegisterStudent from './pages/RegisterStudent';
@@ -43,9 +43,12 @@ import RateTeacher from './pages/RateTeacher';
 import Contact from './pages/Contact';
 import LoginChoice from './pages/LoginChoice';
 import PrivacyPolicy from './pages/PrivacyPolicy';
-import Terms from './pages/Terms';
 import Unsubscribe from './pages/Unsubscribe';
-import AccessibilityStatement from './pages/AccessibilityStatement';
+import LegalDocumentPage from './components/legal/LegalDocumentPage';
+import LegalDocView from './pages/LegalDocView';
+import AdminLegalDocs from './pages/AdminLegalDocs';
+import SiteFooter from './components/site/SiteFooter';
+import AccessibilityToolbar from './components/landing/AccessibilityToolbar';
 import AdminInterface from './pages/AdminInterface';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
@@ -58,7 +61,8 @@ function App() {
         <Router>
           <ScrollToTop />
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<Welcome />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/login-choice" element={<LoginChoice />} />
             <Route path="/teacher-login" element={<TeacherLogin />} />
             <Route path="/student-login" element={<StudentLogin />} />
@@ -91,22 +95,31 @@ function App() {
               <Route path="/rate-teacher" element={<RateTeacher />} />
               <Route path="/student-contact" element={<Contact />} />
             </Route>
-            <Route path="/student-terms" element={<StudentTerms />} />
             <Route path="/student-reset-password" element={<StudentResetPassword />} />
             <Route path="/teacher-reset-password" element={<TeacherResetPassword />} />
             <Route path="/teacher-terms" element={<TeacherTerms />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-failed" element={<PaymentFailed />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<LegalDocView />} />
+            <Route path="/terms" element={<LegalDocView />} />
+            <Route path="/recording-consent" element={<LegalDocumentPage docKey="recording" />} />
+            <Route path="/conduct" element={<LegalDocView />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
-            <Route path="/accessibility" element={<AccessibilityStatement />} />
+            <Route path="/accessibility" element={<LegalDocView />} />
+            <Route path="/student-terms" element={<LegalDocView />} />
+            <Route path="/student-privacy" element={<LegalDocView />} />
+            <Route path="/student-recording" element={<LegalDocView />} />
+            <Route path="/student-cancellation" element={<LegalDocView />} />
+            <Route path="/student-conduct" element={<LegalDocView />} />
+            <Route path="/admin/legal" element={<AdminLegalDocs />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/admin/blog" element={<AdminBlog />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
+          <SiteFooter />
+          <AccessibilityToolbar />
         </Router>
         <Toaster />
         <HotToaster position="top-center" />

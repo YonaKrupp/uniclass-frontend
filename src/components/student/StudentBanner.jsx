@@ -45,7 +45,7 @@ export default function StudentBanner({ name }) {
             פאנל תלמידים
           </span>
           <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground leading-tight truncate">
-            {`שלום, ${safeName} 👋`}
+            {`שלום, ${safeName}`}
           </h1>
           <p className="text-muted-foreground font-body">נהלו את השיעורים שלכם וצפו במורים — הכל במקום אחד</p>
         </div>

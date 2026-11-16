@@ -367,20 +367,67 @@ namespace MyApi.Controllers
                 string otpCode = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
                 byte[] passwordHashBytes = SecurityHelper.ComputeSha256Hash(request.Password);
 
-                // Insert student record (inactive) with OTP code, return new ID as sessionId
-                var sessionId = await ExecuteScalarAsync<decimal>(
+                // תאריך לידה (אופציונלי) — נכתב רק אם העמודה gn01_DateOfBirth קיימת בטבלה
+                DateTime? dateOfBirth = null;
+                if (!string.IsNullOrWhiteSpace(request.DateOfBirth) &&
+                    DateTime.TryParse(request.DateOfBirth, null, System.Globalization.DateTimeStyles.None, out var parsedDob))
+                {
+                    dateOfBirth = parsedDob.Date;
+                }
+
+                bool hasDateOfBirthColumn = await ExecuteScalarAsync<int>(
                     connection,
-                    @"INSERT INTO [dbo].[t_gn01_registration_Students]
-                        (gn01_Email, gn01_FirstName, gn01_LastName, gn01_Password, gn01_PhoneNumber, gn01_create_tick_sysdate, gn01_isActive, gn01_EmailVerifacationCode, gn01_EmailVerifacationDate)
-                      VALUES
-                        (@Email, @FirstName, @LastName, @PasswordHash, @Phone, GETUTCDATE(), 0, @OtpCode, GETUTCDATE());
-                      SELECT CAST(SCOPE_IDENTITY() AS DECIMAL);",
+                    "SELECT COUNT(1) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 't_gn01_registration_Students' AND COLUMN_NAME = 'gn01_DateOfBirth'"
+                ) > 0;
+
+                // העמודה חסרה בטבלה — ניצור אותה כדי שתאריך הלידה יישמר כמו שאר השדות
+                if (!hasDateOfBirthColumn)
+                {
+                    try
+                    {
+                        await ExecuteNonQueryAsync(
+                            connection,
+                            "ALTER TABLE [dbo].[t_gn01_registration_Students] ADD [gn01_DateOfBirth] DATE NULL"
+                        );
+                        hasDateOfBirthColumn = true;
+                        _logger.LogInformation("[AuthController] SendRegistrationOtp: added column gn01_DateOfBirth");
+                    }
+                    catch (Exception alterEx)
+                    {
+                        _logger.LogError($"[AuthController] SendRegistrationOtp: could not add column gn01_DateOfBirth: {alterEx.Message}");
+                    }
+                }
+
+                _logger.LogInformation(
+                    $"[AuthController] SendRegistrationOtp: DateOfBirth raw='{request.DateOfBirth}' parsed='{dateOfBirth?.ToString("yyyy-MM-dd") ?? "null"}' columnExists={hasDateOfBirthColumn}"
+                );
+
+                string dobColumn = hasDateOfBirthColumn ? ", gn01_DateOfBirth" : "";
+                string dobValue = hasDateOfBirthColumn ? ", @DateOfBirth" : "";
+
+                var insertParams = new System.Collections.Generic.List<SqlParameter>
+                {
                     new SqlParameter("@Email", request.Email.Trim()),
                     new SqlParameter("@FirstName", request.FirstName.Trim()),
                     new SqlParameter("@LastName", request.LastName.Trim()),
                     new SqlParameter("@PasswordHash", passwordHashBytes),
                     new SqlParameter("@Phone", request.PhoneNumber.Trim()),
                     new SqlParameter("@OtpCode", otpCode)
+                };
+                if (hasDateOfBirthColumn)
+                {
+                    insertParams.Add(new SqlParameter("@DateOfBirth", SqlDbType.Date) { Value = (object)dateOfBirth ?? DBNull.Value });
+                }
+
+                // Insert student record (inactive) with OTP code, return new ID as sessionId
+                var sessionId = await ExecuteScalarAsync<decimal>(
+                    connection,
+                    $@"INSERT INTO [dbo].[t_gn01_registration_Students]
+                        (gn01_Email, gn01_FirstName, gn01_LastName, gn01_Password, gn01_PhoneNumber, gn01_create_tick_sysdate, gn01_isActive, gn01_EmailVerifacationCode, gn01_EmailVerifacationDate{dobColumn})
+                      VALUES
+                        (@Email, @FirstName, @LastName, @PasswordHash, @Phone, GETUTCDATE(), 0, @OtpCode, GETUTCDATE(){dobValue});
+                      SELECT CAST(SCOPE_IDENTITY() AS DECIMAL);",
+                    insertParams.ToArray()
                 );
 
                 // Send OTP via SMS
@@ -470,6 +517,26 @@ namespace MyApi.Controllers
                     "UPDATE [dbo].[t_gn01_registration_Students] SET [gn01_isActive] = 1 WHERE [gn01_seq] = @Id",
                     new SqlParameter("@Id", sessionId)
                 );
+
+                // תאריך לידה — נכתב שוב כאן, כי שלב האימות הוא השלב שבו הרשומה הופכת לפעילה.
+                if (!string.IsNullOrWhiteSpace(request.DateOfBirth) &&
+                    DateTime.TryParse(request.DateOfBirth, null, System.Globalization.DateTimeStyles.None, out var verifyDob))
+                {
+                    bool hasDobColumn = await ExecuteScalarAsync<int>(
+                        connection,
+                        "SELECT COUNT(1) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 't_gn01_registration_Students' AND COLUMN_NAME = 'gn01_DateOfBirth'"
+                    ) > 0;
+
+                    if (hasDobColumn)
+                    {
+                        await ExecuteNonQueryAsync(
+                            connection,
+                            "UPDATE [dbo].[t_gn01_registration_Students] SET [gn01_DateOfBirth] = @DateOfBirth WHERE [gn01_seq] = @Id",
+                            new SqlParameter("@DateOfBirth", SqlDbType.Date) { Value = verifyDob.Date },
+                            new SqlParameter("@Id", sessionId)
+                        );
+                    }
+                }
 
                 return Ok(new { success = true, message = "ההרשמה בוצעה בהצלחה" });
             }
@@ -1474,6 +1541,7 @@ namespace MyApi.Controllers
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
+        public string DateOfBirth { get; set; }
         public string Password { get; set; }
     }
 
@@ -1507,6 +1575,7 @@ namespace MyApi.Controllers
     {
         public string SessionId { get; set; }
         public string OtpCode { get; set; }
+        public string DateOfBirth { get; set; }
     }
 
     public class PasswordResetRequest

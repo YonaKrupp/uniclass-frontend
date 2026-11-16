@@ -5,23 +5,68 @@ import { useDarkMode } from "@/lib/useDarkMode";
 import { useSessionRenewal } from "@/lib/useSessionRenewal";
 import { clearFetchGuard } from "@/lib/fetchGuard";
 import AppBackground from "@/components/AppBackground";
+import StudentConsentGate from "@/components/legal/StudentConsentGate";
+import { fetchConsentStatus } from "@/lib/legalConsent";
+import { TutorialProvider, useTutorial } from "@/components/student/tutorial/TutorialContext";
+import TutorialOverlay from "@/components/student/tutorial/TutorialOverlay";
+import TutorialHelpButton from "@/components/student/tutorial/TutorialHelpButton";
 
 const studentMenuItems = [
   { label: "דף הבית", path: "/student-home", icon: Home },
-  { label: "בחרו שיעור", path: "/choose-lesson", icon: Home },
-  { label: "רשימת מורים", path: "/student-teachers", icon: GraduationCap },
-  { label: "כניסה לכיתה", path: "/student-video", icon: Video },
-  { label: "סיכום שיעור", path: "/student-lesson-summary", icon: ClipboardList },
-  { label: "צ'אט", path: "/student-chat", icon: MessageCircle },
-  { label: "צור קשר", path: "/student-contact", icon: Mail },
+  { label: "בחרו שיעור", path: "/choose-lesson", icon: Home, tour: "nav-find-lesson" },
+  { label: "רשימת מורים", path: "/student-teachers", icon: GraduationCap, tour: "nav-teachers" },
+  { label: "כניסה לכיתה", path: "/student-video", icon: Video, tour: "nav-classroom" },
+  { label: "סיכום שיעור", path: "/student-lesson-summary", icon: ClipboardList, tour: "nav-summary" },
+  { label: "צ'אט", path: "/student-chat", icon: MessageCircle, tour: "nav-chat" },
+  { label: "צור קשר", path: "/student-contact", icon: Mail, tour: "nav-contact" },
 ];
 
 export default function StudentLayout() {
+  return (
+    <TutorialProvider>
+      <StudentLayoutInner />
+    </TutorialProvider>
+  );
+}
+
+function StudentLayoutInner() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useDarkMode();
   useSessionRenewal();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const studentEmail = (() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("userData") || sessionStorage.getItem("userData") || "{}");
+      return String(stored.studentEmail || stored.email || "").toLowerCase();
+    } catch {
+      return "";
+    }
+  })();
+  const [needsConsent, setNeedsConsent] = useState(false);
+  const { active: tourActive, step: tourStep } = useTutorial();
+
+  // במובייל: פותחים את התפריט אוטומטית כשההדרכה מדגישה פריט ניווט
+  useEffect(() => {
+    if (!tourActive || !tourStep) return;
+    if (tourStep.nav && window.innerWidth < 1024) setMenuOpen(true);
+    else setMenuOpen(false);
+  }, [tourActive, tourStep]);
+
+  // תלמיד שאישר גרסת מסמכים ישנה נחסם עד לאישור מחדש.
+  useEffect(() => {
+    if (!studentEmail) return undefined;
+    let alive = true;
+    fetchConsentStatus(studentEmail, "student")
+      .then((res) => {
+        if (alive && res.needsConsent) setNeedsConsent(true);
+      })
+      .catch((err) => console.error("[consent] student status check failed:", err));
+    return () => {
+      alive = false;
+    };
+  }, [studentEmail]);
 
   useEffect(() => {
     if (!localStorage.getItem("authToken") && sessionStorage.getItem("authToken")) {
@@ -55,6 +100,10 @@ export default function StudentLayout() {
         : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
     }`;
 
+  if (needsConsent) {
+    return <StudentConsentGate email={studentEmail} onAccepted={() => setNeedsConsent(false)} />;
+  }
+
   return (
     <div dir="rtl" className="min-h-screen">
       <AppBackground />
@@ -67,7 +116,12 @@ export default function StudentLayout() {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (
-                <Link key={item.path} to={item.path} className={navItemClass(isActive)}>
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  data-tour={item.tour}
+                  className={navItemClass(isActive)}
+                >
                   <Icon className="w-3.5 h-3.5" />
                   {item.label}
                 </Link>
@@ -75,8 +129,10 @@ export default function StudentLayout() {
             })}
 
             <div className="w-px h-5 bg-border mx-2" />
+            <TutorialHelpButton />
             <button
               onClick={() => setDark(!dark)}
+              data-tour="theme-toggle"
               aria-label={dark ? "מעבר למצב בהיר" : "מעבר למצב כהה"}
               aria-pressed={dark ? "true" : "false"}
               className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -115,6 +171,7 @@ export default function StudentLayout() {
                   <Link
                     key={item.path}
                     to={item.path}
+                    data-tour={item.tour}
                     onClick={() => setMenuOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[48px] ${
                       isActive
@@ -129,8 +186,10 @@ export default function StudentLayout() {
               })}
 
               <div className="h-px bg-border my-1.5" />
+              <TutorialHelpButton withLabel />
               <button
                 onClick={() => { setDark(!dark); setMenuOpen(false); }}
+                data-tour="theme-toggle"
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors w-full min-h-[48px]"
               >
                 {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -155,6 +214,9 @@ export default function StudentLayout() {
       <main className="max-w-5xl mx-auto px-4 py-8 sm:py-10 app-fade-up">
         <Outlet />
       </main>
+
+      {/* שכבת ההדרכה — צפה בלבד */}
+      <TutorialOverlay />
     </div>
   );
 }

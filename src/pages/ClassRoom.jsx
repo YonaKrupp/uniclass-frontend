@@ -28,7 +28,6 @@ export default function ClassRoom() {
   const wrapperRef = useRef(null);
   const placeholderRef = useRef(null);
   const [videoPos, setVideoPos] = useState(null);
-
   const now = new Date();
   const todayDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   const todayDisplay = now.toLocaleDateString("he-IL", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -175,7 +174,7 @@ export default function ClassRoom() {
     return url;
   };
 
-  const handleStartRoom = async (lesson) => {
+  const enterRoom = async (lesson) => {
     if (!lesson.dailyRoom) {
       setError("לא נמצא שם חדר לשיעור זה");
       return;
@@ -317,7 +316,7 @@ export default function ClassRoom() {
                 <div className="col-span-3 font-body text-muted-foreground truncate">{lesson.participantName || "—"}</div>
                 <div className="col-span-2 flex justify-center">
                   <button
-                    onClick={() => handleStartRoom(lesson)}
+                    onClick={() => enterRoom(lesson)}
                     className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-heading font-medium hover:bg-primary/90 transition-colors flex items-center gap-1.5"
                   >
                     <Play className="w-3.5 h-3.5" />
@@ -397,6 +396,7 @@ export default function ClassRoom() {
           )}
         </>
       )}
+
     </div>
   );
 }

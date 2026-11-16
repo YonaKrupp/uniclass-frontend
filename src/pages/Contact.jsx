@@ -9,6 +9,7 @@ import Reveal from "@/components/landing/Reveal";
 import {
   Accordion, AccordionItem, AccordionTrigger, AccordionContent } from
 "@/components/ui/accordion";
+import { trackGaEvent } from "@/lib/gtagEvents";
 
 const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
@@ -84,6 +85,7 @@ export default function Contact() {
         return;
       }
       setSuccess(true);
+      trackGaEvent("contact_submit");
       setSubjectText("");
       setMessageText("");
     } catch (err) {

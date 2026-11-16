@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CreditCard, Loader2, Calendar, Wallet, RotateCcw, ArrowRight, Timer } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import StudentConsentCheckbox from "@/components/legal/StudentConsentCheckbox";
+import { acceptLegalConsent, detectMinor } from "@/lib/legalConsent";
 
 const FUNCTIONS_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
 
@@ -22,11 +24,36 @@ const groupedColumns = {
   totalPayment: "סה\"כ",
 };
 
+const moneyColumns = new Set(["hourlyPayment", "unitPrice", "totalPayment"]);
+
+// Shows the exact amount with 2 decimals and never rounds the value up or down.
+function formatMoney(value) {
+  if (value === null || value === undefined || value === "") return "—";
+  const num = Number(String(value).replace(/[^\d.-]/g, ""));
+  if (Number.isNaN(num)) return String(value);
+  // Trim float noise (e.g. 236.00000000000003) without changing the real value.
+  const normalized = Math.round(num * 1e6) / 1e6;
+  const [intPart, decPart = ""] = Math.abs(normalized).toFixed(6).split(".");
+  return `${normalized < 0 ? "-" : ""}${intPart}.${decPart.slice(0, 2)}`;
+}
+
 function formatDate(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
+}
+
+// האם תאריך הלידה מצביע על תלמיד בן 18 ומעלה (null = תאריך לא ידוע).
+function isAdultFromBirthDate(value) {
+  if (!value) return null;
+  const birth = new Date(value);
+  if (Number.isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const monthDiff = now.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) age -= 1;
+  return age >= 18;
 }
 
 function random6() {
@@ -57,6 +84,8 @@ export default function StudentPayment() {
   const [backLoading, setBackLoading] = useState(false);
   const [error, setError] = useState("");
   const [timeLeft, setTimeLeft] = useState(900);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsError, setShowTermsError] = useState(false);
 
   const navigate = useNavigate();
 
@@ -146,9 +175,21 @@ export default function StudentPayment() {
   const totalRow = lessonsGrouped.find((g) => g.subjectName === 'סה"כ כללי');
   const totalAmount = totalRow?.totalPayment ?? 0;
 
+  // מגיל 18 ומעלה מוצגת הצהרת בגירות; מתחת ל-18 נשמר נוסח הסכמת ההורה.
+  const studentIsAdult = isAdultFromBirthDate(data?.studentDateOfBirth);
+  const isMinor = studentIsAdult === null ? detectMinor(userData) : !studentIsAdult;
+
   const handlePay = async () => {
-    setPaying(true);
     setError("");
+
+    // אישור תנאים חובה לפני חיוב (השרת בודק זאת שוב לפני הסליקה).
+    if (!termsAccepted) {
+      setShowTermsError(true);
+      setError("יש לאשר את התנאים כדי להמשיך");
+      return;
+    }
+
+    setPaying(true);
     try {
       if (!authToken) {
         setError("שגיאה: אין זהות משתמש. אנא התחברו מחדש.");
@@ -158,6 +199,21 @@ export default function StudentPayment() {
 
       localStorage.setItem("authToken", authToken);
       localStorage.setItem("userData", JSON.stringify(userData));
+
+      // תיעוד האישור לפני יצירת החיוב
+      const consent = await acceptLegalConsent({
+        email: studentEmail,
+        userId: userData.studentId || userData.id || "",
+        consentType: "student_payment",
+        roleOfApprover: isMinor ? "parent" : "student",
+        acceptedTerms: true,
+        confirmedParentGuardian: isMinor,
+        confirmed18Plus: !isMinor,
+      });
+      if (consent.success === false) {
+        setError(consent.message || "שמירת האישור נכשלה. אנא נסו שוב.");
+        return;
+      }
 
       // Build description and heshDesc from grouped lessons (excluding the total row)
       const groups = lessonsGrouped.filter((g) => g.subjectName !== 'סה"כ כללי');
@@ -317,7 +373,7 @@ export default function StudentPayment() {
                           <tr key={i} className={`hover:bg-muted/30 transition-colors ${isTotal ? "bg-primary/5 font-bold" : ""}`}>
                             {Object.keys(lessonsColumns).map((k) => (
                               <td key={k} className={`px-4 py-2.5 whitespace-nowrap text-center ${isTotal ? "text-primary" : "text-foreground"}`}>
-                                {String(lesson[k] ?? "—")}
+                                {moneyColumns.has(k) ? formatMoney(lesson[k]) : String(lesson[k] ?? "—")}
                               </td>
                             ))}
                           </tr>
@@ -356,7 +412,11 @@ export default function StudentPayment() {
                         <tr key={i} className={`hover:bg-muted/30 transition-colors ${isTotal ? "bg-primary/5 font-bold" : ""}`}>
                           {Object.keys(groupedColumns).map((k) => (
                             <td key={k} className={`px-4 py-2.5 whitespace-nowrap text-center ${isTotal ? "text-primary" : "text-foreground"}`}>
-                              {String(g[k] ?? "—")}
+                              {isTotal && (k === "lessonCount" || k === "unitPrice")
+                                ? ""
+                                : moneyColumns.has(k)
+                                ? formatMoney(g[k])
+                                : String(g[k] ?? "—")}
                             </td>
                           ))}
                         </tr>
@@ -371,18 +431,37 @@ export default function StudentPayment() {
             </div>
           )}
 
+          {/* אישור תנאים לפני תשלום */}
+          {totalAmount > 0 && (
+            <StudentConsentCheckbox
+              id="student-payment-consent"
+              checked={termsAccepted}
+              onChange={(value) => {
+                setTermsAccepted(value);
+                setShowTermsError(false);
+                setError("");
+              }}
+              variant="payment"
+              isMinor={isMinor}
+              showError={showTermsError}
+            />
+          )}
+
           {/* Pay button */}
           {totalAmount > 0 && (
             <div className="flex justify-end">
               <button
                 onClick={handlePay}
                 disabled={paying}
-                className="flex items-center gap-2 bg-primary text-primary-foreground font-heading font-semibold px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
+                aria-disabled={!termsAccepted || undefined}
+                className={`flex items-center gap-2 bg-primary text-primary-foreground font-heading font-semibold px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 ${
+                  !termsAccepted ? "opacity-60 cursor-not-allowed" : ""
+                }`}
               >
                 {paying ? (
                   <><Loader2 className="w-5 h-5 animate-spin" /> מכין תשלום...</>
                 ) : (
-                  <><CreditCard className="w-5 h-5" /> שלם ₪{totalAmount}</>
+                  <><CreditCard className="w-5 h-5" /> שלם ₪{formatMoney(totalAmount)}</>
                 )}
               </button>
             </div>

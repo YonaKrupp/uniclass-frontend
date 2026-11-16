@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Briefcase, Mail, Lock, Eye, EyeOff, Loader2, Sun, Moon, User, Phone, ArrowRight, ShieldCheck, KeyRound } from "lucide-react";
+import { Briefcase, Mail, Lock, Eye, EyeOff, Loader2, Sun, Moon, User, Phone, ArrowRight, ShieldCheck, KeyRound, CreditCard } from "lucide-react";
 import { useDarkMode } from "@/lib/useDarkMode";
+import { isValidIsraeliId } from "@/lib/israeliId";
 import TeacherBenefits from "@/components/register-teacher/TeacherBenefits";
 import TeacherHowItWorks from "@/components/register-teacher/TeacherHowItWorks";
 import TeacherFaq from "@/components/register-teacher/TeacherFaq";
 import TeacherStickyCta from "@/components/register-teacher/TeacherStickyCta";
 import TeacherThanks from "@/components/register-teacher/TeacherThanks";
+import ConsentCheckboxes, { CONSENT_ERROR } from "@/components/legal/ConsentCheckboxes";
+import { DOCUMENT_SET_VERSION } from "@/content/legalDocs";
 
-const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions";
+import { FUNCTIONS_BASE } from "@/lib/functionsBase";
+import { trackGaEvent } from "@/lib/gtagEvents";
+
+const API_BASE = FUNCTIONS_BASE;
 
 export default function RegisterTeacher() {
   const [dark, setDark] = useDarkMode();
@@ -16,6 +22,7 @@ export default function RegisterTeacher() {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [idNumber, setIdNumber] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,8 +32,24 @@ export default function RegisterTeacher() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [consents, setConsents] = useState({ terms: false, adult: false });
+  const [consentError, setConsentError] = useState("");
+  const [showConsentErrors, setShowConsentErrors] = useState(false);
   const navigate = useNavigate();
+
+  const allConsentsAccepted = consents.terms && consents.adult;
+
+  const consentPayload = {
+    termsPrivacyConduct: consents.terms,
+    adult: consents.adult,
+    version: DOCUMENT_SET_VERSION,
+  };
+
+  const handleConsentChange = (key, checked) => {
+    setConsents((prev) => ({ ...prev, [key]: checked }));
+    setShowConsentErrors(false);
+    setConsentError("");
+  };
 
   const scrollToForm = () => {
     document.getElementById("register-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -77,12 +100,17 @@ export default function RegisterTeacher() {
       setError("הסיסמה חייבת להכיל לפחות 6 תווים");
       return;
     }
+    if (!isValidIsraeliId(idNumber)) {
+      setError("מספר תעודת הזהות אינו תקין");
+      return;
+    }
     if (!/^\d{9,10}$/.test(phoneNumber.replace(/[\s-]/g, ""))) {
       setError("מספר הטלפון אינו תקין");
       return;
     }
-    if (!termsAccepted) {
-      setError("יש לאשר את תנאי השימוש כדי להמשיך");
+    if (!allConsentsAccepted) {
+      setConsentError(CONSENT_ERROR);
+      setShowConsentErrors(true);
       return;
     }
 
@@ -91,7 +119,7 @@ export default function RegisterTeacher() {
       const response = await fetch(`${API_BASE}/teacherRegisterProxy`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "sendOtp", email, firstName, lastName, phoneNumber, password }),
+        body: JSON.stringify({ action: "sendOtp", email, firstName, lastName, idNumber, phoneNumber, password, consents: consentPayload }),
       });
       const data = await response.json();
 
@@ -125,7 +153,7 @@ export default function RegisterTeacher() {
       const response = await fetch(`${API_BASE}/teacherRegisterProxy`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "verifyAndRegister", sessionId, otpCode }),
+        body: JSON.stringify({ action: "verifyAndRegister", sessionId, otpCode, email, idNumber, consents: consentPayload }),
       });
       const data = await response.json();
 
@@ -152,6 +180,8 @@ export default function RegisterTeacher() {
       localStorage.setItem("userData", JSON.stringify(loginData));
       sessionStorage.setItem("authToken", token);
       sessionStorage.setItem("userData", JSON.stringify(loginData));
+
+      trackGaEvent("sign_up", { method: "email", user_type: "teacher" });
 
       if (window.matchMedia("(max-width: 767.98px)").matches) {
         setStep("thanks");
@@ -197,10 +227,10 @@ export default function RegisterTeacher() {
     ? "confirmPassword"
     : error.includes("סיסמה")
     ? "password"
+    : error.includes("תעודת הזהות")
+    ? "idNumber"
     : error.includes("טלפון")
     ? "phone"
-    : error.includes("תנאי")
-    ? "terms"
     : "top";
 
   if (step === "thanks") {
@@ -278,15 +308,17 @@ export default function RegisterTeacher() {
           {step === "form" && (
             <form onSubmit={handleSendOtp} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-heading font-medium text-foreground">מייל</label>
+                <label htmlFor="teacher-register-email" className="text-sm font-heading font-medium text-foreground">מייל</label>
                 <div className="relative">
                   <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
+                    id="teacher-register-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="הכניסו את האימייל שלכם"
                     required
+                    aria-required="true"
                     autoComplete="email"
                     inputMode="email"
                     className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
@@ -296,15 +328,17 @@ export default function RegisterTeacher() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-heading font-medium text-foreground">שם פרטי</label>
+                  <label htmlFor="teacher-register-first-name" className="text-sm font-heading font-medium text-foreground">שם פרטי</label>
                   <div className="relative">
                     <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <input
+                      id="teacher-register-first-name"
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="שם פרטי"
                       required
+                      aria-required="true"
                       autoComplete="given-name"
                       className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                     />
@@ -312,15 +346,17 @@ export default function RegisterTeacher() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-heading font-medium text-foreground">שם משפחה</label>
+                  <label htmlFor="teacher-register-last-name" className="text-sm font-heading font-medium text-foreground">שם משפחה</label>
                   <div className="relative">
                     <User className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <input
+                      id="teacher-register-last-name"
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="שם משפחה"
                       required
+                      aria-required="true"
                       autoComplete="family-name"
                       className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                     />
@@ -329,36 +365,72 @@ export default function RegisterTeacher() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-heading font-medium text-foreground">מספר טלפון</label>
+                <label htmlFor="teacher-id-number" className="text-sm font-heading font-medium text-foreground">
+                  מספר תעודת זהות
+                </label>
+                <div className="relative">
+                  <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                  <input
+                    id="teacher-id-number"
+                    type="text"
+                    value={idNumber}
+                    onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, "").slice(0, 9))}
+                    placeholder="9 ספרות"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{9}"
+                    maxLength={9}
+                    autoComplete="off"
+                    aria-required="true"
+                    aria-invalid={errorTarget === "idNumber" || undefined}
+                    aria-describedby={errorTarget === "idNumber" ? "teacher-id-number-error" : undefined}
+                    className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
+                  />
+                </div>
+                {errorTarget === "idNumber" && (
+                  <p id="teacher-id-number-error" className="md:hidden text-xs text-destructive font-body">{error}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="teacher-phone" className="text-sm font-heading font-medium text-foreground">מספר טלפון</label>
                 <div className="relative">
                   <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
+                    id="teacher-phone"
                     type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="050-1234567"
                     required
+                    aria-required="true"
                     inputMode="tel"
                     autoComplete="tel"
+                    aria-invalid={errorTarget === "phone" || undefined}
+                    aria-describedby={errorTarget === "phone" ? "teacher-phone-error" : undefined}
                     className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
                 </div>
                 {errorTarget === "phone" && (
-                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
+                  <p id="teacher-phone-error" className="md:hidden text-xs text-destructive font-body">{error}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-heading font-medium text-foreground">סיסמה</label>
+                <label htmlFor="teacher-password" className="text-sm font-heading font-medium text-foreground">סיסמה</label>
                 <div className="relative">
                   <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
+                    id="teacher-password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="לפחות 6 תווים"
                     autoComplete="new-password"
                     required
+                    aria-required="true"
+                    aria-invalid={errorTarget === "password" || undefined}
+                    aria-describedby={errorTarget === "password" ? "teacher-password-error" : undefined}
                     className="w-full pr-10 pl-12 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
                   <button
@@ -371,21 +443,25 @@ export default function RegisterTeacher() {
                   </button>
                 </div>
                 {errorTarget === "password" && (
-                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
+                  <p id="teacher-password-error" className="md:hidden text-xs text-destructive font-body">{error}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-heading font-medium text-foreground">אימות סיסמה</label>
+                <label htmlFor="teacher-confirm-password" className="text-sm font-heading font-medium text-foreground">אימות סיסמה</label>
                 <div className="relative">
                   <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
+                    id="teacher-confirm-password"
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="הזינו שוב את הסיסמה"
                     autoComplete="new-password"
                     required
+                    aria-required="true"
+                    aria-invalid={errorTarget === "confirmPassword" || undefined}
+                    aria-describedby={errorTarget === "confirmPassword" ? "teacher-confirm-password-error" : undefined}
                     className="w-full pr-10 pl-12 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
                   <button
@@ -398,45 +474,27 @@ export default function RegisterTeacher() {
                   </button>
                 </div>
                 {errorTarget === "confirmPassword" && (
-                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
+                  <p id="teacher-confirm-password-error" className="md:hidden text-xs text-destructive font-body">{error}</p>
                 )}
               </div>
 
-              {/* Terms of Service */}
-              <div className="bg-muted/60 border border-border rounded-xl p-4 space-y-3">
-                <p className="text-xs text-muted-foreground font-body leading-relaxed">
-                  בהמשך הרשמה זו אתם מאשרים שימוש תקין במערכת, שמירה על פרטיות, והזנת פרטים אמינים בלבד.
-                </p>
-                <label className="flex items-start gap-3 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded border-border text-primary focus:ring-primary/50 cursor-pointer shrink-0"
-                  />
-                  <span className="text-sm font-body text-foreground">
-                    קראתי ואני מאשר/ת את{" "}
-                    <a
-                      href="/teacher-terms"
-                      className="text-primary underline hover:no-underline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        sessionStorage.setItem("registerTeacherDraft", JSON.stringify({ email, firstName, lastName, phoneNumber, password, confirmPassword }));
-                      }}
-                    >
-                      תנאי השימוש באתר
-                    </a>
-                  </span>
-                </label>
-                {errorTarget === "terms" && (
-                  <p className="md:hidden text-xs text-destructive font-body">{error}</p>
-                )}
-              </div>
+              {/* Legal consent */}
+              <ConsentCheckboxes
+                value={consents}
+                onChange={handleConsentChange}
+                showErrors={showConsentErrors}
+              />
+              {consentError && !showConsentErrors && (
+                <p role="alert" className="text-xs text-destructive font-body">{consentError}</p>
+              )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2"
+                aria-disabled={!allConsentsAccepted || undefined}
+                className={`w-full py-3.5 bg-primary text-primary-foreground rounded-xl text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed min-h-[52px] flex items-center justify-center gap-2 ${
+                  !allConsentsAccepted ? "opacity-60 cursor-not-allowed" : ""
+                }`}
               >
                 {loading ? (
                   <>
@@ -464,12 +522,15 @@ export default function RegisterTeacher() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-heading font-medium text-foreground">קוד אימות</label>
+                <label htmlFor="teacher-register-otp" className="text-sm font-heading font-medium text-foreground">קוד אימות</label>
                 <div className="relative">
                   <KeyRound className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
+                    id="teacher-register-otp"
                     type="text"
                     inputMode="numeric"
+                    autoComplete="one-time-code"
+                    aria-required="true"
                     pattern="\d{6}"
                     maxLength={6}
                     value={otpCode}

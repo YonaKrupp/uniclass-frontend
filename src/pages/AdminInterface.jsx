@@ -229,12 +229,19 @@ export default function AdminInterface() {
         token,
       });
       const res = response?.data ?? response;
-      if (res?.success === false || (res?._status && res._status !== 200)) {
+      const rows = Array.isArray(res?.data) ? res.data : [];
+      const failed = res?.success === false || (res?._status && res._status !== 200);
+      if (failed && rows.length === 0) {
+        // אין נתוני הכנסה לתאריך הזה — מצב תקין, לא שגיאה
+        setIncomeList([]);
+        return;
+      }
+      if (failed) {
         const backendMsg = res?.message || res?.error || "";
         setError(backendMsg ? `שגיאה מהשרת: ${backendMsg}` : "שגיאה בטעינת רשימת הכנסות");
         setIncomeList([]);
       } else {
-        setIncomeList(res?.data ?? []);
+        setIncomeList(rows);
       }
     } catch (err) {
       console.error("[AdminInterface] Income fetch error:", err);

@@ -11,9 +11,14 @@ import {
 import PageLogo from "@/components/PageLogo";
 
 const SEARCH_MODES = [
-  { value: "1", label: "חיפוש מלא", icon: Search },
-  { value: "3", label: "חיפוש בהקלדה", icon: BookOpen },
-  { value: "2", label: "חיפוש מורים מתוך שיעורים שכבר לקחתם", icon: GraduationCap },
+  { value: "1", label: "חיפוש מלא", hint: "בחרו מוסד, תואר וקורס, צעד אחר צעד", icon: Search },
+  { value: "3", label: "חיפוש בהקלדה", hint: "הקלידו שם קורס ותגיעו אליו מיד", icon: BookOpen },
+  {
+    value: "2",
+    label: "חיפוש מורים מתוך שיעורים שכבר לקחתם",
+    hint: "חזרו למורה שכבר למדתם איתו",
+    icon: GraduationCap,
+  },
 ];
 
 const UNIVERSITY_MODES = [
@@ -21,6 +26,9 @@ const UNIVERSITY_MODES = [
   { value: "2", label: "האוניברסיטה הפתוחה", icon: BookOpen },
   { value: "3", label: "בית ספר", icon: GraduationCap },
 ];
+
+// Hebrew A–B ordering for course/subject names
+const byHebrew = (a, b) => String(a ?? "").localeCompare(String(b ?? ""), "he", { numeric: true, sensitivity: "base" });
 
 // Module-level: prevents concurrent fetch calls across component remounts within the same page load
 let _fetchInProgress = false;
@@ -43,7 +51,8 @@ export default function ChooseLesson() {
   const [typedQuery, setTypedQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [showSubjectList, setShowSubjectList] = useState(false);
-  const [activeOnly, setActiveOnly] = useState(true);
+  // כל הקורסים מוצגים תמיד — ללא סינון לפי סטטוס פעיל
+  const activeOnly = false;
   const subjectListRef = useRef(null);
   const typedInputRef = useRef(null);
   const typedSearchSectionRef = useRef(null);
@@ -163,15 +172,43 @@ export default function ChooseLesson() {
     ? allYears.filter((y) => String(y.gn22_subject_id) === String(selectedDegree))
     : allYears;
 
-  // Filter courses by selected degree via subjects' gn22_subject_id mapping
+  const normalizeText = (value) =>
+    String(value ?? "")
+      .replace(/[\u00a0\u200e\u200f]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  // The API carries the year only inside the subject's level name
+  // (e.g. "תיכון כיתה יא"), so a course belongs to a year when the level of its
+  // subject names that year as a whole word — "כיתה י" must not match "כיתה יא".
+  const levelMatchesYear = (level, yearLabel) => {
+    if (!yearLabel) return false;
+    const text = normalizeText(level);
+    if (!text) return false;
+    const escaped = yearLabel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`${escaped}(?![\\u05d0-\\u05ea])`).test(text);
+  };
+
+  const selectedYearId = selectedYear && String(selectedYear) !== "0" ? String(selectedYear) : "";
+  const selectedYearLabel = selectedYearId
+    ? normalizeText(years.find((y) => String(y.degree_years_ID) === selectedYearId)?.degree_years)
+    : "";
+
+  // Filter courses by selected degree via subjects' gn22_subject_id mapping,
+  // and — when a year of study is chosen — only that year's courses.
   const filteredCourses = (() => {
     if (!selectedDegree) return [];
-    const matchingSubjectIds = subjects
-      .filter((s) => String(s.gn22_subject_id ?? s.Gn22_subject_id ?? "") === String(selectedDegree))
-      .map((s) => s.gn03_id);
+    const degreeSubjects = subjects.filter(
+      (s) => String(s.gn22_subject_id ?? s.Gn22_subject_id ?? "") === String(selectedDegree)
+    );
+    const matchingSubjectIds = (
+      selectedYearLabel
+        ? degreeSubjects.filter((s) => levelMatchesYear(s.gn04_levelName, selectedYearLabel))
+        : degreeSubjects
+    ).map((s) => String(s.gn03_id ?? s.Gn03_id ?? ""));
     const seen = new Set();
-    return courses.filter((c) => {
-      if (!matchingSubjectIds.includes(c.course_id)) return false;
+    const list = courses.filter((c) => {
+      if (!matchingSubjectIds.includes(String(c.course_id))) return false;
       if (activeOnly) {
         const v = c.Active ?? c.active ?? c.gn03_Active ?? c.gn03_active ?? c.IsActive ?? c.gn03_IsActive;
         if (!(Number(v) === 1 || v === true || v === "1" || v === "true")) return false;
@@ -181,10 +218,24 @@ export default function ChooseLesson() {
       seen.add(key);
       return true;
     });
+    // Courses are listed alphabetically (א'–ב')
+    return list.sort((a, b) => byHebrew(a.course_name, b.course_name));
   })();
 
+  const isSchool = universityMode === "3";
   const canSelectYear = selectedDegree !== "";
-  const canSelectCourse = selectedDegree !== "";
+  // In school mode the course is reachable only after a class is chosen
+  const canSelectCourse = selectedDegree !== "" && (!isSchool || selectedYearId !== "");
+
+  const degreeLabel = isSchool ? "שלב לימודים" : "תואר אקדמי";
+  const degreePlaceholder = isSchool ? "בחרו שלב לימודים" : "בחרו תואר";
+  const yearLabel = isSchool ? "כיתה" : "שנת לימוד";
+  const yearPlaceholder = !canSelectYear
+    ? isSchool ? "בחרו שלב לימודים קודם" : "בחרו תואר קודם"
+    : isSchool ? "בחרו כיתה" : "בחרו שנת לימוד";
+  const coursePlaceholder = canSelectCourse
+    ? "בחרו קורס"
+    : isSchool ? "בחרו שלב לימודים וכיתה קודם" : "בחרו תואר קודם";
 
   const showUniversitySection = searchMode === "1";
   const showDropdowns = showUniversitySection;
@@ -212,20 +263,14 @@ export default function ChooseLesson() {
         if (seen.has(s._label)) return false;
         seen.add(s._label);
         return true;
-      });
+      })
+      .sort((a, b) => byHebrew(a._label, b._label));
   }, [subjects]);
 
   const normalizeForSearch = (str) => (str ?? "")
     .replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00A0]/g, "")
     .toLowerCase()
     .trim();
-
-  // Debug: log the first subject's keys to identify the Active field name
-  useEffect(() => {
-    if (subjects.length > 0) {
-      console.log("[ChooseLesson] first subject keys:", Object.keys(subjects[0]), "values:", subjects[0]);
-    }
-  }, [subjects]);
 
   const filteredSubjects = useMemo(() => {
     let list = subjectOptions;
@@ -264,27 +309,8 @@ export default function ChooseLesson() {
         </div>
       )}
 
-{/* Active lessons filter */}
-      <div className="flex items-center gap-2 cursor-pointer select-none bg-card rounded-2xl border border-border p-4" dir="rtl">
-        <input
-          type="checkbox"
-          checked={activeOnly}
-          onChange={(e) => {
-            setActiveOnly(e.target.checked);
-            setSelectedDegree("");
-            setSelectedYear("0");
-            setSelectedCourse("");
-            setTypedQuery("");
-            setSelectedSubject(null);
-            setShowSubjectList(false);
-          }}
-          className="w-4 h-4 accent-primary cursor-pointer shrink-0"
-        />
-        <span className="text-sm font-body text-foreground">הצג רק קורסים שקיים עבורם מורה</span>
-      </div>
-
       {/* Search Mode Radio Buttons */}
-      <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
+      <div data-tour="search-mode" className="bg-card rounded-2xl border border-border p-5 space-y-4">
         <h2 className="text-base font-heading font-semibold text-foreground">אופן החיפוש</h2>
         <div className="space-y-2">
           {SEARCH_MODES.map((mode) => {
@@ -307,9 +333,12 @@ export default function ChooseLesson() {
                   onChange={(e) => setSearchMode(e.target.value)}
                   className="w-4 h-4 accent-primary"
                 />
-                <Icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                <span className={`font-body text-sm ${isSelected ? "text-primary font-semibold" : "text-foreground"}`}>
-                  {mode.label}
+                <Icon className={`w-5 h-5 shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                <span className="flex flex-col gap-0.5 min-w-0 text-right">
+                  <span className={`font-body text-sm ${isSelected ? "text-primary font-semibold" : "text-foreground"}`}>
+                    {mode.label}
+                  </span>
+                  <span className="font-body text-xs text-muted-foreground">{mode.hint}</span>
                 </span>
               </label>
             );
@@ -319,8 +348,8 @@ export default function ChooseLesson() {
 
       {/* University Selection (only when searchMode = 1) */}
       {showUniversitySection && !loading && (
-        <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
-          <h2 className="w-full text-right text-base font-heading font-semibold text-foreground">סוג אוניברסיטה</h2>
+        <div data-tour="institution-type" className="bg-card rounded-2xl border border-border p-5 space-y-4">
+          <h2 className="w-full text-right text-base font-heading font-semibold text-foreground">סוג מוסד</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {UNIVERSITY_MODES.map((mode) => {
               const Icon = mode.icon;
@@ -353,15 +382,15 @@ export default function ChooseLesson() {
 
           {/* Dropdowns */}
           {showDropdowns && (
-            <div className="space-y-4 pt-2">
+            <div data-tour="degree-course" className="space-y-4 pt-2">
               {/* Degrees */}
               <div className="space-y-2" dir="rtl">
               <label className="w-full text-right text-sm font-heading font-semibold text-foreground block">
-                תואר אקדמי
+                {degreeLabel}
               </label>
               <Select value={selectedDegree} onValueChange={setSelectedDegree}>
                 <SelectTrigger className="w-full text-right flex flex-row-reverse justify-between items-center">
-                  <SelectValue placeholder="בחרו תואר" />
+                  <SelectValue placeholder={degreePlaceholder} />
                 </SelectTrigger>
                 <SelectContent className="min-w-[16rem] max-w-[90vw] text-right" align="end">
                   {degrees.map((d, i) => (
@@ -381,17 +410,17 @@ export default function ChooseLesson() {
               {universityMode === "3" && (
                 <div className="space-y-2" dir="rtl">
                   <label className={`w-full text-right text-sm font-heading font-semibold block ${canSelectYear ? "text-foreground" : "text-muted-foreground/50"}`}>
-                    שנת לימוד
+                    {yearLabel}
                   </label>
                   <Select value={selectedYear} onValueChange={setSelectedYear} disabled={!canSelectYear}>
                     <SelectTrigger className="w-full text-right flex flex-row-reverse justify-between items-center">
-                      <SelectValue placeholder={canSelectYear ? "בחרו שנת לימוד" : "בחרו תואר קודם"} />
+                      <SelectValue placeholder={yearPlaceholder} />
                     </SelectTrigger>
                     <SelectContent className="min-w-[16rem] max-w-[90vw] text-right" align="end">
                       {years.map((y, i) => (
                         <SelectItem
-                          key={y.year_id ?? y.gn22_id ?? y.id ?? i}
-                          value={String(y.year_id ?? y.gn22_id ?? y.id ?? i)}
+                          key={y.degree_years_ID ?? y.year_id ?? y.gn22_id ?? y.id ?? i}
+                          value={String(y.degree_years_ID ?? y.year_id ?? y.gn22_id ?? y.id ?? i)}
                           className="whitespace-normal break-words leading-snug py-2 text-right justify-start flex-row-reverse"
                         >
                           {y.degree_years ?? y.Degree_years ?? y.year_name ?? y.gn22_yearName ?? y.name ?? `שנה ${i + 1}`}
@@ -409,7 +438,7 @@ export default function ChooseLesson() {
                 </label>
                 <Select value={selectedCourse} onValueChange={setSelectedCourse} disabled={!canSelectCourse}>
                   <SelectTrigger className="w-full text-right flex flex-row-reverse justify-between items-center">
-                    <SelectValue placeholder={canSelectCourse ? "בחרו קורס" : "בחרו תואר קודם"} />
+                    <SelectValue placeholder={coursePlaceholder} />
                   </SelectTrigger>
                   <SelectContent className="min-w-[16rem] max-w-[90vw] text-right" align="end">
                     {filteredCourses.map((c, i) => (

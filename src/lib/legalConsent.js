@@ -1,11 +1,21 @@
 import { base44 } from "@/api/base44Client";
 
+/** טוקן ההתחברות של המשתמש המחובר — השרת גוזר ממנו את הזהות. */
+function authToken() {
+  return (
+    localStorage.getItem("authToken") ||
+    sessionStorage.getItem("authToken") ||
+    ""
+  );
+}
+
 /** מצב האישור של משתמש מול גרסת חבילת המסמכים הנוכחית. */
 export async function fetchConsentStatus(email, audience) {
   const res = await base44.functions.invoke("legalConsentProxy", {
     action: "status",
     email,
     audience,
+    token: authToken(),
   });
   return res.data || {};
 }
@@ -15,6 +25,7 @@ export async function acceptLegalConsent(payload) {
   const res = await base44.functions.invoke("legalConsentProxy", {
     action: "accept",
     ...payload,
+    token: authToken(),
   });
   return res.data || {};
 }

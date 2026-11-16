@@ -1,12 +1,22 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
+import { validateImage } from '../../shared/fileValidation.ts';
 
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const { action, email, token, pictureData } = body;
 
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
+
     if (!email) {
       return Response.json({ error: 'חסר אימייל מורה' }, { status: 400 });
+    }
+
+    // תמונת מורה ניתנת לצפייה לכל משתמש מחובר, אבל החלפה רק על ידי המורה עצמו.
+    if (action === 'upload' && !sameEmail(email, auth.email)) {
+      return forbidden('אין הרשאה לעדכן תמונת מורה אחר');
     }
 
     const API_BASE = getApiBase(req);
@@ -58,13 +68,19 @@ Deno.serve(async (req) => {
         if (!pictureData) {
           return Response.json({ error: 'חסרים נתוני תמונה' }, { status: 400 });
         }
+        // הסוג נקבע לפי תוכן הקובץ (magic bytes) ולא לפי הסיומת או ה-mime שהלקוח שולח.
+        const check = validateImage(pictureData);
+        if (!check.ok) {
+          console.warn('[teacherPictureProxy] rejected upload for', email, '-', check.error);
+          return Response.json({ error: check.error }, { status: 400 });
+        }
         url = `${API_BASE}/api/Teacher/SetTeacherPicture`;
         method = 'POST';
         headers['Content-Type'] = 'application/json';
         fetchOptions = {
           method,
           headers,
-          body: JSON.stringify({ email, pictureData }),
+          body: JSON.stringify({ email, pictureData: check.base64 }),
         };
         const apiRes = await fetch(url, fetchOptions);
         const text = await apiRes.text();

@@ -1,7 +1,16 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { passwordError } from '../../shared/passwordPolicy.ts';
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { DOCUMENT_SET_VERSION, CONSENT_REQUIRED_MESSAGE, hasValidConsent, clientIp } from '../../shared/legalDocs.ts';
 import { docsVersionForAudience, INITIAL_DOCS_VERSION } from '../../shared/legalConsent.ts';
+import {
+  checkLimit,
+  noteAttempt,
+  tooManyAttemptsResponse,
+  keyFor,
+  ipKey,
+  FIVE_PER_15_MIN,
+} from '../../shared/rateLimit.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -32,6 +41,27 @@ Deno.serve(async (req) => {
     const mapping = endpointMap[action];
     if (!mapping) {
       return Response.json({ success: false, message: 'פעולה לא מוכרת' });
+    }
+
+    // הגבלת קצב לשליחת קודים (מונע הצפת SMS): 5 ב-15 דקות לכל אימייל/כתובת IP.
+    const limitKeys = [
+      keyFor(`register-${action}`, body.email || body.sessionId),
+      ipKey(req),
+    ].filter(Boolean);
+    const limitState = await checkLimit(req, limitKeys);
+    if (limitState.limited) {
+      console.warn(`teacherRegisterProxy: rate limited (${action})`);
+      return tooManyAttemptsResponse(limitState.retryAfter);
+    }
+    await noteAttempt(req, limitKeys, FIVE_PER_15_MIN);
+
+    // מדיניות סיסמאות נאכפת גם בשרת, לא רק בטופס.
+    if (action === 'sendOtp') {
+      const pwError = passwordError(body.password);
+      if (pwError) {
+        console.warn(`teacherRegisterProxy: rejected weak password for ${body.email || '(no email)'}`);
+        return Response.json({ success: false, message: pwError }, { status: 400 });
+      }
     }
 
     // אישור משפטי חובה — השרת מסרב להתחיל או להשלים רישום בלי שלושת האישורים

@@ -1,4 +1,16 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { passwordError } from '../../shared/passwordPolicy.ts';
+import {
+  checkLimit,
+  noteAttempt,
+  tooManyAttemptsResponse,
+  keyFor,
+  ipKey,
+  FIVE_PER_15_MIN,
+} from '../../shared/rateLimit.ts';
+
+// תשובה אחידה — אינה חושפת אם קיימת כתובת במערכת.
+const GENERIC_SENT_MESSAGE = 'אם קיים חשבון עם כתובת זו, שלחנו אליה הוראות לאיפוס סיסמה.';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -29,6 +41,24 @@ Deno.serve(async (req) => {
     const mapping = endpointMap[action];
     if (!mapping) {
       return Response.json({ success: false, message: 'פעולה לא מוכרת' });
+    }
+
+    // הגבלת קצב: 5 ניסיונות ב-15 דקות לכל אימייל/כתובת IP — מונע הצפת SMS וניחוש קודים.
+    const limitKeys = [
+      keyFor(`reset-${action}`, body.email || body.sessionId),
+      ipKey(req),
+    ].filter(Boolean);
+    const limitState = await checkLimit(req, limitKeys);
+    if (limitState.limited) {
+      console.warn(`studentResetPasswordProxy: rate limited (${action})`);
+      return tooManyAttemptsResponse(limitState.retryAfter, GENERIC_SENT_MESSAGE);
+    }
+    await noteAttempt(req, limitKeys, FIVE_PER_15_MIN);
+
+    // מדיניות סיסמאות נאכפת גם בשרת, לא רק בטופס.
+    if (action === 'verifyAndReset') {
+      const pwError = passwordError(body.newPassword);
+      if (pwError) return Response.json({ success: false, message: pwError }, { status: 400 });
     }
 
     const targetUrl = `${getApiBase(req)}/api/Auth/${mapping.url}`;
@@ -72,6 +102,12 @@ Deno.serve(async (req) => {
       data = text ? JSON.parse(text) : {};
     } catch {
       data = { message: text };
+    }
+
+    // שליחת הקוד מחזירה תשובה אחידה תמיד — כדי לא לחשוף אילו כתובות רשומות.
+    if (action === 'sendOtp' && apiRes.status >= 400 && apiRes.status < 500) {
+      console.warn(`studentResetPasswordProxy: sendOtp normalized (C# ${apiRes.status})`);
+      return Response.json({ success: true, sessionId: '', message: GENERIC_SENT_MESSAGE, _status: 200 });
     }
 
     return Response.json({ ...data, _status: apiRes.status });

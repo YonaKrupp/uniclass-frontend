@@ -1,11 +1,13 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
 
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const { action, teacherEmail, token, ...params } = body;
 
-    if (!token) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
 
     const API_BASE = getApiBase(req);
     const headers = {
@@ -101,6 +103,19 @@ Deno.serve(async (req) => {
 
       default:
         return Response.json({ error: 'Unknown action' }, { status: 400 });
+    }
+
+    // הזהות מהטוקן בלבד: כל פעולה מותרת רק על הנתונים של המשתמש המחובר.
+    const isParty = sameEmail(teacherEmail, auth.email) || sameEmail(params.studentEmail, auth.email);
+    if (action === 'markAvailable' && !sameEmail(teacherEmail, auth.email)) {
+      return forbidden('אין הרשאה לעדכן זמינות של מורה אחר');
+    }
+    if (['studentSelectUnselect', 'joinWaitingList', 'backToSchedule'].includes(action)
+      && !sameEmail(params.studentEmail, auth.email)) {
+      return forbidden('אין הרשאה לפעול בשם תלמיד אחר');
+    }
+    if (['cancelLesson', 'moveLesson', 'getStudent'].includes(action) && !isParty) {
+      return forbidden('אין הרשאה לנתוני השיעור של משתמש אחר');
     }
 
     const fetchOptions = { method, headers };

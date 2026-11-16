@@ -1,4 +1,8 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, forbidden, isOwnerOrAdmin } from '../../shared/requireUser.ts';
+import { isAdminEmail } from '../../shared/adminAuth.ts';
+import { stripSensitiveFields } from '../../shared/redact.ts';
+import { validateDocument } from '../../shared/fileValidation.ts';
 
 // Search recursively for any field that looks like document data (base64 / data URL)
 // Returns the value of the first match, or null
@@ -109,6 +113,31 @@ Deno.serve(async (req) => {
     const { email, token, todayDate, action } = body;
     const API_BASE = getApiBase(req);
 
+    // הזהות מהטוקן בלבד. צפייה בפרופיל מורה מותרת לכל משתמש מחובר,
+    // אבל עדכון או פעולה על נתונים מתבצעים רק על ידי הבעלים או מנהל.
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
+    const callerIsAdmin = isAdminEmail(auth.email);
+
+    const selfActions = ['updateAbout', 'updateHourlyPayment'];
+    const teacherActions = [
+      'insertNewTeacherSubject',
+      'removeTeacherSubject',
+      'set_Verified_document',
+      'select_Verified_document',
+    ];
+    const studentActions = ['getRating', 'setRating'];
+
+    if (selfActions.includes(action) && !isOwnerOrAdmin(email, auth.email, callerIsAdmin)) {
+      return forbidden('אין הרשאה לעדכן פרופיל של מורה אחר');
+    }
+    if (teacherActions.includes(action) && !isOwnerOrAdmin(body.teacherEmail, auth.email, callerIsAdmin)) {
+      return forbidden('אין הרשאה לפעול על נתוני מורה אחר');
+    }
+    if (studentActions.includes(action) && !isOwnerOrAdmin(body.studentEmail, auth.email, callerIsAdmin)) {
+      return forbidden('אין הרשאה לפעול בשם תלמיד אחר');
+    }
+
     if (action === 'updateAbout') {
       const { gn02Seq, description } = body;
       console.log('[teacherProfileProxy] updateAbout: gn02Seq=', gn02Seq, 'description length=', description?.length);
@@ -194,10 +223,14 @@ Deno.serve(async (req) => {
       if (!teacherEmail || !subject || !documentData) {
         return Response.json({ error: 'חסרים פרטים לשמירת מסמך', _status: 400 });
       }
-      // Strip data URL prefix (e.g. "data:image/png;base64,") so C# gets clean base64
-      const base64Match = documentData.match(/^data:[^;]+;base64,(.+)$/);
-      const cleanBase64 = base64Match ? base64Match[1] : documentData;
-      console.log('[teacherProfileProxy] set_Verified_document: teacherEmail=', teacherEmail, 'subject=', subject, 'cleanBase64 length=', cleanBase64?.length);
+      // ולידציה בשרת: JPG/PNG/WEBP/PDF בלבד, לפי תוכן הקובץ, ועד 5MB.
+      const check = validateDocument(documentData);
+      if (!check.ok) {
+        console.warn('[teacherProfileProxy] rejected document for', teacherEmail, '-', check.error);
+        return Response.json({ error: check.error, _status: 400 });
+      }
+      const cleanBase64 = check.base64;
+      console.log('[teacherProfileProxy] set_Verified_document: teacherEmail=', teacherEmail, 'subject=', subject, 'type=', check.mime, 'cleanBase64 length=', cleanBase64.length);
       const verifyUrl = `${API_BASE}/api/TeacherProfile/set_Verified_document`;
       const verifyRes = await fetch(verifyUrl, {
         method: 'POST',
@@ -365,10 +398,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (Array.isArray(data)) {
-      return Response.json({ Data: data, _status: apiRes.status });
+    // ת"ז, סיסמאות ומסמכים גולמיים מוחזרים למורה עצמו או למנהל בלבד.
+    const canSeePrivate = callerIsAdmin || isOwnerOrAdmin(email, auth.email, callerIsAdmin);
+    const safeData = canSeePrivate ? data : stripSensitiveFields(data);
+
+    if (Array.isArray(safeData)) {
+      return Response.json({ Data: safeData, _status: apiRes.status });
     }
-    return Response.json({ ...data, _status: apiRes.status });
+    return Response.json({ ...safeData, _status: apiRes.status });
   } catch (error) {
     console.error('[teacherProfileProxy] Unhandled error:', error.message, error.stack);
     return Response.json({ error: 'שגיאת שרת פנימית: ' + error.message, _status: 500 });

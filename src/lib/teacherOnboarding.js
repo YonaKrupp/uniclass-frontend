@@ -30,27 +30,36 @@ export function todayDateString() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
+// מדריך ההצטרפות נשמר ונקרא דרך השרת בלבד (מאומת לפי הטוקן של המורה).
+async function callOnboarding(action, payload) {
+  const { email, token } = getTeacherIdentity();
+  if (!email || !token) return null;
+  const response = await base44.functions.invoke("teacherOnboardingProxy", {
+    action,
+    teacherEmail: email,
+    token,
+    ...payload,
+  });
+  // invoke מחזיר תשובת Axios; שגיאת הרשאה מגיעה כשגיאה מן השרת.
+  return response?.data ?? response ?? null;
+}
+
 export async function loadOnboarding(teacherEmail) {
   const email = normalizeEmail(teacherEmail);
   if (!email) return null;
-  const res = await base44.entities.TeacherOnboarding.filter(
-    { teacherEmail: email },
-    { sort: "-created_date", limit: 1 }
-  );
-  const items = Array.isArray(res) ? res : res?.items ?? [];
-  return items[0] ?? null;
+  const res = await callOnboarding("get");
+  return res?.record ?? null;
 }
 
-export async function createOnboarding(teacherEmail) {
-  return base44.entities.TeacherOnboarding.create({
-    teacherEmail: normalizeEmail(teacherEmail),
-    ...DEFAULT_STATE,
-  });
+export async function createOnboarding(teacherEmail, extra = {}) {
+  const res = await callOnboarding("create", { patch: { ...DEFAULT_STATE, ...extra } });
+  return res?.record ?? null;
 }
 
 export async function updateOnboarding(id, patch) {
   if (!id) return null;
-  return base44.entities.TeacherOnboarding.update(id, patch);
+  const res = await callOnboarding("update", { id, patch });
+  return res?.record ?? null;
 }
 
 // Restart is triggered from the profile page: reset the saved progress so the

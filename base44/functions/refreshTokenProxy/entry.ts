@@ -1,4 +1,8 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { checkLimit, noteAttempt, tooManyAttemptsResponse, ipKey } from '../../shared/rateLimit.ts';
+
+// חידוש טוקן — עד 20 בקשות ב-15 דקות לכל כתובת IP.
+const REFRESH_LIMIT = { max: 20, windowMs: 15 * 60 * 1000, lockMs: 15 * 60 * 1000 };
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -24,6 +28,11 @@ Deno.serve(async (req) => {
     if (!refreshToken) {
       return Response.json({ error: 'Missing refresh token' }, { status: 400 });
     }
+
+    const limitKeys = [ipKey(req)].filter(Boolean);
+    const limitState = await checkLimit(req, limitKeys);
+    if (limitState.limited) return tooManyAttemptsResponse(limitState.retryAfter);
+    await noteAttempt(req, limitKeys, REFRESH_LIMIT);
 
     const endpoint = `${getApiBase(req)}/api/Auth/RefreshToken`;
 

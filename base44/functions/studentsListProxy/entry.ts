@@ -1,14 +1,25 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
 
 Deno.serve(async (req) => {
   try {
-    const { email, todayDate, token } = await req.json();
+    let body: any = {};
+    try { body = await req.json(); } catch { body = {}; }
+    const { todayDate, token } = body;
 
-    const apiUrl = `${getApiBase(req)}/api/StudentsList?teacherEmail=${encodeURIComponent(email)}&todayDate=${encodeURIComponent(todayDate)}`;
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
+
+    const requestedTeacherEmail = String(body.email || '').trim();
+    if (requestedTeacherEmail && !sameEmail(requestedTeacherEmail, auth.email)) {
+      return forbidden('אין הרשאה לרשימת התלמידים של מורה אחר');
+    }
+
+    const apiUrl = `${getApiBase(req)}/api/StudentsList?teacherEmail=${encodeURIComponent(auth.email)}&todayDate=${encodeURIComponent(todayDate)}`;
 
     const apiRes = await fetch(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${String(token).trim()}`,
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
       },

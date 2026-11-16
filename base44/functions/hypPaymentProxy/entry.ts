@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import { getApiBase } from '../../shared/apiBase.ts';
 import { docsVersionForAudience, hasCurrentConsent } from '../../shared/legalConsent.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -9,9 +10,14 @@ Deno.serve(async (req) => {
     const authToken = params.token || '';
 
     // verifyPayment is called from HYP redirect — no user token available; C# endpoint doesn't require auth
-    if (!authToken && action !== 'verifyPayment') {
-      console.log('[hypPaymentProxy] Missing authToken - returning 401');
-      return Response.json({ error: 'Missing token' }, { status: 401 });
+    if (action !== 'verifyPayment') {
+      const auth = await requireUser(authToken);
+      if (!auth.ok) return auth.response;
+
+      // תשלום מתבצע רק עבור המשתמש המחובר עצמו.
+      if (action === 'createPayment' && params.studentEmail && !sameEmail(params.studentEmail, auth.email)) {
+        return forbidden('אין הרשאה לבצע תשלום עבור משתמש אחר');
+      }
     }
 
     // אכיפה בצד השרת: אין ליצור חיוב ללא אישור תנאים תקף בגרסה העדכנית.

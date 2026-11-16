@@ -37,6 +37,7 @@ export default function ConsentGate({ email, onAccepted }) {
         roleOfApprover: "teacher",
         acceptedTerms: value.terms,
         confirmed18Plus: value.adult,
+        token: localStorage.getItem("authToken") || sessionStorage.getItem("authToken") || "",
       });
       if (res.data?.success === false) {
         setError(res.data?.message || "שמירת האישור נכשלה. אנא נסו שוב.");

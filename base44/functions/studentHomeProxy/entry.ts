@@ -1,13 +1,20 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
 
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
-    const { studentEmail, token } = body;
+    const { token } = body;
 
-    if (!studentEmail) return Response.json({ error: 'חסר אימייל תלמיד' }, { status: 400 });
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
 
-    const url = `${getApiBase(req)}/api/StudentHome/studentHomeList?studentEmail=${encodeURIComponent(studentEmail)}`;
+    const requestedEmail = String(body.studentEmail || '').trim();
+    if (requestedEmail && !sameEmail(requestedEmail, auth.email)) {
+      return forbidden('אין הרשאה לנתוני תלמיד אחר');
+    }
+
+    const url = `${getApiBase(req)}/api/StudentHome/studentHomeList?studentEmail=${encodeURIComponent(auth.email)}`;
 
     const apiRes = await fetch(url, {
       method: 'GET',

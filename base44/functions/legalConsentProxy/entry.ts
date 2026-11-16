@@ -7,6 +7,12 @@ import {
   parseAge,
   MIN_STUDENT_AGE,
 } from '../../shared/legalConsent.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
+import { isAdminEmail } from '../../shared/adminAuth.ts';
+import { checkLimit, noteAttempt, tooManyAttemptsResponse, keyFor } from '../../shared/rateLimit.ts';
+
+// עד 10 אישורי תנאים ב-15 דקות לכל משתמש.
+const CONSENT_LIMIT = { max: 10, windowMs: 15 * 60 * 1000, lockMs: 15 * 60 * 1000 };
 
 const CONSENT_REQUIRED = 'יש לאשר את התנאים כדי להמשיך';
 
@@ -30,7 +36,6 @@ export default async function (req: Request): Promise<Response> {
     const body = await req.json().catch(() => ({}));
     const action = body.action;
     const base44 = createClientFromRequest(req);
-    const email = String(body.email || '').trim().toLowerCase();
 
     // גרסאות חבילות המסמכים — ציבורי, נדרש לעמודי ההרשמה והתשלום.
     if (action === 'versions') {
@@ -42,9 +47,15 @@ export default async function (req: Request): Promise<Response> {
       });
     }
 
-    if (!email) {
-      return Response.json({ success: false, message: 'חסר אימייל' }, { status: 400 });
+    // כל פעולה אחרת דורשת טוקן מאומת. הזהות (והאימייל שנשמר ברשומה) נלקחת מהטוקן בלבד.
+    const auth = await requireUser(body.token);
+    if (!auth.ok) return auth.response;
+
+    const requestedEmail = String(body.email || '').trim().toLowerCase();
+    if (requestedEmail && !sameEmail(requestedEmail, auth.email) && !isAdminEmail(auth.email)) {
+      return forbidden('אין הרשאה לפעול בשם משתמש אחר');
     }
+    const email = auth.email.toLowerCase();
 
     if (action === 'status') {
       const audience = body.audience === 'teacher' ? 'teacher' : body.audience === 'student' ? 'student' : '';
@@ -56,6 +67,12 @@ export default async function (req: Request): Promise<Response> {
     }
 
     if (action === 'accept') {
+      const limitKey = keyFor('consent', email);
+      const limitState = await checkLimit(req, [limitKey]);
+      if (limitState.limited) {
+        return tooManyAttemptsResponse(limitState.retryAfter);
+      }
+
       const consentType = String(body.consentType || '');
       if (!isConsentType(consentType)) {
         return Response.json({ success: false, message: 'סוג אישור לא מוכר' }, { status: 400 });
@@ -101,7 +118,7 @@ export default async function (req: Request): Promise<Response> {
 
       const record = await recordConsent(base44, req, {
         email,
-        userId: body.userId,
+        userId: '',
         consentType,
         roleOfApprover,
         audience,
@@ -110,6 +127,7 @@ export default async function (req: Request): Promise<Response> {
         confirmedParentGuardian: body.confirmedParentGuardian === true,
       });
 
+      await noteAttempt(req, [limitKey], CONSENT_LIMIT);
       return Response.json({ success: true, id: record.id, docsVersion: record.docs_version });
     }
 

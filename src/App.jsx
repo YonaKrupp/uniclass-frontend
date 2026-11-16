@@ -7,6 +7,8 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
+import CanonicalUrl from './components/CanonicalUrl';
+import RoleGuard from './components/RoleGuard';
 
 // Page imports - student-schedule route fix
 import Welcome from './pages/Welcome';
@@ -25,7 +27,6 @@ import TeacherLayout from './components/TeacherLayout';
 import StudentLayout from './components/StudentLayout';
 import StudentsList from './pages/StudentsList';
 import TeachersList from './pages/TeachersList';
-import PaymentPackages from './pages/PaymentPackages';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 import StudentPayment from './pages/StudentPayment';
@@ -60,6 +61,7 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <ScrollToTop />
+          <CanonicalUrl />
           <Routes>
             <Route path="/" element={<Welcome />} />
             <Route path="/welcome" element={<Welcome />} />
@@ -69,7 +71,7 @@ function App() {
             <Route path="/register-student" element={<RegisterStudent />} />
             <Route path="/register-teacher" element={<RegisterTeacher />} />
             <Route element={<TeacherLayout />}>
-              <Route path="/teacher-home" element={<TeacherHome />} />
+              <Route path="/teacher-home" element={<RoleGuard role="teacher"><TeacherHome /></RoleGuard>} />
               <Route path="/teacher-schedule" element={<TeacherSchedule />} />
               <Route path="/teacher-picture" element={<TeacherPicture />} />
               <Route path="/teacher-video" element={<ClassRoom />} />
@@ -78,13 +80,12 @@ function App() {
               <Route path="/lesson-summary" element={<LessonSummary />} />
               <Route path="/teacher-chat" element={<Chat />} />
               <Route path="/teacher-contact" element={<Contact />} />
-              <Route path="/admin-interface" element={<AdminInterface />} />
+              <Route path="/admin-interface" element={<RoleGuard role="admin"><AdminInterface /></RoleGuard>} />
             </Route>
             <Route element={<StudentLayout />}>
               <Route path="/student-home" element={<StudentHome />} />
               <Route path="/student-video" element={<ClassRoom />} />
               <Route path="/student-test" element={<StudentTest />} />
-              <Route path="/payment-packages" element={<PaymentPackages />} />
               <Route path="/student-payment" element={<StudentPayment />} />
               <Route path="/choose-lesson" element={<ChooseLesson />} />
               <Route path="/student-teachers" element={<TeachersList />} />

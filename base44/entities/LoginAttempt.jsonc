@@ -1,0 +1,50 @@
+{
+  "name": "LoginAttempt",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "title": "\u05de\u05d6\u05d4\u05d4 \u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea (\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d0\u05d5 IP)"
+    },
+    "count": {
+      "type": "number",
+      "default": 0,
+      "title": "\u05de\u05e1\u05e4\u05e8 \u05e0\u05d9\u05e1\u05d9\u05d5\u05e0\u05d5\u05ea \u05db\u05d5\u05e9\u05dc\u05d9\u05dd"
+    },
+    "first_attempt_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "\u05e0\u05d9\u05e1\u05d9\u05d5\u05df \u05db\u05d5\u05e9\u05dc \u05e8\u05d0\u05e9\u05d5\u05df"
+    },
+    "locked_until": {
+      "type": "string",
+      "format": "date-time",
+      "title": "\u05e0\u05e2\u05d5\u05dc \u05e2\u05d3"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -13,6 +13,7 @@ import { DOCUMENT_SET_VERSION } from "@/content/legalDocs";
 
 import { FUNCTIONS_BASE } from "@/lib/functionsBase";
 import { trackGaEvent } from "@/lib/gtagEvents";
+import { passwordError } from "@/lib/passwordPolicy";
 
 const API_BASE = FUNCTIONS_BASE;
 
@@ -96,8 +97,9 @@ export default function RegisterTeacher() {
       setError("הסיסמאות אינן תואמות");
       return;
     }
-    if (password.length < 6) {
-      setError("הסיסמה חייבת להכיל לפחות 6 תווים");
+    const pwProblem = passwordError(password);
+    if (pwProblem) {
+      setError(pwProblem);
       return;
     }
     if (!isValidIsraeliId(idNumber)) {
@@ -425,7 +427,7 @@ export default function RegisterTeacher() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="לפחות 6 תווים"
+                    placeholder="לפחות 8 תווים, כולל אות וספרה"
                     autoComplete="new-password"
                     required
                     aria-required="true"

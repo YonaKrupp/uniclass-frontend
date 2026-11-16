@@ -1,13 +1,28 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
+import { isAdminEmail } from '../../shared/adminAuth.ts';
 
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
-    const { studentEmail, gn06_id, token } = body;
+    const { gn06_id, token } = body;
 
-    if (!studentEmail || !gn06_id) {
-      return Response.json({ error: 'חסרים פרמטרים (studentEmail / gn06_id)' }, { status: 400 });
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
+
+    const callerIsAdmin = isAdminEmail(auth.email);
+    const requestedEmail = String(body.studentEmail || '').trim();
+
+    // הבעלות נקבעת לפי הטוקן: התלמיד מבטל שיעור של עצמו בלבד; מנהל רשאי לבטל עבור תלמיד שצוין.
+    if (!callerIsAdmin && requestedEmail && !sameEmail(requestedEmail, auth.email)) {
+      return forbidden('אין הרשאה לבטל שיעור של תלמיד אחר');
     }
+
+    if (!gn06_id) {
+      return Response.json({ error: 'חסרים פרמטרים (gn06_id)' }, { status: 400 });
+    }
+
+    const studentEmail = callerIsAdmin && requestedEmail ? requestedEmail : auth.email;
 
     const url = `${getApiBase(req)}/api/StudentHome/cancelLesson?studentEmail=${encodeURIComponent(studentEmail)}&gn06_id=${encodeURIComponent(gn06_id)}`;
 
@@ -16,7 +31,7 @@ Deno.serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${auth.token}`,
       },
       body: JSON.stringify({ studentEmail, gn06_id: String(gn06_id) }),
     });

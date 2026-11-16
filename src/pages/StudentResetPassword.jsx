@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GraduationCap, Mail, Lock, Eye, EyeOff, Loader2, Sun, Moon, ShieldCheck, KeyRound, ArrowRight } from "lucide-react";
 import { useDarkMode } from "@/lib/useDarkMode";
+import { passwordError } from "@/lib/passwordPolicy";
 
 import { FUNCTIONS_BASE } from "@/lib/functionsBase";
 
@@ -35,8 +36,9 @@ export default function StudentResetPassword() {
       setError("הסיסמאות אינן תואמות");
       return;
     }
-    if (password.length < 6) {
-      setError("הסיסמה חייבת להכיל לפחות 6 תווים");
+    const pwProblem = passwordError(password);
+    if (pwProblem) {
+      setError(pwProblem);
       return;
     }
 
@@ -188,7 +190,7 @@ export default function StudentResetPassword() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="לפחות 6 תווים"
+                    placeholder="לפחות 8 תווים, כולל אות וספרה"
                     required
                     className="w-full pr-10 pl-12 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />

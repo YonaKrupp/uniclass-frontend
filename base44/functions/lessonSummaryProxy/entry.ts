@@ -1,9 +1,18 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
 
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const { action, email, token, date, show, gn06Id, description } = body;
+
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
+
+    // הזהות מהטוקן בלבד — אין קריאה או כתיבה של סיכומי שיעור של משתמש אחר.
+    if (email && !sameEmail(email, auth.email)) {
+      return forbidden('אין הרשאה לנתוני סיכומי שיעור של משתמש אחר');
+    }
 
     const BASE = `${getApiBase(req)}/api/LessonSummary`;
 

@@ -1,18 +1,27 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
+import { stripSensitiveFields } from '../../shared/redact.ts';
 
 Deno.serve(async (req) => {
   try {
-    const { studentEmail, todayDate, token } = await req.json();
+    let body: any = {};
+    try { body = await req.json(); } catch { body = {}; }
+    const { todayDate, token } = body;
 
-    if (!studentEmail) {
-      return Response.json({ error: 'חסר אימייל תלמיד' }, { status: 400 });
+    // הזהות נלקחת מהטוקן של המשתמש המחובר בלבד — לא מפרמטר שהלקוח שולח.
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
+
+    const requestedStudentEmail = String(body.studentEmail || '').trim();
+    if (requestedStudentEmail && !sameEmail(requestedStudentEmail, auth.email)) {
+      return forbidden('אין הרשאה לרשימת המורים של תלמיד אחר');
     }
 
-    const apiUrl = `${getApiBase(req)}/api/StudentsList/select_teachersList?studentEmail=${encodeURIComponent(studentEmail)}&date=${encodeURIComponent(todayDate)}`;
+    const apiUrl = `${getApiBase(req)}/api/StudentsList/select_teachersList?studentEmail=${encodeURIComponent(auth.email)}&date=${encodeURIComponent(todayDate)}`;
 
     const apiRes = await fetch(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${String(token).trim()}`,
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
       },
@@ -27,10 +36,11 @@ Deno.serve(async (req) => {
     let data;
     try { data = JSON.parse(text); } catch { data = { message: text }; }
 
+    // ת"ז ומזהים אישיים אינם נשלחים לתלמיד שמחפש מורה.
     if (Array.isArray(data)) {
-      return Response.json({ Data: data, _status: apiRes.status });
+      return Response.json({ Data: stripSensitiveFields(data), _status: apiRes.status });
     }
-    return Response.json({ ...data, _status: apiRes.status });
+    return Response.json({ ...stripSensitiveFields(data), _status: apiRes.status });
   } catch (error) {
     console.error('TeachersList proxy error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });

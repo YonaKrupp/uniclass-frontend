@@ -37,7 +37,6 @@ const STUDENT_PAGES = [
   "/student-chat",
   "/student-contact",
   "/student-payment",
-  "/payment-packages",
   "/choose-lesson",
   "/teacher-results",
   "/rate-teacher",

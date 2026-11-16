@@ -54,6 +54,10 @@ export default function TeacherLogin() {
       });
       const data = await res.json();
       const token = data.accessToken || data.AccessToken || data.token || "";
+      if (data.locked || data._status === 429) {
+        setError(data.message || "יותר מדי ניסיונות התחברות. נסו שוב בעוד 15 דקות.");
+        return;
+      }
       if (data._status === 401) {
         setError("אימייל או סיסמה שגויים");
         return;

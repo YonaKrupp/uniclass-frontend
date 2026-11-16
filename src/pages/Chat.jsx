@@ -26,6 +26,7 @@ export default function Chat() {
 
   const studentEmailParam = searchParams.get("student") || "";
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   // Init user info from storage
   useEffect(() => {
@@ -125,9 +126,10 @@ export default function Chat() {
     return () => clearInterval(interval);
   }, [selectedEmail, loadMessages, loadConversations]);
 
-  // Scroll to bottom on new messages
+  // Scroll only the messages panel (never the page/window) on new messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
   const handleSelectConversation = (conv) => {
@@ -300,7 +302,7 @@ export default function Chat() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+              <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                 {loadingMessages ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="w-5 h-5 animate-spin text-primary" />

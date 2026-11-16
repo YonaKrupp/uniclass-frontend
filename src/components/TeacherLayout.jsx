@@ -47,7 +47,12 @@ export default function TeacherLayout() {
     if (!teacherEmail) return undefined;
     let alive = true;
     base44.functions
-      .invoke("legalConsentProxy", { action: "status", email: teacherEmail, audience: "teacher" })
+      .invoke("legalConsentProxy", {
+        action: "status",
+        email: teacherEmail,
+        audience: "teacher",
+        token: localStorage.getItem("authToken") || sessionStorage.getItem("authToken") || "",
+      })
       .then((res) => {
         if (alive && res.data?.needsConsent) setConsentRequired(true);
       })

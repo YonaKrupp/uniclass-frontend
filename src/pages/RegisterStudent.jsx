@@ -4,6 +4,7 @@ import { GraduationCap, Mail, Lock, Eye, EyeOff, Loader2, Sun, Moon, User, Phone
 import { useDarkMode } from "@/lib/useDarkMode";
 import StudentConsentCheckbox from "@/components/legal/StudentConsentCheckbox";
 import { trackGaEvent } from "@/lib/gtagEvents";
+import { passwordError } from "@/lib/passwordPolicy";
 
 import { FUNCTIONS_BASE } from "@/lib/functionsBase";
 
@@ -115,8 +116,9 @@ export default function RegisterStudent() {
       setError("הסיסמאות אינן תואמות");
       return;
     }
-    if (password.length < 6) {
-      setError("הסיסמה חייבת להכיל לפחות 6 תווים");
+    const pwProblem = passwordError(password);
+    if (pwProblem) {
+      setError(pwProblem);
       return;
     }
     if (!/^\d{9,10}$/.test(phoneNumber.replace(/[\s-]/g, ""))) {
@@ -400,7 +402,7 @@ export default function RegisterStudent() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="לפחות 6 תווים"
+                    placeholder="לפחות 8 תווים, כולל אות וספרה"
                     required
                     aria-required="true"
                     autoComplete="new-password"

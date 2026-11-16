@@ -6,10 +6,27 @@
 // resolver reads the caller origin, so a real visitor's details never end up on
 // the developer's machine.
 import { getApiBase } from '../../shared/apiBase.ts';
+import {
+  checkLimit,
+  noteAttempt,
+  tooManyAttemptsResponse,
+  ipKey,
+} from '../../shared/rateLimit.ts';
+
+// טופס לידים ציבורי — עד 3 שליחות בשעה לכל כתובת IP.
+const PILOT_LIMIT = { max: 3, windowMs: 60 * 60 * 1000, lockMs: 60 * 60 * 1000 };
 
 export default async function (req: Request): Promise<Response> {
   try {
     const API_BASE = getApiBase(req);
+
+    const limitKeys = [ipKey(req)].filter(Boolean);
+    const limitState = await checkLimit(req, limitKeys);
+    if (limitState.limited) {
+      console.warn('[pilotInsertProxy] rate limited');
+      return tooManyAttemptsResponse(limitState.retryAfter);
+    }
+
     const body = await req.json();
     const {
       fullName, email, phone, educationalInstitution, academicDegree, gn32_Notes,
@@ -21,6 +38,12 @@ export default async function (req: Request): Promise<Response> {
     if (!fullName || !email || !phone || !educationalInstitution || !academicDegree) {
       return Response.json({ error: 'חסרים פרמטרים (fullName / email / phone / educationalInstitution / academicDegree)' }, { status: 400 });
     }
+
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(email).trim())) {
+      return Response.json({ error: 'כתובת אימייל לא תקינה' }, { status: 400 });
+    }
+
+    await noteAttempt(req, limitKeys, PILOT_LIMIT);
 
     const payload = {
       fullName, email, phone, educationalInstitution, academicDegree, gn32_Notes: gn32_Notes ?? '',

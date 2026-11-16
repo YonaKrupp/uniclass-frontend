@@ -71,15 +71,34 @@ Deno.serve(async (req) => {
       '26': 'מספר זהות שגוי',
     };
 
-    // Determine success or failure based on CCode from HYP redirect
-    const ccode = params.CCode || params.ccode || '';
+    // --- אימות ונרמול פרמטרים -----------------------------------------------
+    // כל הערכים כאן מגיעים מהפניה חיצונית ונשלטים לגמרי על ידי הפונה, לכן כל שדה
+    // מנורמל, מוגבל באורך ונבדק בפורמט לפני שהוא משמש לחישוב או לתצוגה.
+    const rawString = (value: unknown): string =>
+      (typeof value === 'string' || typeof value === 'number') ? String(value).trim().slice(0, 512) : '';
+
+    const digitsOnly = (value: unknown, max: number): string => {
+      const clean = rawString(value).replace(/\D/g, '');
+      return clean.length > 0 && clean.length <= max ? clean : '';
+    };
+
+    // CCode from the HYP redirect is display-only; it never decides success by itself.
+    const ccode = digitsOnly(params.CCode ?? params.ccode, 4);
+    const orderId = digitsOnly(params.Order ?? params.order, 20);
+    const l4digit = digitsOnly(params.L4digit ?? params.l4digit, 4);
+    const rawAmount = rawString(params.Amount);
+    const amount = /^\d{1,9}(\.\d{1,2})?$/.test(rawAmount) ? rawAmount : '';
+    const hypTransactionId = rawString(params.Id ?? params.id).replace(/[^A-Za-z0-9\-_]/g, '').slice(0, 40);
+    const rawStudentEmail = rawString(params.Fild2 ?? params.fild2).toLowerCase();
+    const studentEmailFromHyp = /^[^@\s]{1,64}@[^@\s]{1,190}\.[^@\s]{2,20}$/.test(rawStudentEmail)
+      ? rawStudentEmail
+      : '';
+    // בלי מספר הזמנה תקין אין למה לאמת מול הספק.
+    const invalidParams = !orderId;
+
     const isHypSuccess = ccode === '0' || ccode === '600' || ccode === '700' || ccode === '800';
     const declineMessage = ccodeMessages[ccode] || (ccode ? `קוד דחייה: ${ccode}` : '');
-    const hypTransactionId = params.Id || params.id || '';
-    const orderId = params.Order || params.order || '';
-    const amount = params.Amount || '';
-    const l4digit = params.L4digit || params.l4digit || '';
-    console.log('[hypPaymentReturn] CCode:', ccode, 'isHypSuccess:', isHypSuccess, 'orderId:', orderId, 'amount:', amount);
+    console.log('[hypPaymentReturn] CCode:', ccode, 'isHypSuccess:', isHypSuccess, 'orderId:', orderId, 'amount:', amount, 'invalidParams:', invalidParams);
 
     // Call C# VerifyPayment server-side (no frontend needed)
     // Don't trust Origin header — HYP redirect may send its own origin or "null" string.
@@ -93,7 +112,6 @@ Deno.serve(async (req) => {
     // This lookup is done BEFORE the VerifyPayment call so we can resolve the correct API base.
     let savedScheduleParams = null;
     let lookupMethod = 'none';
-    const studentEmailFromHyp = params.Fild2 || params.fild2 || '';
     try {
       const base44 = createClientFromRequest(req);
       if (orderId) {
@@ -126,9 +144,18 @@ Deno.serve(async (req) => {
     // falling back to the Origin header, then ngrok (Base44 dev).
     const apiBase = getApiBaseFromAppUrl(savedScheduleParams?.appBaseUrl || originHeader || '');
 
+    // Payload for verification: only sanitized string values leave this function.
+    const verifyPayload: Record<string, string> = {};
+    for (const [key, value] of Object.entries(params)) {
+      const clean = rawString(value);
+      if (clean) verifyPayload[key] = clean;
+    }
+
     let verifyResult: any = null;
     let verifyError = '';
-    try {
+    if (invalidParams) {
+      console.warn('[hypPaymentReturn] Missing/invalid order id — skipping verification');
+    } else try {
       console.log('[hypPaymentReturn] Calling C# VerifyPayment at:', `${apiBase}/api/HypPayment/VerifyPayment`);
       const verifyResponse = await fetch(`${apiBase}/api/HypPayment/VerifyPayment`, {
         method: 'POST',
@@ -137,7 +164,7 @@ Deno.serve(async (req) => {
           'ngrok-skip-browser-warning': 'true',
           'Referer': apiBase,
         },
-        body: JSON.stringify(params),
+        body: JSON.stringify(verifyPayload),
       });
       const verifyText = await verifyResponse.text();
       console.log('[hypPaymentReturn] C# Verify status:', verifyResponse.status);
@@ -155,9 +182,9 @@ Deno.serve(async (req) => {
 
     console.log('[hypPaymentReturn] Final: transactionId=', transactionId, 'isHypSuccess=', isHypSuccess, 'isVerified=', isVerified);
 
-    // Render result as a full HTML page — no redirect, no SPA dependency
-    // Trust C# VerifyPayment result (checks signature + CCode) as primary; local check as fallback
-    const isSuccess = isHypSuccess || isVerified;
+    // Render result as a full HTML page — no redirect, no SPA dependency.
+    // הצלחה נקבעת אך ורק מתוצאת האימות בשרת (חתימה + CCode), ולא מ-CCode שהתקבל בבקשה.
+    const isSuccess = isVerified;
 
     // Determine the app URL: prefer the saved appBaseUrl (captured at payment creation),
     // then the Origin header if valid, then fall back to the known Base44 URL.
@@ -168,6 +195,8 @@ Deno.serve(async (req) => {
     console.log('[hypPaymentReturn] appUrl:', appUrl, '(savedAppUrl:', savedAppUrl, ')');
 
     // Build schedule URL from saved params (server-side, no localStorage dependency)
+    // טוקן ההתחברות נשלח רק לאחר שהתשלום אומת מול HYP — אחרת כל מי שמנחש מספר הזמנה
+    // יכול לקבל טוקן של תלמיד אחר.
     let scheduleQuery = '';
     if (savedScheduleParams) {
       const sp = new URLSearchParams();
@@ -176,7 +205,7 @@ Deno.serve(async (req) => {
       if (savedScheduleParams.firstDayOfWeek) sp.set('firstDayOfWeek', savedScheduleParams.firstDayOfWeek);
       if (savedScheduleParams.subjectId) sp.set('subjectId', savedScheduleParams.subjectId);
       if (savedScheduleParams.subjectName) sp.set('subjectName', savedScheduleParams.subjectName);
-      if (savedScheduleParams.authToken) sp.set('authToken', savedScheduleParams.authToken);
+      if (isVerified && savedScheduleParams.authToken) sp.set('authToken', savedScheduleParams.authToken);
       scheduleQuery = sp.toString();
     }
     const scheduleHref = scheduleQuery
@@ -184,8 +213,9 @@ Deno.serve(async (req) => {
       : `${appUrl}/student-schedule`;
     console.log('[hypPaymentReturn] scheduleHref:', scheduleHref);
 
-    // The saved schedule params have now been used (verification done, redirect URL built) — remove the record.
-    if (savedScheduleParams?.id) {
+    // The saved schedule params are removed only after a verified payment, so an
+    // unverified (or replayed) request cannot consume a legitimate record.
+    if (savedScheduleParams?.id && isVerified) {
       try {
         const base44 = createClientFromRequest(req);
         await base44.asServiceRole.entities.PaymentScheduleParam.delete(savedScheduleParams.id);
@@ -233,8 +263,8 @@ Deno.serve(async (req) => {
         ? '<svg class="check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>'
         : '<svg class="cross" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>'}
     </div>
-    <h1>${isSuccess ? 'התשלום בוצע בהצלחה!' : 'שגיאה בתשלום'}</h1>
-    <p class="subtitle">${isSuccess ? 'תודה על רכישתכם. השיעורים נוספו לחשבונכם.' : (declineMessage || 'התשלום לא הצליח, אנא צרו קשר עם התמיכה.')}</p>
+    <h1>${isSuccess ? 'התשלום בוצע בהצלחה!' : (invalidParams ? 'פרטי תשלום לא תקינים' : 'שגיאה בתשלום')}</h1>
+    <p class="subtitle">${isSuccess ? 'תודה על רכישתכם. השיעורים נוספו לחשבונכם.' : (invalidParams ? 'פרטי התשלום חסרים או שאינם תקינים. אנא צרו קשר עם התמיכה.' : (declineMessage || 'התשלום לא הצליח, אנא צרו קשר עם התמיכה.'))}</p>
 
     ${isSuccess && transactionId ? `<div class="ref-box"><div class="ref-label">מספר אסמכתה</div><div class="ref-value">${escapeHtml(transactionId)}</div></div>` : ''}
     <div class="order-line">
@@ -247,9 +277,7 @@ Deno.serve(async (req) => {
       ? '<div class="verify-status verify-fail">אימות: שגיאת תקשורת</div>'
       : isVerified
         ? '<div class="verify-status verify-ok">אימות HYP: אושר ✓</div>'
-        : isSuccess
-          ? '<div class="verify-status verify-ok">סטטוס תשלום: התקבל</div>'
-          : '<div class="verify-status verify-fail">סטטוס תשלום: נכשל</div>'}
+        : '<div class="verify-status verify-fail">סטטוס תשלום: לא אומת</div>'}
 
     <br>
     <div style="margin-top:24px;">

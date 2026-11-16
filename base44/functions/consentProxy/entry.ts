@@ -1,6 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { DOCUMENT_SET_VERSION, CONSENT_REQUIRED_MESSAGE, hasValidConsent, clientIp } from '../../shared/legalDocs.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
+import { isAdminEmail } from '../../shared/adminAuth.ts';
 
+// רשומות אישור (ConsentRecord) נכתבות רק עבור המשתמש המחובר עצמו:
+// הזהות נלקחת מהטוקן המאומת ולא משדה email/g.userId שהלקוח שולח.
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -20,11 +24,15 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const action = body.action;
-    const email = String(body.email || '').trim().toLowerCase();
 
-    if (!email) {
-      return Response.json({ success: false, message: 'חסר אימייל' }, { status: 400 });
+    const auth = await requireUser(body.token);
+    if (!auth.ok) return auth.response;
+
+    const requestedEmail = String(body.email || '').trim().toLowerCase();
+    if (requestedEmail && !sameEmail(requestedEmail, auth.email) && !isAdminEmail(auth.email)) {
+      return forbidden('אין הרשאה לפעול בשם משתמש אחר');
     }
+    const email = auth.email.toLowerCase();
 
     const base44 = createClientFromRequest(req);
 
@@ -58,7 +66,7 @@ Deno.serve(async (req) => {
       }
 
       const record = await base44.asServiceRole.entities.ConsentRecord.create({
-        user_id: String(body.userId || ''),
+        user_id: '',
         user_email: email,
         document_set_version: DOCUMENT_SET_VERSION,
         accepted_terms_privacy_conduct: false,
@@ -80,7 +88,7 @@ Deno.serve(async (req) => {
       }
 
       const record = await base44.asServiceRole.entities.ConsentRecord.create({
-        user_id: String(body.userId || ''),
+        user_id: '',
         user_email: email,
         document_set_version: DOCUMENT_SET_VERSION,
         accepted_terms_privacy_conduct: true,

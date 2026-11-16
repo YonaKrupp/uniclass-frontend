@@ -1,11 +1,20 @@
 import { getApiBase } from '../../shared/apiBase.ts';
+import { requireUser, sameEmail, forbidden } from '../../shared/requireUser.ts';
 
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
-    const { studentEmail, random6, date, token } = body;
+    const { random6, date, token } = body;
 
-    if (!studentEmail || !token) return Response.json({ error: 'חסרים פרטים' }, { status: 400 });
+    const auth = await requireUser(token);
+    if (!auth.ok) return auth.response;
+
+    const requestedEmail = String(body.studentEmail || '').trim();
+    if (requestedEmail && !sameEmail(requestedEmail, auth.email)) {
+      return forbidden('אין הרשאה לנתוני תשלום של תלמיד אחר');
+    }
+
+    const studentEmail = auth.email;
 
     const apiUrl = `${getApiBase(req)}/api/HypPayment/studentPayment`;
 

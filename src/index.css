@@ -364,6 +364,17 @@ html.a11y-stop-animations *::after {
   }
 }
 
+/* Safari ignores width:100% on date inputs unless they are display:block, and then
+   adds its own inner padding to the date fields, which would double our padding. */
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  padding: 0;
+}
+
 /* Screen-reader-only utility */
 .sr-only {
   position: absolute;

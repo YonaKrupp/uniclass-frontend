@@ -383,7 +383,7 @@ export default function RegisterStudent() {
                     autoComplete="bday"
                     aria-invalid={dobError ? true : undefined}
                     aria-describedby={dobError ? "student-date-of-birth-error" : undefined}
-                    className="w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
+                    className="block w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
                   />
                 </div>
                 {dobError && (

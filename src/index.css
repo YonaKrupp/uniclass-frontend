@@ -215,10 +215,9 @@
   }
 
   /* iOS Safari: the native date control keeps its intrinsic width and overflows
-     narrow screens — force it to stay inside its container. */
+     narrow screens. Keep the native rendering (so the dd/mm/yyyy hint stays
+     visible) and only constrain the box. */
   input[type="date"] {
-    -webkit-appearance: none;
-    appearance: none;
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -226,7 +225,6 @@
   }
 
   input[type="date"]::-webkit-date-and-time-value {
-    text-align: right;
     min-width: 0;
   }
 

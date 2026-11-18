@@ -367,8 +367,8 @@ export default function RegisterStudent() {
 
               <div className="space-y-2">
                 <label htmlFor="student-date-of-birth" className="text-sm font-heading font-medium text-foreground">תאריך לידה</label>
-                <div className="relative">
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                <div className="flex w-full min-w-0 items-center gap-2 pr-3 pl-4 bg-muted border border-border rounded-xl focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all min-h-[48px]">
+                  <Calendar className="w-5 h-5 shrink-0 text-muted-foreground" aria-hidden="true" />
                   <input
                     id="student-date-of-birth"
                     type="date"
@@ -383,7 +383,7 @@ export default function RegisterStudent() {
                     autoComplete="bday"
                     aria-invalid={dobError ? true : undefined}
                     aria-describedby={dobError ? "student-date-of-birth-error" : undefined}
-                    className="block w-full pr-10 pl-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base font-body min-h-[48px]"
+                    className="block w-full min-w-0 flex-1 p-0 bg-transparent border-0 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 text-base font-body min-h-[48px]"
                   />
                 </div>
                 {dobError && (

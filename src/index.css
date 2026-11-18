@@ -213,25 +213,6 @@
     -webkit-touch-callout: none;
     touch-action: manipulation;
   }
-
-  /* iOS Safari: the native date control keeps its intrinsic width and overflows
-     narrow screens. Keep the native rendering (so the dd/mm/yyyy hint stays
-     visible) and only constrain the box. */
-  input[type="date"] {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-  }
-
-  input[type="date"]::-webkit-date-and-time-value {
-    min-width: 0;
-  }
-
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    max-width: 100%;
-    margin: 0;
-  }
 }
 
 /* === App-wide ambient motion utilities (used by AppBackground + layouts) === */

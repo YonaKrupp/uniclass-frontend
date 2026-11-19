@@ -192,10 +192,15 @@ export default function Chat() {
     }
   };
 
-  const formatTime = (dateStr) => {
+  // תאריך ושעה לצד כל הודעה — יום בשבוע, dd/mm/yyyy, HH:MM
+  const formatDateTime = (dateStr) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+      if (Number.isNaN(d.getTime())) return "";
+      const weekday = d.toLocaleDateString("he-IL", { weekday: "long" });
+      const date = d.toLocaleDateString("he-IL", { day: "2-digit", month: "2-digit", year: "numeric" });
+      const time = d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+      return `${weekday}, ${date}, ${time}`;
     } catch {
       return "";
     }
@@ -273,7 +278,7 @@ export default function Chat() {
                   <span className="text-xs text-muted-foreground font-body truncate">
                     {conv.lastMessageFromMe ? "אתה: " : ""}{conv.lastMessage}
                   </span>
-                  <span className="text-[10px] text-muted-foreground/70 font-body">{formatTime(conv.lastMessageAt)}</span>
+                  <span className="text-[10px] text-muted-foreground/70 font-body">{formatDateTime(conv.lastMessageAt)}</span>
                 </button>
               ))
             )}
@@ -324,7 +329,7 @@ export default function Chat() {
                         }`}>
                           <p className="text-sm font-body break-words whitespace-pre-wrap">{msg.messageText}</p>
                           <p className={`text-[10px] mt-1 font-body ${isMine ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                            {formatTime(msg.sentAt)}
+                            {formatDateTime(msg.sentAt)}
                           </p>
                         </div>
                       </div>

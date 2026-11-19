@@ -7,6 +7,7 @@ import GoogleIcon from "@/components/GoogleIcon";
 import GoogleAuthLoading from "@/components/GoogleAuthLoading";
 import { useGoogleAuthCallback } from "@/hooks/useGoogleAuthCallback";
 import MeshGradient from "@/components/landing/MeshGradient";
+import LoginAttemptsNotice from "@/components/auth/LoginAttemptsNotice";
 
 
 export default function StudentLogin() {
@@ -17,6 +18,8 @@ export default function StudentLogin() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
+  const [lockSeconds, setLockSeconds] = useState(0);
+  const [remainingAttempts, setRemainingAttempts] = useState(null);
   const [authLoading, setAuthLoading] = useState(() => {
     // Only show loading if we're actually returning from Google (code in URL)
     if (sessionStorage.getItem("googleAuthLoading") !== "true") return false;
@@ -32,6 +35,20 @@ export default function StudentLogin() {
       sessionStorage.removeItem("googleAuthMessage");
     }
   }, []);
+
+  // ספירה לאחור עד סוף החסימה
+  useEffect(() => {
+    if (lockSeconds <= 0) return;
+    const timer = setTimeout(() => {
+      const next = lockSeconds - 1;
+      setLockSeconds(next);
+      if (next === 0) {
+        setError("");
+        setRemainingAttempts(null);
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [lockSeconds]);
 
   const handleGoogle = async () => {
     setError("");
@@ -53,10 +70,15 @@ export default function StudentLogin() {
       const data = await response.json();
       const token = data.accessToken || data.AccessToken || data.token || "";
       if (data.locked || data._status === 429) {
-        setError(data.message || "יותר מדי ניסיונות התחברות. נסו שוב בעוד 15 דקות.");
+        const retryAfter = Number(data.retryAfter);
+        setLockSeconds(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : 15 * 60);
+        setRemainingAttempts(0);
+        setError(data.message || "יותר מדי ניסיונות התחברות. נסו שוב מאוחר יותר.");
         return;
       }
       if (data._status === 401) {
+        const left = Number(data.remainingAttempts);
+        setRemainingAttempts(Number.isFinite(left) && left > 0 ? left : null);
         setError("אימייל או סיסמה שגויים");
         return;
       }
@@ -149,6 +171,8 @@ export default function StudentLogin() {
             </div>
           )}
 
+          <LoginAttemptsNotice lockSeconds={lockSeconds} remainingAttempts={remainingAttempts} />
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <label htmlFor="student-login-email" className="text-sm font-heading font-medium text-foreground">אימייל</label>
@@ -197,7 +221,7 @@ export default function StudentLogin() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || lockSeconds > 0}
               className="stripe-gradient-button w-full py-3.5 text-primary-foreground rounded-full text-base font-heading font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all min-h-[52px] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {loading ? (

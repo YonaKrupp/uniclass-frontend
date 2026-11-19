@@ -1,7 +1,7 @@
 import { getApiBase } from '../../shared/apiBase.ts';
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 
-const MAX_FAILED_ATTEMPTS = 5;
+const MAX_FAILED_ATTEMPTS = 10;
 const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
 const LOCK_MS = 15 * 60 * 1000;
 const LOCK_MESSAGE = 'יותר מדי ניסיונות התחברות. נסו שוב בעוד 15 דקות.';
@@ -20,12 +20,17 @@ async function findAttempt(base44: any, key: string) {
   return (items || [])[0] ?? null;
 }
 
-async function isLocked(base44: any, keys: string[]): Promise<boolean> {
+/** כמה שניות נותרו עד סוף הנעילה (0 = לא נעול). */
+async function lockRemainingSeconds(base44: any, keys: string[]): Promise<number> {
+  let remaining = 0;
   for (const key of keys) {
     const record = await findAttempt(base44, key);
-    if (record?.locked_until && new Date(record.locked_until).getTime() > Date.now()) return true;
+    const until = record?.locked_until ? new Date(record.locked_until).getTime() : 0;
+    if (until > Date.now()) {
+      remaining = Math.max(remaining, Math.ceil((until - Date.now()) / 1000));
+    }
   }
-  return false;
+  return remaining;
 }
 
 async function clearAttempts(base44: any, keys: string[]) {
@@ -35,9 +40,13 @@ async function clearAttempts(base44: any, keys: string[]) {
   }
 }
 
-async function registerFailure(base44: any, keys: string[]): Promise<boolean> {
+async function registerFailure(
+  base44: any,
+  keys: string[],
+): Promise<{ locked: boolean; retryAfter: number; remaining: number }> {
   const now = Date.now();
-  let locked = false;
+  let retryAfter = 0;
+  let remaining = MAX_FAILED_ATTEMPTS;
   for (const key of keys) {
     const record = await findAttempt(base44, key);
     if (!record) {
@@ -46,6 +55,7 @@ async function registerFailure(base44: any, keys: string[]): Promise<boolean> {
         count: 1,
         first_attempt_at: new Date(now).toISOString(),
       });
+      remaining = Math.min(remaining, MAX_FAILED_ATTEMPTS - 1);
       continue;
     }
     const first = record.first_attempt_at ? new Date(record.first_attempt_at).getTime() : now;
@@ -57,11 +67,12 @@ async function registerFailure(base44: any, keys: string[]): Promise<boolean> {
     };
     if (count >= MAX_FAILED_ATTEMPTS) {
       patch.locked_until = new Date(now + LOCK_MS).toISOString();
-      locked = true;
+      retryAfter = Math.max(retryAfter, Math.ceil(LOCK_MS / 1000));
     }
     await base44.asServiceRole.entities.LoginAttempt.update(record.id, patch);
+    remaining = Math.min(remaining, Math.max(0, MAX_FAILED_ATTEMPTS - count));
   }
-  return locked;
+  return { locked: retryAfter > 0, retryAfter, remaining };
 }
 
 Deno.serve(async (req) => {
@@ -98,11 +109,20 @@ Deno.serve(async (req) => {
     let base44: any = null;
     try {
       base44 = createClientFromRequest(req);
-      if (await isLocked(base44, keys)) {
+      const retryAfter = await lockRemainingSeconds(base44, keys);
+      if (retryAfter > 0) {
         console.warn(`[authProxy] login blocked (locked): ${email}`);
         return Response.json(
-          { success: false, locked: true, message: LOCK_MESSAGE, error: LOCK_MESSAGE, retryAfter: 900, _status: 429 },
-          { status: 429, headers: { 'Retry-After': '900' } },
+          {
+            success: false,
+            locked: true,
+            message: LOCK_MESSAGE,
+            error: LOCK_MESSAGE,
+            retryAfter,
+            remainingAttempts: 0,
+            _status: 429,
+          },
+          { status: 429, headers: { 'Retry-After': String(retryAfter) } },
         );
       }
     } catch (guardError) {
@@ -150,17 +170,27 @@ Deno.serve(async (req) => {
     }
 
     // רישום כישלון התחברות (פרטי שגויים בלבד)
+    let remainingAttempts: number | null = null;
     if (base44) {
       try {
         if (apiRes.status === 401) {
-          const locked = await registerFailure(base44, keys);
-          if (locked) {
+          const failure = await registerFailure(base44, keys);
+          if (failure.locked) {
             console.warn(`[authProxy] login locked after repeated failures: ${email}`);
             return Response.json(
-              { success: false, locked: true, message: LOCK_MESSAGE, error: LOCK_MESSAGE, _status: 429 },
-              { status: 429 },
+              {
+                success: false,
+                locked: true,
+                message: LOCK_MESSAGE,
+                error: LOCK_MESSAGE,
+                retryAfter: failure.retryAfter,
+                remainingAttempts: 0,
+                _status: 429,
+              },
+              { status: 429, headers: { 'Retry-After': String(failure.retryAfter) } },
             );
           }
+          remainingAttempts = failure.remaining;
         } else if (apiRes.status < 400) {
           await clearAttempts(base44, keys);
         }
@@ -179,7 +209,7 @@ Deno.serve(async (req) => {
     }
 
     // Always return 200 so the frontend can read the actual error message
-    return Response.json({ ...data, _status: apiRes.status });
+    return Response.json({ ...data, remainingAttempts, _status: apiRes.status });
   } catch (error) {
     console.error('authProxy: Unexpected error:', (error as Error).message);
     return Response.json({ error: (error as Error).message }, { status: 500 });

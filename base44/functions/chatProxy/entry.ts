@@ -10,7 +10,21 @@ Deno.serve(async (req) => {
     if (!auth.ok) return auth.response;
 
     // התפקיד נגזר מהטוקן המאומת בלבד — לא מפרמטר שהלקוח שולח.
-    const callerRole = auth.userType || auth.role || '';
+    // ה-API מקבל רק "teacher" או "student" באותיות קטנות, לכן מנרמלים את הערך מהטוקן.
+    const normalizeRole = (value: unknown): string => {
+      const role = String(value ?? '').trim().toLowerCase();
+      return role === 'teacher' || role === 'student' ? role : '';
+    };
+    const recipientRoleFromClient = normalizeRole(params.recipientRole);
+    // תמיד נשלח תפקיד תקין ל-API: מהטוקן, אחר כך מהתפקיד השמור אצל הלקוח,
+    // ואם אין בכלל תפקיד — מהתפקיד של הצד השני בשיחה.
+    const callerRole = normalizeRole(auth.userType)
+      || normalizeRole(auth.role)
+      || normalizeRole(params.senderRole)
+      || normalizeRole(params.userRole)
+      || (recipientRoleFromClient === 'teacher' ? 'student' : 'teacher');
+    const recipientRole = recipientRoleFromClient || (callerRole === 'teacher' ? 'student' : 'teacher');
+    console.log('[chatProxy] action:', action, 'callerRole:', callerRole, 'recipientRole:', recipientRole);
 
     const API_BASE = `${getApiBase(req)}/api/Chat`;
     let apiUrl = "";
@@ -64,9 +78,9 @@ Deno.serve(async (req) => {
       const postBody = action === "sendMessage"
         ? {
             senderEmail: auth.email,
-            senderRole: callerRole || params.senderRole,
+            senderRole: callerRole,
             recipientEmail: params.recipientEmail,
-            recipientRole: params.recipientRole,
+            recipientRole,
             messageText: params.messageText,
           }
         : { user1: params.user1, user2: params.user2 };

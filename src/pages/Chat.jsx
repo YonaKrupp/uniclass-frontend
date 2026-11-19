@@ -2,8 +2,25 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Send, ArrowRight, Loader2, MessageCircle, Plus, X } from "lucide-react";
 import PageLogo from "@/components/PageLogo";
+import { base44 } from "@/api/base44Client";
 
-const API_BASE = "https://learn-le-connect.base44.app/api/apps/6a37f1517bf59551c5f4b6f9/functions/chatProxy";
+// קריאה לפונקציית השרת דרך ה-SDK, כדי שהתצוגה המקדימה והאתר החי ישתמשו
+// תמיד בגרסה העדכנית של הפונקציה (ולא בכתובת מקודדת של גרסה שפורסמה בעבר).
+async function callChat(payload) {
+  const res = await base44.functions.invoke("chatProxy", payload);
+  return res?.data ?? {};
+}
+
+// גיבוי: קורא את התפקיד (teacher/student) מתוך הטוקן כשהתפקיד לא נשמר בדפדפן.
+function roleFromToken(token) {
+  try {
+    const payload = JSON.parse(atob(String(token).split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    const role = String(payload.userType || payload.role || "").trim().toLowerCase();
+    return role === "teacher" || role === "student" ? role : "";
+  } catch {
+    return "";
+  }
+}
 
 export default function Chat() {
   const [searchParams] = useSearchParams();
@@ -34,7 +51,7 @@ export default function Chat() {
       const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken") || "";
       const userDataStr = localStorage.getItem("userData") || sessionStorage.getItem("userData") || "{}";
       const userData = JSON.parse(userDataStr);
-      const role = localStorage.getItem("userRole") || "";
+      const role = localStorage.getItem("userRole") || sessionStorage.getItem("userRole") || roleFromToken(token);
       const email = userData.teacherEmail || userData.studentEmail || userData.email || "";
       setAuthToken(token);
       setUserRole(role);
@@ -48,11 +65,7 @@ export default function Chat() {
     if (!userEmail) { if (!isPolling) setLoadingConversations(false); return; }
     if (!isPolling) setLoadingConversations(true);
     try {
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getConversations", userEmail, userRole, studentEmail: userEmail, token: authToken }),
-      }).then(r => r.json());
+      const res = await callChat({ action: "getConversations", userEmail, userRole, studentEmail: userEmail, token: authToken });
       if (res?.success && Array.isArray(res.conversations)) {
         setConversations(prev => {
           if (JSON.stringify(prev) === JSON.stringify(res.conversations)) return prev;
@@ -71,11 +84,7 @@ export default function Chat() {
     if (!userEmail || !otherEmail) return;
     if (!isPolling) setLoadingMessages(true);
     try {
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getConversation", user1: userEmail, user2: otherEmail, token: authToken }),
-      }).then(r => r.json());
+      const res = await callChat({ action: "getConversation", user1: userEmail, user2: otherEmail, token: authToken });
       if (res?.success && Array.isArray(res.messages)) {
         setMessages(prev => {
           // Only update if something actually changed (new message count or different last message id)
@@ -88,11 +97,7 @@ export default function Chat() {
         });
       }
       // Mark as read
-      fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "markAsRead", user1: userEmail, user2: otherEmail, token: authToken }),
-      });
+      callChat({ action: "markAsRead", user1: userEmail, user2: otherEmail, token: authToken }).catch(() => {});
     } catch (err) {
       console.error("loadMessages error:", err);
     } finally {
@@ -158,19 +163,15 @@ export default function Chat() {
     setError("");
     try {
       const recipientRole = userRole === "teacher" ? "student" : "teacher";
-      const res = await fetch(API_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "sendMessage",
-          senderEmail: userEmail,
-          senderRole: userRole,
-          recipientEmail: selectedEmail,
-          recipientRole,
-          messageText: messageInput.trim(),
-          token: authToken,
-        }),
-      }).then(r => r.json());
+      const res = await callChat({
+        action: "sendMessage",
+        senderEmail: userEmail,
+        senderRole: userRole,
+        recipientEmail: selectedEmail,
+        recipientRole,
+        messageText: messageInput.trim(),
+        token: authToken,
+      });
       if (res?.success) {
         const sentText = messageInput.trim();
         setMessageInput("");

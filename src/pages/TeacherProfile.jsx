@@ -576,7 +576,7 @@ export default function TeacherProfile() {
                             style={{ left: `${(1 - (hourlyValue - 80) / 70) * 100}%` }}
                             role="status"
                           >
-                            לתלמיד יוצג {(hourlyValue * 1.18).toFixed(2)} ₪
+                            לתלמיד יוצג {(hourlyValue * 1.18 * 1.15).toFixed(2)} ₪
                           </div>
                         )}
                         <input

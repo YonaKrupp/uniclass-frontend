@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { GraduationCap, Loader2, RefreshCw, Star, MessageCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { GraduationCap, Loader2, RefreshCw, Star, MessageCircle, ChevronLeft } from "lucide-react";
 import { useSingleMountEffect } from "@/hooks/useSingleMountEffect";
 import { shouldFetch } from "@/lib/fetchGuard";
 import PageLogo from "@/components/PageLogo";
@@ -90,9 +90,15 @@ export default function TeachersList() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : teachers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
+          <div className="flex flex-col items-center justify-center py-16 gap-4 text-center px-5">
             <GraduationCap className="w-10 h-10 text-muted-foreground/40" />
-            <p className="text-sm font-body">אין מורים להצגה</p>
+            <p className="text-sm font-body text-muted-foreground">עדיין אין מורים שכבר למדתם אצלם</p>
+            <Link
+              to="/choose-lesson"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-heading font-semibold hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all"
+            >
+              עברו לבחרו שיעור <ChevronLeft className="w-4 h-4" />
+            </Link>
           </div>
         ) : (
           <div className="overflow-x-auto">

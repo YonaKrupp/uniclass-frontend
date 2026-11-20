@@ -85,7 +85,7 @@ export default function StudentLessonsBoard({
             <div className="space-y-1">
               <p className="text-foreground font-heading font-semibold">אין שיעורים קרובים כרגע</p>
               <p className="text-muted-foreground font-body text-sm">
-                עברו לבחור שיעור
+                עברו לבחרו שיעור
               </p>
             </div>
             <Link

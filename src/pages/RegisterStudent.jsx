@@ -154,10 +154,15 @@ export default function RegisterStudent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
-      if (data.error || data.success === false) {
-        setError(data.message || "שליחת קוד האימות נכשלה. אנא נסו שוב.");
+      // הצלחה = השרת החזיר sessionId. תשובה ריקה או "השרת אינו זמין" אינה הצלחה.
+      if (data.success !== true || !data.sessionId) {
+        setError(
+          data.success === false && data.message
+            ? data.message
+            : "שרת ההרשמה אינו זמין כעת, ולכן לא נשלח קוד אימות. אנא נסו שוב מאוחר יותר."
+        );
         return;
       }
 
@@ -197,15 +202,44 @@ export default function RegisterStudent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
-      if (data.error || data.success === false || data._status >= 400) {
-        setError(data.message || "האימות נכשל. אנא נסו שוב.");
+      if (data.success !== true) {
+        setError(
+          data.success === false && data.message
+            ? data.message
+            : "שרת ההרשמה אינו זמין כעת. אנא נסו שוב מאוחר יותר."
+        );
         return;
       }
 
       trackGaEvent("sign_up", { method: "email", user_type: "student" });
-      navigate("/student-login");
+
+      // התחברות אוטומטית אחרי האימות, כדי לפתוח ישר את עמוד הבית של התלמיד.
+      let loginData = {};
+      try {
+        const loginRes = await fetch(`${API_BASE}/authProxy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userType: "student", email, password }),
+        });
+        loginData = await loginRes.json().catch(() => ({}));
+      } catch {
+        loginData = {};
+      }
+      const token = loginData.accessToken || loginData.AccessToken || loginData.token || "";
+
+      if (!token) {
+        navigate("/student-login");
+        return;
+      }
+
+      localStorage.setItem("userRole", "student");
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("userData", JSON.stringify(loginData));
+      sessionStorage.setItem("authToken", token);
+      sessionStorage.setItem("userData", JSON.stringify(loginData));
+      navigate("/student-home");
     } catch (err) {
       setError("שגיאה: " + (err.message || "בדקו את החיבור לאינטרנט ונסו שוב."));
     } finally {
@@ -223,10 +257,14 @@ export default function RegisterStudent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "resendOtp", sessionId }),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
-      if (data.error || data.success === false) {
-        setError(data.message || "שליחת קוד חדש נכשלה");
+      if (data.success !== true) {
+        setError(
+          data.success === false && data.message
+            ? data.message
+            : "שרת ההרשמה אינו זמין כעת. אנא נסו שוב מאוחר יותר."
+        );
         return;
       }
 

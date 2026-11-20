@@ -85,14 +85,14 @@ export default function StudentLessonsBoard({
             <div className="space-y-1">
               <p className="text-foreground font-heading font-semibold">אין שיעורים קרובים כרגע</p>
               <p className="text-muted-foreground font-body text-sm">
-                עיינו במורים הזמינים כדי לקבוע שיעור חדש
+                עברו לבחור שיעור
               </p>
             </div>
             <Link
-              to="/student-teachers"
+              to="/choose-lesson"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-heading font-semibold hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all"
             >
-              עיינו במורים זמינים <ChevronLeft className="w-4 h-4" />
+              בחרו שיעור <ChevronLeft className="w-4 h-4" />
             </Link>
           </div>
         ) : (

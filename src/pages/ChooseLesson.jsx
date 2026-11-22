@@ -24,9 +24,9 @@ const SEARCH_MODES = [
 ];
 
 const UNIVERSITY_MODES = [
+  { value: "3", label: "בית ספר", icon: GraduationCap },
   { value: "1", label: "אוניברסיטה", icon: School },
   { value: "2", label: "האוניברסיטה הפתוחה", icon: BookOpen },
-  { value: "3", label: "בית ספר", icon: GraduationCap },
 ];
 
 // Hebrew A–B ordering for course/subject names
@@ -44,14 +44,14 @@ export default function ChooseLesson() {
   const [error, setError] = useState("");
 
   const [searchMode, setSearchMode] = useState("1");
-  const [universityMode, setUniversityMode] = useState("1");
+  const [universityMode, setUniversityMode] = useState("3");
 
   const [selectedDegree, setSelectedDegree] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
 
   const [typedQuery, setTypedQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("university");
+  const [categoryFilter, setCategoryFilter] = useState("school");
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [showSubjectList, setShowSubjectList] = useState(false);
   // כל הקורסים מוצגים תמיד — ללא סינון לפי סטטוס פעיל

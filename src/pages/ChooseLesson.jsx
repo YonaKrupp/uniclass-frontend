@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Loader2, Search, GraduationCap, School, X, ArrowLeft } from "lucide-react";
+import { BookOpen, Loader2, Search, GraduationCap, X, ArrowLeft } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -23,11 +23,9 @@ const SEARCH_MODES = [
   },
 ];
 
-const UNIVERSITY_MODES = [
-  { value: "3", label: "בית ספר", icon: GraduationCap },
-  { value: "1", label: "אוניברסיטה", icon: School },
-  { value: "2", label: "האוניברסיטה הפתוחה", icon: BookOpen },
-];
+// מיפוי בין סוג המוסד (gn20_uni_type) לקטגוריות הטאבים
+const INSTITUTION_CATEGORY = { "1": "university", "2": "openUniversity", "3": "school" };
+const CATEGORY_MODE = { university: "1", openUniversity: "2", school: "3" };
 
 // Hebrew A–B ordering for course/subject names
 const byHebrew = (a, b) => String(a ?? "").localeCompare(String(b ?? ""), "he", { numeric: true, sensitivity: "base" });
@@ -381,35 +379,10 @@ export default function ChooseLesson() {
       {showUniversitySection && !loading && (
         <div data-tour="institution-type" className="bg-card rounded-2xl border border-border p-5 space-y-4">
           <h2 className="w-full text-right text-base font-heading font-semibold text-foreground">סוג מוסד</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {UNIVERSITY_MODES.map((mode) => {
-              const Icon = mode.icon;
-              const isSelected = universityMode === mode.value;
-              return (
-                <label
-                  key={mode.value}
-                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                    isSelected
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:bg-muted/50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="universityMode"
-                    value={mode.value}
-                    checked={isSelected}
-                    onChange={(e) => setUniversityMode(e.target.value)}
-                    className="w-4 h-4 accent-primary"
-                  />
-                  <Icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className={`font-body text-sm ${isSelected ? "text-primary font-semibold" : "text-foreground"}`}>
-                    {mode.label}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
+          <SubjectCategoryTabs
+            value={INSTITUTION_CATEGORY[universityMode]}
+            onChange={(category) => setUniversityMode(CATEGORY_MODE[category])}
+          />
 
           {/* Dropdowns */}
           {showDropdowns && (

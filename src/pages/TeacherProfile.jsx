@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import SubjectsFreeAllList from "@/components/SubjectsFreeAllList";
 import EasyPayslipPanel from "@/components/teacher/EasyPayslipPanel";
+import SubjectsRequiredGuide from "@/components/teacher/SubjectsRequiredGuide";
 import PageLogo from "@/components/PageLogo";
 import { ONBOARDING_RESTART_EVENT, restartOnboarding } from "@/lib/teacherOnboarding";
 
@@ -670,7 +671,11 @@ export default function TeacherProfile() {
               <button
                 type="button"
                 onClick={() => setShowSubjectsFreeAll(!showSubjectsFreeAll)}
-                className="flex items-center gap-1.5 px-3 py-2 bg-muted text-foreground rounded-lg text-xs font-heading font-medium hover:bg-accent transition-colors min-h-[44px] cursor-pointer"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-heading font-medium transition-colors min-h-[44px] cursor-pointer ${
+                  subjects.length === 0 && !showSubjectsFreeAll
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 ring-2 ring-primary/40 ring-offset-2 ring-offset-card hover:bg-primary/90"
+                    : "bg-muted text-foreground hover:bg-accent"
+                }`}
               >
                 {showSubjectsFreeAll ? (
                   <><ChevronUp className="w-4 h-4" />הסתר מקצועות לימוד נוספים</>
@@ -679,6 +684,12 @@ export default function TeacherProfile() {
                 )}
               </button>
             </div>
+            {subjects.length === 0 && (
+              <SubjectsRequiredGuide
+                open={showSubjectsFreeAll}
+                onShow={() => setShowSubjectsFreeAll(true)}
+              />
+            )}
             {subjects.length > 0 && (
               <ul className="space-y-1">
                 {subjects.map((subject, i) => (

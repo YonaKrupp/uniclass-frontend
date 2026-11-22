@@ -1,8 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Search, X, Plus, Loader2 } from "lucide-react";
+import SubjectCategoryTabs from "@/components/subjects/SubjectCategoryTabs";
+import { subjectCategory } from "@/lib/subjectCategory";
 
 export default function SubjectsFreeAllList({ items, onSelect, saving }) {
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("school");
   const prevSaving = useRef(saving);
 
   // Clear search after saving completes (not synchronously, to avoid iOS click cancellation)
@@ -34,18 +37,29 @@ export default function SubjectsFreeAllList({ items, onSelect, saving }) {
       });
   }, [items]);
 
+  // פיצול ל"בית ספר" (כיתות ח׳–י״ב) ול"אוניברסיטה" (כל שאר הרמות)
+  const categorized = useMemo(() => {
+    const groups = { school: [], university: [] };
+    options.forEach((s) => {
+      groups[subjectCategory(s)].push(s);
+    });
+    return { groups, counts: { school: groups.school.length, university: groups.university.length } };
+  }, [options]);
+
   const filtered = useMemo(() => {
+    const base = categorized.groups[category] || [];
     const q = normalizeForSearch(query);
-    if (!q) return options;
+    if (!q) return base;
     const words = q.split(/\s+/).filter(Boolean);
-    return options.filter((s) => {
+    return base.filter((s) => {
       const label = normalizeForSearch(s._label);
       return words.every((w) => label.includes(w));
     });
-  }, [options, query]);
+  }, [categorized, category, query]);
 
   return (
     <div className="space-y-3">
+      <SubjectCategoryTabs value={category} onChange={setCategory} counts={categorized.counts} />
       <div className="relative">
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <input

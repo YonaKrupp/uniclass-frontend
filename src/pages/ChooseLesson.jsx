@@ -161,14 +161,21 @@ export default function ChooseLesson() {
   const allYears = data?.years ?? [];
   const courses = data?.courses ?? [];
   const subjects = data?.subjects ?? [];
-  const degrees = allDegrees.filter((d) => {
-    if (Number(d.gn20_uni_type) !== Number(universityMode)) return false;
-    if (activeOnly) {
-      const v = d.Active ?? d.active ?? d.gn20_Active ?? d.gn20_active ?? d.IsActive ?? d.gn20_IsActive;
-      return Number(v) === 1 || v === true || v === "1" || v === "true";
-    }
-    return true;
-  });
+  const degrees = allDegrees
+    .filter((d) => {
+      if (Number(d.gn20_uni_type) !== Number(universityMode)) return false;
+      if (activeOnly) {
+        const v = d.Active ?? d.active ?? d.gn20_Active ?? d.gn20_active ?? d.IsActive ?? d.gn20_IsActive;
+        return Number(v) === 1 || v === true || v === "1" || v === "true";
+      }
+      return true;
+    })
+    // In university and open university the degrees are listed alphabetically (א'–ב')
+    .sort((a, b) =>
+      universityMode === "1" || universityMode === "2"
+        ? byHebrew(a.degree_name ?? a.name, b.degree_name ?? b.name)
+        : 0
+    );
   const years = selectedDegree
     ? allYears.filter((y) => String(y.gn22_subject_id) === String(selectedDegree))
     : allYears;

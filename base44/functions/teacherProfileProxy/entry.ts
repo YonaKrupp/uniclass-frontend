@@ -107,6 +107,9 @@ async function sendUpdate(endpointPath, gn02Seq, payload, token, apiBase) {
   return Response.json({ ...updateData, _status: updateRes.status });
 }
 
+// מיפוי סוגי מוסדות נשמר בזיכרון לזמן קצר — הנתונים כמעט לא משתנים.
+let degreesCache: { at: number; map: Record<string, number> } | null = null;
+
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
@@ -136,6 +139,45 @@ Deno.serve(async (req) => {
     }
     if (studentActions.includes(action) && !isOwnerOrAdmin(body.studentEmail, auth.email, callerIsAdmin)) {
       return forbidden('אין הרשאה לפעול בשם תלמיד אחר');
+    }
+
+    // מיפוי מזהה תואר -> סוג מוסד (1 אוניברסיטה, 2 האוניברסיטה הפתוחה, 3 בית ספר).
+    // משמש את רשימת המקצועות בפרופיל כדי להפריד לקטגוריות.
+    if (action === 'subjectCategories') {
+      const now = Date.now();
+      if (degreesCache && now - degreesCache.at < 10 * 60 * 1000) {
+        return Response.json({ uniTypes: degreesCache.map, _status: 200 });
+      }
+      const uniTypes: Record<string, number> = {};
+      try {
+        const degreesRes = await fetch(`${API_BASE}/api/Student/selectdegrees_toar_academy`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
+        const degreesText = await degreesRes.text();
+        console.log('[teacherProfileProxy] subjectCategories status:', degreesRes.status);
+        let degreesData: any = null;
+        try { degreesData = JSON.parse(degreesText); } catch { degreesData = null; }
+        const list = Array.isArray(degreesData)
+          ? degreesData
+          : (Array.isArray(degreesData?.Data) ? degreesData.Data
+            : Array.isArray(degreesData?.data) ? degreesData.data
+            : Array.isArray(degreesData?.degrees) ? degreesData.degrees
+            : []);
+        for (const degree of list) {
+          const id = degree?.degree_id ?? degree?.Degree_id ?? degree?.id;
+          const type = degree?.gn20_uni_type ?? degree?.Gn20_uni_type;
+          if (id != null && type != null) uniTypes[String(id)] = Number(type);
+        }
+        degreesCache = { at: now, map: uniTypes };
+      } catch (err) {
+        console.warn('[teacherProfileProxy] subjectCategories failed:', err?.message);
+      }
+      return Response.json({ uniTypes, _status: 200 });
     }
 
     if (action === 'updateAbout') {

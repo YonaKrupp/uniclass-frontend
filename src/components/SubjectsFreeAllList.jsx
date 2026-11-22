@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Search, X, Plus, Loader2 } from "lucide-react";
 import SubjectCategoryTabs from "@/components/subjects/SubjectCategoryTabs";
-import { subjectCategory } from "@/lib/subjectCategory";
+import { subjectCategory, institutionName } from "@/lib/subjectCategory";
 
 export default function SubjectsFreeAllList({ items, onSelect, saving }) {
   const [query, setQuery] = useState("");
@@ -28,22 +28,31 @@ export default function SubjectsFreeAllList({ items, onSelect, saving }) {
         const name = (s.gn03_subjectName ?? "").replace(/\u00a0/g, " ").trim();
         const level = (s.gn04_levelName ?? "").replace(/\u00a0/g, " ").trim();
         const label = level ? `${name} - ${level}` : name;
-        return { ...s, _label: label };
+        return { ...s, _label: label, _uni: institutionName(s) };
       })
       .filter((s) => {
-        if (seen.has(s._label)) return false;
-        seen.add(s._label);
+        // אותו מקצוע יכול להופיע במוסדות שונים — לא לאחד ביניהם
+        const key = `${s._label}__${s._uni}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
         return true;
       });
   }, [items]);
 
-  // פיצול ל"בית ספר" (כיתות ח׳–י״ב) ול"אוניברסיטה" (כל שאר הרמות)
+  // פיצול לפי שם המוסד (Gn23_uni_Name): בית ספר, אוניברסיטה, האוניברסיטה הפתוחה
   const categorized = useMemo(() => {
-    const groups = { school: [], university: [] };
+    const groups = { school: [], university: [], openUniversity: [] };
     options.forEach((s) => {
       groups[subjectCategory(s)].push(s);
     });
-    return { groups, counts: { school: groups.school.length, university: groups.university.length } };
+    return {
+      groups,
+      counts: {
+        school: groups.school.length,
+        university: groups.university.length,
+        openUniversity: groups.openUniversity.length,
+      },
+    };
   }, [options]);
 
   const filtered = useMemo(() => {
@@ -88,9 +97,14 @@ export default function SubjectsFreeAllList({ items, onSelect, saving }) {
         <ul className="space-y-1 max-h-80 overflow-y-auto">
           {filtered.slice(0, 50).map((s, i) => (
             <li key={`${s.gn03_id ?? ""}-${i}`} className="text-sm font-body text-foreground flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <span className="flex items-center gap-2 flex-1">
+              <span className="flex items-start gap-2 flex-1 min-w-0">
                 <span className="text-primary">•</span>
-                {s._label}
+                <span className="flex flex-col min-w-0">
+                  <span className="break-words">{s._label}</span>
+                  {s._uni && (
+                    <span className="text-xs text-muted-foreground">{s._uni}</span>
+                  )}
+                </span>
               </span>
               <button
                 type="button"

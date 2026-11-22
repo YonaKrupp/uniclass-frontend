@@ -9,6 +9,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import PageLogo from "@/components/PageLogo";
+import SubjectCategoryTabs from "@/components/subjects/SubjectCategoryTabs";
+import { subjectCategory, institutionName } from "@/lib/subjectCategory";
 
 const SEARCH_MODES = [
   { value: "1", label: "חיפוש מלא", hint: "בחרו מוסד, תואר וקורס, צעד אחר צעד", icon: Search },
@@ -49,6 +51,7 @@ export default function ChooseLesson() {
   const [selectedCourse, setSelectedCourse] = useState("");
 
   const [typedQuery, setTypedQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("university");
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [showSubjectList, setShowSubjectList] = useState(false);
   // כל הקורסים מוצגים תמיד — ללא סינון לפי סטטוס פעיל
@@ -249,6 +252,18 @@ export default function ChooseLesson() {
     return id && subject ? `${id}__${subject}` : `idx_${i}`;
   };
 
+  // מיפוי תואר -> סוג מוסד (1 אוניברסיטה, 2 האוניברסיטה הפתוחה, 3 בית ספר).
+  // משמש כגיבוי לסיווג כשהמקצוע אינו כולל את שם המוסד.
+  const degreeTypeById = useMemo(() => {
+    const map = {};
+    allDegrees.forEach((d) => {
+      const id = d.degree_id ?? d.id;
+      const type = Number(d.gn20_uni_type ?? d.Gn20_uni_type);
+      if (id != null && !Number.isNaN(type)) map[String(id)] = type;
+    });
+    return map;
+  }, [allDegrees]);
+
   // Build subject display strings: gn03_subjectName + ' ' + gn04_levelName
   const subjectOptions = useMemo(() => {
     const seen = new Set();
@@ -257,15 +272,31 @@ export default function ChooseLesson() {
         const name = (s.gn03_subjectName ?? "").replace(/\u00a0/g, " ").trim();
         const level = (s.gn04_levelName ?? "").replace(/\u00a0/g, " ").trim();
         const label = level ? `${name} ${level}` : name;
-        return { ...s, _label: label };
+        const uni = institutionName(s);
+        let category;
+        if (uni) {
+          category = subjectCategory(s);
+        } else {
+          const type = degreeTypeById[String(s.gn22_subject_id ?? s.Gn22_subject_id ?? "")];
+          category = type === 2 ? "openUniversity" : type === 3 ? "school" : "university";
+        }
+        return { ...s, _label: label, _uni: uni, _cat: category };
       })
       .filter((s) => {
-        if (seen.has(s._label)) return false;
-        seen.add(s._label);
+        // אותו מקצוע יכול להופיע במוסדות שונים — לא לאחד ביניהם
+        const key = `${s._label}__${s._uni}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
         return true;
       })
       .sort((a, b) => byHebrew(a._label, b._label));
-  }, [subjects]);
+  }, [subjects, degreeTypeById]);
+
+  const categoryCounts = useMemo(() => {
+    const counts = { school: 0, university: 0, openUniversity: 0 };
+    subjectOptions.forEach((s) => { counts[s._cat] += 1; });
+    return counts;
+  }, [subjectOptions]);
 
   const normalizeForSearch = (str) => (str ?? "")
     .replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00A0]/g, "")
@@ -273,7 +304,7 @@ export default function ChooseLesson() {
     .trim();
 
   const filteredSubjects = useMemo(() => {
-    let list = subjectOptions;
+    let list = subjectOptions.filter((s) => s._cat === categoryFilter);
     if (activeOnly) {
       list = list.filter((s) => {
         const v = s.Active ?? s.active ?? s.gn03_Active ?? s.gn03_active ?? s.IsActive ?? s.IsActiveSubject ?? s.gn03_isActive ?? s.gn03_IsActive;
@@ -287,7 +318,7 @@ export default function ChooseLesson() {
       const label = normalizeForSearch(s._label);
       return words.every((w) => label.includes(w));
     });
-  }, [subjectOptions, typedQuery, activeOnly]);
+  }, [subjectOptions, typedQuery, activeOnly, categoryFilter]);
 
   const displayedSubjects = useMemo(() => filteredSubjects.slice(0, 50), [filteredSubjects]);
 
@@ -522,6 +553,11 @@ export default function ChooseLesson() {
       {showTypedSearch && !loading && (
         <div ref={typedSearchSectionRef} className="bg-card rounded-2xl border border-border p-5 space-y-4 scroll-mt-20">
           <h2 className="w-full text-right text-base font-heading font-semibold text-foreground">חיפוש מקצוע</h2>
+          <SubjectCategoryTabs
+            value={categoryFilter}
+            onChange={(value) => { setCategoryFilter(value); setShowSubjectList(true); }}
+            counts={categoryCounts}
+          />
           <div ref={subjectListRef} className="space-y-2">
             <label className="w-full text-right text-sm font-heading font-semibold text-foreground">הקלידו שם מקצוע או רמה</label>
             <div className="relative">
@@ -550,7 +586,12 @@ export default function ChooseLesson() {
             {/* Selected subject chip */}
             {selectedSubject && (
               <div className="flex items-center justify-between gap-2 bg-primary/10 border border-primary/20 rounded-lg px-3 py-2">
-                <span className="text-sm font-body text-primary font-semibold text-right">{selectedSubject._label}</span>
+                <span className="flex flex-col text-right">
+                  <span className="text-sm font-body text-primary font-semibold">{selectedSubject._label}</span>
+                  {selectedSubject._uni && (
+                    <span className="text-xs font-body text-muted-foreground">{selectedSubject._uni}</span>
+                  )}
+                </span>
                 <button
                   type="button"
                   onClick={() => setSelectedSubject(null)}
@@ -597,7 +638,10 @@ export default function ChooseLesson() {
                             isSelected ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted text-foreground"
                           }`}
                         >
-                          {s._label}
+                          <span className="block break-words">{s._label}</span>
+                          {s._uni && (
+                            <span className="block text-xs font-normal text-muted-foreground">{s._uni}</span>
+                          )}
                         </button>
                       );
                     })}

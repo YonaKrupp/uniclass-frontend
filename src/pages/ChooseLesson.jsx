@@ -30,6 +30,13 @@ const CATEGORY_MODE = { university: "1", openUniversity: "2", school: "3" };
 // Hebrew A–B ordering for course/subject names
 const byHebrew = (a, b) => String(a ?? "").localeCompare(String(b ?? ""), "he", { numeric: true, sensitivity: "base" });
 
+// מפתח מיון עברי: מתעלם מניקוד, מפיסוק ומרווחים כפולים כדי שהרשימה תהיה לפי א'-ב' בצורה עקבית
+const hebrewSortKey = (value) => String(value ?? "")
+  .replace(/[\u0591-\u05C7]/g, "")
+  .replace(/["'’״׳`.,:;!?()\[\]\-–—_/\\]/g, " ")
+  .replace(/\s+/g, " ")
+  .trim();
+
 // Module-level: prevents concurrent fetch calls across component remounts within the same page load
 let _fetchInProgress = false;
 
@@ -285,7 +292,7 @@ export default function ChooseLesson() {
           const type = degreeTypeById[String(s.gn22_subject_id ?? s.Gn22_subject_id ?? "")];
           category = type === 2 ? "openUniversity" : type === 3 ? "school" : "university";
         }
-        return { ...s, _label: label, _uni: uni, _cat: category };
+        return { ...s, _label: label, _uni: uni, _cat: category, _name: name, _level: level };
       })
       .filter((s) => {
         // אותו מקצוע יכול להופיע במוסדות שונים — לא לאחד ביניהם
@@ -294,7 +301,7 @@ export default function ChooseLesson() {
         seen.add(key);
         return true;
       })
-      .sort((a, b) => byHebrew(a._label, b._label));
+      .sort((a, b) => byHebrew(hebrewSortKey(a._name), hebrewSortKey(b._name)) || byHebrew(hebrewSortKey(a._level), hebrewSortKey(b._level)));
   }, [subjects, degreeTypeById]);
 
   const categoryCounts = useMemo(() => {

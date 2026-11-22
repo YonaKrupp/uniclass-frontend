@@ -7,9 +7,9 @@ const STEPS = [
   "המקצוע יופיע ברשימה, וזה מה שתלמידים יראו ויוכלו להזמין.",
 ];
 
-export default function SubjectsRequiredGuide({ open, onShow }) {
+export default function SubjectsRequiredGuide({ open, onShow, bare = false }) {
   return (
-    <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-4 space-y-3">
+    <div className={bare ? "space-y-3" : "rounded-xl border-2 border-primary/40 bg-primary/5 p-4 space-y-3"}>
       <div className="flex items-start gap-2">
         <BookOpen className="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
         <div className="space-y-1">

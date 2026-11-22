@@ -6,6 +6,7 @@ import TeacherBanner from "@/components/teacher/TeacherBanner";
 import TeacherStats from "@/components/teacher/TeacherStats";
 import TeacherActivityChart from "@/components/teacher/TeacherActivityChart";
 import TeacherLessonsBoard from "@/components/teacher/TeacherLessonsBoard";
+import HomeSubjectsBanner from "@/components/teacher/HomeSubjectsBanner";
 
 // Module-level in-flight promise store — prevents duplicate concurrent fetches
 // for the same email when TeacherHome mounts multiple times in quick succession
@@ -26,6 +27,8 @@ export default function TeacherHome() {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(false);
   const [pictureUrl, setPictureUrl] = useState(null);
+  // null = עוד לא ידוע, false = אין מקצועות (יציג את באנר בחירת המקצועות), true = יש מקצועות
+  const [hasSubjects, setHasSubjects] = useState(null);
 
   // תמונת הפרופיל של המורה (זהה לזו שמוצגת בעמוד "תמונת פרופיל")
   useEffect(() => {
@@ -37,6 +40,33 @@ export default function TeacherHome() {
         if (alive && d.found && d.pictureData) setPictureUrl(`data:image/jpeg;base64,${d.pictureData}`);
       })
       .catch((err) => console.error("[TeacherHome] picture load failed:", err));
+    return () => { alive = false; };
+  }, [teacherEmail]);
+
+  // בדיקה האם למורה יש מקצועות — אם לא, מוצג באנר בחירת המקצועות בדף הבית
+  useEffect(() => {
+    if (!teacherEmail) return undefined;
+    const cacheKey = `_teacherSubjects_${teacherEmail}`;
+    const CACHE_TTL = 60000;
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+      if (cached && Date.now() - cached.at < CACHE_TTL) {
+        setHasSubjects(cached.has);
+        return undefined;
+      }
+    } catch { /* ignore cache errors */ }
+
+    let alive = true;
+    base44.functions.invoke("teacherProfileProxy", { email: teacherEmail, token: authToken, todayDate })
+      .then((res) => {
+        const d = res.data || {};
+        if (!alive || d._status === 401 || d.error) return;
+        const list = d.subjects || d.Subjects || [];
+        const has = Array.isArray(list) && list.length > 0;
+        setHasSubjects(has);
+        try { localStorage.setItem(cacheKey, JSON.stringify({ has, at: Date.now() })); } catch { /* ignore */ }
+      })
+      .catch((err) => console.error("[TeacherHome] subjects check failed:", err));
     return () => { alive = false; };
   }, [teacherEmail]);
 
@@ -144,6 +174,7 @@ export default function TeacherHome() {
       />
       <div className="relative z-10 space-y-6">
         <TeacherBanner name={name} pictureUrl={pictureUrl} />
+        {hasSubjects === false && <HomeSubjectsBanner />}
         <TeacherStats
           loading={loading}
           todayLessons={todayLessons}

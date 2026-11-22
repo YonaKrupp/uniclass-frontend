@@ -28,7 +28,10 @@ export default function TeacherProfile() {
   const [hourlyValue, setHourlyValue] = useState(80);
   const [savingHourly, setSavingHourly] = useState(false);
   const [draggingHourly, setDraggingHourly] = useState(false);
-  const [showSubjectsFreeAll, setShowSubjectsFreeAll] = useState(false);
+  // הגעה מהבאנר בדף הבית (?subjects=1) פותחת מיד את רשימת המקצועות להוספה
+  const [showSubjectsFreeAll, setShowSubjectsFreeAll] = useState(
+    () => new URLSearchParams(window.location.search).get("subjects") === "1"
+  );
   const [savingSubject, setSavingSubject] = useState(false);
   const [removingSubjectId, setRemovingSubjectId] = useState("");
   const [scanningSubjectId, setScanningSubjectId] = useState("");
@@ -38,6 +41,7 @@ export default function TeacherProfile() {
   const [restartingOnboarding, setRestartingOnboarding] = useState(false);
   const fileInputRef = useRef(null);
   const aboutTextareaRef = useRef(null);
+  const subjectsSectionRef = useRef(null);
 
   const handleRestartOnboarding = async () => {
     if (!teacherEmail) {
@@ -87,6 +91,16 @@ export default function TeacherProfile() {
   };
 
   useEffect(() => { loadProfile(); }, []);
+
+  // הגעה מהבאנר בדף הבית — גוללים ישר לסקשן בחירת המקצועות
+  useEffect(() => {
+    if (!profile) return undefined;
+    if (new URLSearchParams(window.location.search).get("subjects") !== "1") return undefined;
+    const t = setTimeout(() => {
+      subjectsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+    return () => clearTimeout(t);
+  }, [profile]);
 
   if (loading && !profile) {
     return (
@@ -207,6 +221,8 @@ export default function TeacherProfile() {
         return;
       }
       toast.success("המקצוע נוסף בהצלחה");
+      // מאפס את בדיקת המקצועות של דף הבית כדי שהבאנר ייעלם מיד
+      try { localStorage.removeItem(`_teacherSubjects_${teacherEmail}`); } catch { /* ignore */ }
       // Optimistic update — the API returned success, so keep it in the list.
       // Don't auto-refresh: the external backend is slow to reflect changes and
       // would revert the optimistic state with stale data.
@@ -247,6 +263,7 @@ export default function TeacherProfile() {
         return;
       }
       toast.success("המקצוע הוסר בהצלחה");
+      try { localStorage.removeItem(`_teacherSubjects_${teacherEmail}`); } catch { /* ignore */ }
       // Optimistic update — the API returned success, so keep it removed.
       // Don't auto-refresh: the external backend is slow to reflect changes and
       // would revert the optimistic state with stale data.
@@ -499,13 +516,13 @@ export default function TeacherProfile() {
       {profile && (
         <>
           {/* Details + Picture */}
-          <div className="bg-card rounded-2xl border border-border p-5 space-y-3">
-            <h2 className="text-base font-heading font-semibold text-foreground flex items-center gap-2">
+          <div className="bg-card rounded-2xl border border-border p-5 space-y-3 md:grid md:grid-cols-[10rem_minmax(0,1fr)] md:items-start md:gap-x-6 md:gap-y-4 md:space-y-0">
+            <h2 className="md:col-span-2 text-base font-heading font-semibold text-foreground flex items-center gap-2">
                 <IdCard className="w-5 h-5 text-primary" />
                 פרטים אישיים
               </h2>
             {/* Profile picture */}
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 md:col-start-1 md:row-start-2">
               {profilePictureSrc ? (
                 <img
                   src={profilePictureSrc}
@@ -527,7 +544,7 @@ export default function TeacherProfile() {
             </div>
 
             {/* Details table */}
-            <div className="space-y-0 divide-y divide-border">
+            <div className="min-w-0 space-y-0 divide-y divide-border md:col-start-2 md:row-start-2">
               {displayDetails.map(([key, value]) => (
                 <div key={key} className={`flex gap-3 py-2.5 ${(key === "gn02_presentYourSelf" && editingAbout) || (key === "gn02_hourlyPayment" && editingHourly) ? "items-start" : "items-center"}`}>
                   <span className="text-xs font-heading font-semibold text-muted-foreground w-20 text-right shrink-0">
@@ -658,11 +675,13 @@ export default function TeacherProfile() {
               ))}
             </div>
 
-            <EasyPayslipPanel />
+            <div className="md:col-span-2">
+              <EasyPayslipPanel />
+            </div>
           </div>
 
           {/* Subjects */}
-          <div className="bg-card rounded-2xl border border-border p-5 space-y-3">
+          <div ref={subjectsSectionRef} className="scroll-mt-24 bg-card rounded-2xl border border-border p-5 space-y-3">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-base font-heading font-semibold text-foreground flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-primary" />

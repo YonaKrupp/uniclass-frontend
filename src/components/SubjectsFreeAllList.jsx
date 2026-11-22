@@ -58,12 +58,11 @@ export default function SubjectsFreeAllList({ items, onSelect, saving }) {
   const filtered = useMemo(() => {
     const base = categorized.groups[category] || [];
     const q = normalizeForSearch(query);
-    if (!q) return base;
     const words = q.split(/\s+/).filter(Boolean);
-    return base.filter((s) => {
-      const label = normalizeForSearch(s._label);
-      return words.every((w) => label.includes(w));
-    });
+    // רשימת כל המקצועות מוצגת לפי סדר א'-ב'
+    return base
+      .filter((s) => words.every((w) => normalizeForSearch(s._label).includes(w)))
+      .sort((a, b) => a._label.localeCompare(b._label, "he", { numeric: true, sensitivity: "base" }));
   }, [categorized, category, query]);
 
   return (

@@ -119,7 +119,12 @@ export default function TeacherProfile() {
     : null;
 
   const ratings = profile?.ratings || profile?.Ratings || [];
-  const subjects = profile?.subjects || profile?.Subjects || [];
+  // המקצועות מוצגים לפי סדר א'-ב'
+  const subjectLabel = (s) =>
+    typeof s === "object" ? [s?.gn03_subjectName, s?.gn04_levelName].filter(Boolean).join(" - ") : String(s ?? "");
+  const subjects = [...(profile?.subjects || profile?.Subjects || [])].sort((a, b) =>
+    subjectLabel(a).localeCompare(subjectLabel(b), "he", { numeric: true, sensitivity: "base" })
+  );
   const subjectsFreeAllRaw = profile?.subjectsFreeAll || profile?.SubjectsFreeAll || [];
   const existingSubjectIds = subjects.map((s) => String(s.gn05_subject_id ?? "")).filter(Boolean);
   const subjectsFreeAll = subjectsFreeAllRaw.filter(

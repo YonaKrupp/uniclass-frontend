@@ -27,7 +27,7 @@ export default function EasyPayslipPanel() {
           איזי תלוש
         </button>
         <p className="text-xs font-body text-muted-foreground leading-relaxed">
-          הפקת תלוש שכר דיגיטלי. לוחצים על הכפתור, ממלאים את הפרטים בטופס שנפתח ושולחים.
+          הפקת תלוש שכר דיגיטלי. לוחצים על הכפתור, ממלאים את הפרטים בטופס שנפתח ושולחים. חשוב לבחור את uniclass
         </p>
       </div>
 

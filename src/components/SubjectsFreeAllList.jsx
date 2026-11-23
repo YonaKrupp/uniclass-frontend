@@ -3,7 +3,7 @@ import { Search, X, Plus, Loader2 } from "lucide-react";
 import SubjectCategoryTabs from "@/components/subjects/SubjectCategoryTabs";
 import { subjectCategory, institutionName } from "@/lib/subjectCategory";
 
-export default function SubjectsFreeAllList({ items, onSelect, saving, autoFocusSearch = false }) {
+export default function SubjectsFreeAllList({ items, onSelect, saving, autoFocusSearch = false, stackTabsOnMobile = false }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("school");
   const prevSaving = useRef(saving);
@@ -73,7 +73,12 @@ export default function SubjectsFreeAllList({ items, onSelect, saving, autoFocus
 
   return (
     <div className="space-y-3">
-      <SubjectCategoryTabs value={category} onChange={setCategory} counts={categorized.counts} />
+      <SubjectCategoryTabs
+        value={category}
+        onChange={setCategory}
+        counts={categorized.counts}
+        stackedOnMobile={stackTabsOnMobile}
+      />
       <div className="relative">
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <input

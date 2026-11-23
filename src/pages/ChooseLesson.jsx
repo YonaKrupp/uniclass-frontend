@@ -396,6 +396,7 @@ export default function ChooseLesson() {
           <SubjectCategoryTabs
             value={INSTITUTION_CATEGORY[universityMode]}
             onChange={(category) => setUniversityMode(CATEGORY_MODE[category])}
+            stackedOnMobile
           />
 
           {/* Dropdowns */}
@@ -544,6 +545,7 @@ export default function ChooseLesson() {
             value={categoryFilter}
             onChange={(value) => { setCategoryFilter(value); setShowSubjectList(true); }}
             counts={categoryCounts}
+            stackedOnMobile
           />
           <div ref={subjectListRef} className="space-y-2">
             <label className="w-full text-right text-sm font-heading font-semibold text-foreground">הקלידו שם מקצוע או רמה</label>

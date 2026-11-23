@@ -793,6 +793,7 @@ export default function TeacherProfile() {
                   onSelect={handleAddSubject}
                   saving={savingSubject}
                   autoFocusSearch={focusSubjectSearch}
+                  stackTabsOnMobile
                 />
               </div>
             )}

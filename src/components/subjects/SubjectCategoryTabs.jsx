@@ -7,9 +7,13 @@ const CATEGORIES = [
   { value: "openUniversity", label: "אוניברסיטה פתוחה", icon: BookOpen },
 ];
 
-export default function SubjectCategoryTabs({ value, onChange, counts }) {
+export default function SubjectCategoryTabs({ value, onChange, counts, stackedOnMobile = false }) {
   return (
-    <div role="tablist" aria-label="סוג המקצועות" className="grid grid-cols-3 gap-1 rounded-xl bg-muted p-1">
+    <div
+      role="tablist"
+      aria-label="סוג המקצועות"
+      className={`grid gap-1 rounded-xl bg-muted p-1 ${stackedOnMobile ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-3"}`}
+    >
       {CATEGORIES.map(({ value: categoryValue, label, icon: Icon }) => {
         const isActive = value === categoryValue;
         return (
@@ -26,7 +30,7 @@ export default function SubjectCategoryTabs({ value, onChange, counts }) {
             }`}
           >
             <Icon className="w-4 h-4 shrink-0" />
-            <span className="truncate">{label}</span>
+            <span className={stackedOnMobile ? "sm:truncate" : "truncate"}>{label}</span>
             {typeof counts?.[categoryValue] === "number" && (
               <span className="text-xs text-muted-foreground">({counts[categoryValue]})</span>
             )}

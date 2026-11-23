@@ -10,7 +10,7 @@ import {
   teacherHasProfile,
 } from "@/lib/teacherOnboarding";
 
-export default function TeacherOnboarding() {
+export default function TeacherOnboarding({ onActiveChange }) {
   const [record, setRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const recordRef = useRef(null);
@@ -50,6 +50,12 @@ export default function TeacherOnboarding() {
     window.addEventListener(ONBOARDING_RESTART_EVENT, onRestart);
     return () => window.removeEventListener(ONBOARDING_RESTART_EVENT, onRestart);
   }, []);
+
+  const isActive = !loading && !!record && !record.completed && !record.skipped;
+
+  useEffect(() => {
+    onActiveChange?.(isActive);
+  }, [isActive, onActiveChange]);
 
   const persist = async (patch) => {
     setRecord((prev) => (prev ? { ...prev, ...patch } : prev));

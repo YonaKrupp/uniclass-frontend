@@ -6,6 +6,7 @@ import { useSessionRenewal } from "@/lib/useSessionRenewal";
 import { clearFetchGuard } from "@/lib/fetchGuard";
 import AppBackground from "@/components/AppBackground";
 import TeacherOnboarding from "@/components/teacher/onboarding/TeacherOnboarding";
+import EasyPayslipNotice from "@/components/teacher/EasyPayslipNotice";
 import { ONBOARDING_TOUR_STEP_EVENT } from "@/lib/teacherOnboarding";
 import { base44 } from "@/api/base44Client";
 import ConsentGate from "@/components/teacher/ConsentGate";
@@ -41,6 +42,8 @@ export default function TeacherLayout() {
     }
   })();
   const [consentRequired, setConsentRequired] = useState(false);
+  // כדי שהודעת איזי תלוש לא תעלה יחד עם מדריך ההצטרפות
+  const [onboardingActive, setOnboardingActive] = useState(true);
 
   // מורה שאישר גרסת מסמכים ישנה נחסם עד לאישור מחדש.
   useEffect(() => {
@@ -229,7 +232,8 @@ export default function TeacherLayout() {
         <Outlet />
       </main>
 
-      <TeacherOnboarding />
+      <TeacherOnboarding onActiveChange={setOnboardingActive} />
+      <EasyPayslipNotice email={teacherEmail} enabled={!onboardingActive} />
     </div>
   );
 }

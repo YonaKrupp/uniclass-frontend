@@ -272,7 +272,7 @@ export default function RegisterTeacher() {
                 <span className="md:hidden">פתחו פרופיל מורה בחינם בדקה אחת</span>
               </>
             ) : (
-              `קוד אימות נשלח ל-${email}`
+              `קוד אימות נשלח ל-${phoneNumber}`
             )}
           </p>
           {step === "form" && (
@@ -510,7 +510,7 @@ export default function RegisterTeacher() {
             <form onSubmit={handleVerifyOtp} className="space-y-5">
               <div className="text-center space-y-1">
                 <p className="text-sm text-muted-foreground font-body">
-                  הזינו את קוד האימות בן 6 הספרות שנשלח לאימייל
+                  הזינו את קוד האימות בן 6 הספרות שנשלח לנייד
                 </p>
               </div>
 

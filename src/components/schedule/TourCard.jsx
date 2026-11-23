@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const CARD_WIDTH = 360;
@@ -35,7 +36,10 @@ export default function TourCard({ step, index, total, rect, onPrev, onNext, onS
 
   const primaryLabel = isLast ? "מתחילים" : "הבא";
 
-  return (
+  // Portal into <body>: the page's <main> has a CSS transform (fade-up animation),
+  // which would otherwise make these fixed layers position against <main> instead
+  // of the viewport and shift the spotlight off its target.
+  return createPortal(
     <>
       {rect ? (
         <>
@@ -155,6 +159,7 @@ export default function TourCard({ step, index, total, rect, onPrev, onNext, onS
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

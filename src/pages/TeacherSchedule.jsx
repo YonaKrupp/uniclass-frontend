@@ -347,9 +347,9 @@ export default function TeacherSchedule() {
           setFlashKey(cellKey);
           window.setTimeout(() => setFlashKey(null), 900);
         }
-        if (tourStep === 4) {
+        if (tourStep === 5) {
           toast.success("מעולה! כך פותחים שעה.");
-          setTourStep(5);
+          setTourStep(6);
         } else {
           toast.success(opening ? slotsOpenedMessage(1) : "הזמינות בוטלה");
         }
@@ -907,6 +907,7 @@ export default function TeacherSchedule() {
         <button
           type="button"
           onClick={startTour}
+          data-tour="tour-help"
           title="מדריך שימוש"
           aria-label="מדריך שימוש בלוח השיעורים"
           className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card text-primary hover:bg-primary/5 hover:border-primary/40 transition-colors"
@@ -979,7 +980,7 @@ export default function TeacherSchedule() {
                     endTime={`${String(endHour).padStart(2, "0")}:${String(endMinutes).padStart(2, "0")}`}
                     tooltip={tooltipFor(cell, DAY_NAMES[day])}
                     flash={flashKey === cell.key}
-                    highlight={tourStep === 4 && tourTargetKey === cell.key}
+                    highlight={tourStep === 5 && tourTargetKey === cell.key}
                     selected={selection.includes(cell.key)}
                     onClick={() => handleSlotTap(date, hour)}
                     onPointerDown={selectable ? () => beginDrag(cell.key) : undefined}

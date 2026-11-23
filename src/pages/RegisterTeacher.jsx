@@ -16,6 +16,15 @@ import { passwordError } from "@/lib/passwordPolicy";
 
 const API_BASE = FUNCTIONS_BASE;
 
+// השרת מבטל קוד אימות 10 דקות מרגע שליחתו.
+const OTP_VALID_SECONDS = 10 * 60;
+
+function formatCountdown(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
 export default function RegisterTeacher() {
   const [dark, setDark] = useDarkMode();
   const [step, setStep] = useState("form");
@@ -31,7 +40,8 @@ export default function RegisterTeacher() {
   const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const [otpSecondsLeft, setOtpSecondsLeft] = useState(0);
+  const [notice, setNotice] = useState("");
   const [consents, setConsents] = useState({ terms: false, adult: false });
   const [consentError, setConsentError] = useState("");
   const [showConsentErrors, setShowConsentErrors] = useState(false);
@@ -82,15 +92,25 @@ export default function RegisterTeacher() {
     }
   }, []);
 
+  // ספירת תוקף הקוד בזמן שהמורה נמצא בשלב האימות
   useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const timer = setInterval(() => setResendCooldown((c) => c - 1), 1000);
+    if (step !== "otp" || otpSecondsLeft === 0) return;
+    const timer = setInterval(() => setOtpSecondsLeft((s) => s - 1), 1000);
     return () => clearInterval(timer);
-  }, [resendCooldown]);
+  }, [step, otpSecondsLeft]);
+
+  // הקוד פג: חזרה לטופס עם כל הפרטים שהוזנו, כדי לבקש קוד חדש משם
+  useEffect(() => {
+    if (step !== "otp" || otpSecondsLeft > 0) return;
+    setStep("form");
+    setOtpCode("");
+    setNotice("פג תוקף קוד האימות. הפרטים שהזנתם נשמרו — לחצו שוב על ״שלח קוד אימות״ לקבלת קוד חדש לנייד.");
+  }, [step, otpSecondsLeft]);
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setError("");
+    setNotice("");
 
     if (password !== confirmPassword) {
       setError("הסיסמאות אינן תואמות");
@@ -131,7 +151,7 @@ export default function RegisterTeacher() {
 
       setSessionId(data.sessionId);
       setStep("otp");
-      setResendCooldown(60);
+      setOtpSecondsLeft(OTP_VALID_SECONDS);
       setOtpCode("");
     } catch (err) {
       setError("שגיאה: " + (err.message || "בדקו את החיבור לאינטרנט ונסו שוב."));
@@ -187,32 +207,6 @@ export default function RegisterTeacher() {
       navigate("/teacher-profile");
     } catch (err) {
       setError("שגיאה: " + (err.message || "בדקו את החיבור לאינטרנט ונסו שוב."));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    if (resendCooldown > 0 || loading) return;
-    setError("");
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE}/teacherRegisterProxy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "resendOtp", sessionId }),
-      });
-      const data = await response.json();
-
-      if (data.error || data.success === false) {
-        setError(data.message || "שליחת קוד חדש נכשל");
-        return;
-      }
-
-      setResendCooldown(60);
-      setOtpCode("");
-    } catch (err) {
-      setError("שגיאה: " + (err.message || "נסו שוב."));
     } finally {
       setLoading(false);
     }
@@ -294,6 +288,12 @@ export default function RegisterTeacher() {
               }`}
             >
               {error}
+            </div>
+          )}
+
+          {notice && (
+            <div className="bg-primary/10 text-primary text-sm rounded-xl p-3 text-center font-body">
+              {notice}
             </div>
           )}
 
@@ -512,6 +512,9 @@ export default function RegisterTeacher() {
                 <p className="text-sm text-muted-foreground font-body">
                   הזינו את קוד האימות בן 6 הספרות שנשלח לנייד
                 </p>
+                <p className="text-xs text-muted-foreground font-body">
+                  תוקף הקוד: {formatCountdown(otpSecondsLeft)}
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -554,21 +557,13 @@ export default function RegisterTeacher() {
                 )}
               </button>
 
-              <div className="flex items-center justify-between text-sm font-body">
+              <div className="text-center text-sm font-body">
                 <button
                   type="button"
                   onClick={() => { setStep("form"); setError(""); setOtpCode(""); }}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   ← חזרה לפרטים
-                </button>
-                <button
-                  type="button"
-                  onClick={handleResendOtp}
-                  disabled={resendCooldown > 0 || loading}
-                  className="text-primary hover:underline disabled:text-muted-foreground disabled:no-underline transition-colors"
-                >
-                  {resendCooldown > 0 ? `שלח שוב (${resendCooldown}s)` : "שלח קוד מחדש"}
                 </button>
               </div>
             </form>

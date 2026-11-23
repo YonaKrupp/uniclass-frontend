@@ -7,7 +7,6 @@ import TeacherBenefits from "@/components/register-teacher/TeacherBenefits";
 import TeacherHowItWorks from "@/components/register-teacher/TeacherHowItWorks";
 import TeacherFaq from "@/components/register-teacher/TeacherFaq";
 import TeacherStickyCta from "@/components/register-teacher/TeacherStickyCta";
-import TeacherThanks from "@/components/register-teacher/TeacherThanks";
 import ConsentCheckboxes, { CONSENT_ERROR } from "@/components/legal/ConsentCheckboxes";
 import { DOCUMENT_SET_VERSION } from "@/content/legalDocs";
 
@@ -185,11 +184,7 @@ export default function RegisterTeacher() {
 
       trackGaEvent("sign_up", { method: "email", user_type: "teacher" });
 
-      if (window.matchMedia("(max-width: 767.98px)").matches) {
-        setStep("thanks");
-      } else {
-        navigate("/teacher-profile");
-      }
+      navigate("/teacher-profile");
     } catch (err) {
       setError("שגיאה: " + (err.message || "בדקו את החיבור לאינטרנט ונסו שוב."));
     } finally {
@@ -234,10 +229,6 @@ export default function RegisterTeacher() {
     : error.includes("טלפון")
     ? "phone"
     : "top";
-
-  if (step === "thanks") {
-    return <TeacherThanks onContinue={() => navigate("/teacher-profile")} />;
-  }
 
   return (
     <div dir="rtl" className="min-h-screen bg-background flex flex-col items-center justify-center px-4 pb-24 md:pb-0 overflow-x-hidden">

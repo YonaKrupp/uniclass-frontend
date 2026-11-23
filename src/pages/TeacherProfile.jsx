@@ -623,7 +623,7 @@ export default function TeacherProfile() {
                         />
                       </div>
                       <p className="text-[11px] font-body text-muted-foreground leading-relaxed">
-                        המחיר לתלמיד כולל מע"מ (18%). הפער בין הסכום שתקבלו למחיר שיוצג לתלמיד נובע מהמע"מ.
+                        המחיר לתלמיד יכלול תוספת של מע"מ (18%) והוצאות האתר. הפער בין הסכום שתקבלו למחיר שיוצג לתלמיד נובע מתוספת מע"מ ועמלת האתר.
                       </p>
                       <div className="flex gap-2">
                         <button

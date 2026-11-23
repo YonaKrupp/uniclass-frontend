@@ -34,7 +34,7 @@ export default function TourCard({ step, index, total, rect, onPrev, onNext, onS
     arrow = { left: Math.max(20, Math.min(cx - left - 8, width - 28)), below };
   }
 
-  const primaryLabel = isLast ? "מתחילים" : "הבא";
+  const primaryLabel = step.primaryLabel || (isLast ? "מתחילים" : "הבא");
 
   // Portal into <body>: the page's <main> has a CSS transform (fade-up animation),
   // which would otherwise make these fixed layers position against <main> instead

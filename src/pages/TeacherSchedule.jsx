@@ -850,6 +850,19 @@ export default function TeacherSchedule() {
     }
   };
 
+  // המשך הסיור שהתחיל בדף הבית: /teacher-schedule?tour=1 פותח את הסיור מיד
+  // לאחר שהלוח נטען, ואז מנקה את הפרמטר מהכתובת.
+  useEffect(() => {
+    if (!initialLoaded) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("tour") !== "1") return;
+    params.delete("tour");
+    const qs = params.toString();
+    window.history.replaceState({}, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    startTour();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLoaded]);
+
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 5);
   const weekRange = formatHebrewWeekRange(weekStart, weekEnd);

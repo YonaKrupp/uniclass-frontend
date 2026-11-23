@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, HelpCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import TeacherBanner from "@/components/teacher/TeacherBanner";
 import TeacherStats from "@/components/teacher/TeacherStats";
 import TeacherActivityChart from "@/components/teacher/TeacherActivityChart";
 import TeacherLessonsBoard from "@/components/teacher/TeacherLessonsBoard";
 import HomeSubjectsBanner from "@/components/teacher/HomeSubjectsBanner";
+import TeacherHomeTour from "@/components/teacher/TeacherHomeTour";
 
 // Module-level in-flight promise store — prevents duplicate concurrent fetches
 // for the same email when TeacherHome mounts multiple times in quick succession
@@ -29,6 +30,8 @@ export default function TeacherHome() {
   const [pictureUrl, setPictureUrl] = useState(null);
   // null = עוד לא ידוע, false = אין מקצועות (יציג את באנר בחירת המקצועות), true = יש מקצועות
   const [hasSubjects, setHasSubjects] = useState(null);
+  // null = הסיור סגור, אחרת מספר השלב המוצג
+  const [tourStep, setTourStep] = useState(null);
 
   // תמונת הפרופיל של המורה (זהה לזו שמוצגת בעמוד "תמונת פרופיל")
   useEffect(() => {
@@ -172,19 +175,53 @@ export default function TeacherHome() {
         className="absolute -top-24 left-1/2 -translate-x-1/2 w-[80%] h-64 rounded-full blur-[130px] opacity-[0.05] pointer-events-none"
         style={{ background: "radial-gradient(circle, hsl(243 75% 59%), transparent 70%)" }}
       />
+      {/* כפתור עזרה — פותח את הסיור המודרך בדף הבית */}
+      <button
+        type="button"
+        onClick={() => setTourStep(0)}
+        data-tour="home-tour-help"
+        title="מדריך שימוש"
+        aria-label="מדריך שימוש בדף הבית"
+        className="absolute top-3 left-3 z-30 inline-flex items-center justify-center w-11 h-11 rounded-full border border-border bg-card/90 backdrop-blur text-primary hover:bg-primary/5 hover:border-primary/40 transition-colors"
+      >
+        <HelpCircle className="w-5 h-5" aria-hidden="true" />
+      </button>
+
       <div className="relative z-10 space-y-6">
-        <TeacherBanner name={name} pictureUrl={pictureUrl} />
+        <div data-tour="home-banner">
+          <TeacherBanner name={name} pictureUrl={pictureUrl} />
+        </div>
         {hasSubjects === false && <HomeSubjectsBanner />}
-        <TeacherStats
-          loading={loading}
-          todayLessons={todayLessons}
-          students={students}
-          scheduledLessons={scheduledLessons}
-          ratingLabel={ratingLabel}
-        />
-        <TeacherActivityChart lessons={lessonsList} />
-        <TeacherLessonsBoard loading={loading} lessons={lessonsList} todayDate={todayDate} />
+        <div data-tour="home-stats">
+          <TeacherStats
+            loading={loading}
+            todayLessons={todayLessons}
+            students={students}
+            scheduledLessons={scheduledLessons}
+            ratingLabel={ratingLabel}
+          />
+        </div>
+        <div data-tour="home-activity">
+          <TeacherActivityChart lessons={lessonsList} />
+        </div>
+        <div data-tour="home-lessons">
+          <TeacherLessonsBoard loading={loading} lessons={lessonsList} todayDate={todayDate} />
+        </div>
       </div>
+
+      {tourStep !== null && (
+        <TeacherHomeTour
+          step={tourStep}
+          onNext={() => setTourStep((s) => Math.min(s + 1, 5))}
+          onPrev={() => setTourStep((s) => Math.max(s - 1, 0))}
+          onSkip={() => setTourStep(null)}
+          onFinish={() => {
+            setTourStep(null);
+            // המשך הסיור: עבודה לדף ניהול השיעורים ופתיחת הסיור שם
+            navigate("/teacher-schedule?tour=1");
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -5,12 +5,14 @@ import SkipConfirmDialog from "./SkipConfirmDialog";
 import AboutStep from "./wizard/AboutStep";
 import PriceStep from "./wizard/PriceStep";
 import PictureStep from "./wizard/PictureStep";
+import SubjectsStep from "./wizard/SubjectsStep";
 import { todayDateString } from "@/lib/teacherOnboarding";
 
 const STEPS = [
   { key: "about", title: "אודות", hint: "משפט או שניים עליך — זה מה שהתלמידים קוראים קודם." },
   { key: "price", title: "מחיר לשיעור", hint: "בחרו כמה תקבלו על כל שיעור." },
   { key: "picture", title: "תמונת פרופיל", hint: "תמונה ברורה מעלה את הסיכוי לפנייה." },
+  { key: "subjects", title: "רשימת מקצועות", hint: "בלי מקצועות תלמידים לא ימצאו אתכם — הוסיפו לפחות מקצוע אחד." },
 ];
 
 const failIfError = (response) => {
@@ -26,6 +28,10 @@ export default function ProfileWizard({ email, token, record, onStepChange, onDo
   const [price, setPrice] = useState(100);
   const [picturePreview, setPicturePreview] = useState("");
   const [pictureBase64, setPictureBase64] = useState("");
+  const [mySubjects, setMySubjects] = useState([]);
+  const [freeSubjects, setFreeSubjects] = useState([]);
+  const [savingSubject, setSavingSubject] = useState(false);
+  const [subjectError, setSubjectError] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [askSkip, setAskSkip] = useState(false);
@@ -49,6 +55,14 @@ export default function ProfileWizard({ email, token, record, onStepChange, onDo
         }
         const picture = data.profilePicture || data.ProfilePicture || details.profilePicture || "";
         if (picture) setPicturePreview(picture.startsWith("data:") ? picture : `data:image/jpeg;base64,${picture}`);
+        const ownSubjects = data.subjects || data.Subjects || [];
+        setMySubjects(ownSubjects);
+        const ownSubjectIds = ownSubjects.map((item) => String(item?.gn05_subject_id ?? "")).filter(Boolean);
+        setFreeSubjects(
+          (data.subjectsFreeAll || data.SubjectsFreeAll || []).filter(
+            (item) => !ownSubjectIds.includes(String(item?.gn03_id ?? ""))
+          )
+        );
       } catch {
         // Profile prefill is best-effort — the wizard stays usable and saves surface their own errors.
       } finally {
@@ -130,6 +144,29 @@ export default function ProfileWizard({ email, token, record, onStepChange, onDo
     onStepChange(index - 1);
   };
 
+  const handleAddSubject = async (subject) => {
+    if (!subject || savingSubject) return;
+    setSubjectError("");
+    setSavingSubject(true);
+    try {
+      const res = await base44.functions.invoke("teacherProfileProxy", {
+        action: "insertNewTeacherSubject",
+        teacherEmail: email,
+        subject: subject.gn03_id,
+        token,
+      });
+      failIfError(res);
+      setMySubjects((prev) => [...prev, subject]);
+      setFreeSubjects((prev) => prev.filter((item) => String(item?.gn03_id) !== String(subject.gn03_id)));
+      // מאפס את בדיקת המקצועות של דף הבית כדי שהבאנר ייעלם מיד
+      try { localStorage.removeItem(`_teacherSubjects_${email}`); } catch { /* ignore */ }
+    } catch (err) {
+      setSubjectError(err.message || "הוספת המקצוע נכשלה. נסו שוב.");
+    } finally {
+      setSavingSubject(false);
+    }
+  };
+
   const stepContent = {
     about: <AboutStep value={about} onChange={setAbout} />,
     price: <PriceStep value={price} onChange={setPrice} />,
@@ -142,6 +179,15 @@ export default function ProfileWizard({ email, token, record, onStepChange, onDo
         }}
       />
     ),
+    subjects: (
+      <SubjectsStep
+        subjects={mySubjects}
+        freeSubjects={freeSubjects}
+        onAdd={handleAddSubject}
+        saving={savingSubject}
+        error={subjectError}
+      />
+    ),
   }[step.key];
 
   return (
@@ -152,7 +198,7 @@ export default function ProfileWizard({ email, token, record, onStepChange, onDo
       aria-labelledby="onboarding-wizard-title"
       className="fixed inset-0 z-[95] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
     >
-      <div className="w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-card border border-border rounded-t-3xl sm:rounded-2xl shadow-2xl app-fade-up">
+      <div className="w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto bg-card border border-border rounded-t-3xl sm:rounded-2xl shadow-2xl app-fade-up">
         <div className="sticky top-0 z-10 bg-card/95 backdrop-blur px-5 pt-4 pb-3 border-b border-border space-y-2">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-0.5">

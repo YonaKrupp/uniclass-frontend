@@ -543,7 +543,7 @@ export default function ChooseLesson() {
           <h2 className="w-full text-right text-base font-heading font-semibold text-foreground">חיפוש מקצוע</h2>
           <SubjectCategoryTabs
             value={categoryFilter}
-            onChange={(value) => { setCategoryFilter(value); setShowSubjectList(true); }}
+            onChange={(value) => { setCategoryFilter(value); setTypedQuery(""); setShowSubjectList(true); }}
             counts={categoryCounts}
             stackedOnMobile
           />

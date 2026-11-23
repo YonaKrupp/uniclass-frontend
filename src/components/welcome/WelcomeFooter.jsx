@@ -22,7 +22,6 @@ const LEGAL = [
   { label: "תנאי שימוש", to: "/terms" },
   { label: "קוד התנהגות", to: "/conduct" },
   { label: "הצהרת נגישות", to: "/accessibility" },
-  { label: "הסרה מרשימת תפוצה", to: "/unsubscribe" },
 ];
 
 /** /welcome footer — only routes that already exist in the app. */

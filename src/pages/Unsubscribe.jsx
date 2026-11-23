@@ -7,8 +7,20 @@ const LOGO = "https://media.base44.com/images/public/6a37f1517bf59551c5f4b6f9/c4
 
 const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+// המייל של התלמיד/מורה המחובר — כשקיים, השדה מלא ואינו ניתן לעריכה
+const getLoggedInEmail = () => {
+  try {
+    const raw = localStorage.getItem("userData") || sessionStorage.getItem("userData") || "{}";
+    const parsed = JSON.parse(raw);
+    return parsed.studentEmail || parsed.teacherEmail || parsed.email || "";
+  } catch {
+    return "";
+  }
+};
+
 export default function Unsubscribe() {
-  const [email, setEmail] = useState("");
+  const lockedEmail = getLoggedInEmail();
+  const [email, setEmail] = useState(lockedEmail);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -67,7 +79,9 @@ export default function Unsubscribe() {
           ) : (
             <>
               <p className="text-sm text-muted-foreground font-body text-center leading-relaxed">
-                הזינו את כתובת האימייל שברצונכם להסיר מרשימת התפוצה.
+                {lockedEmail
+                  ? "החשבון שאיתו התחברתם יוסר מרשימת התפוצה."
+                  : "הזינו את כתובת האימייל שברצונכם להסיר מרשימת התפוצה."}
               </p>
               <form onSubmit={handleSubmit} className="mt-5 space-y-3" noValidate>
                 <div className="space-y-1">
@@ -81,11 +95,16 @@ export default function Unsubscribe() {
                       autoComplete="email"
                       dir="ltr"
                       value={email}
+                      readOnly={!!lockedEmail}
                       onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }}
                       placeholder="you@example.com"
                       aria-invalid={!!error}
                       aria-describedby={error ? "unsubscribe-error" : undefined}
-                      className="w-full rounded-lg border border-border bg-muted/30 py-2.5 pr-9 pl-3 text-sm text-left shadow-sm outline-none focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all min-h-[48px]"
+                      className={`w-full rounded-lg border border-border py-2.5 pr-9 pl-3 text-sm text-left shadow-sm outline-none transition-all min-h-[48px] ${
+                        lockedEmail
+                          ? "bg-muted/60 text-muted-foreground cursor-not-allowed"
+                          : "bg-muted/30 focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/30"
+                      }`}
                     />
                   </div>
                   {error && <p id="unsubscribe-error" role="alert" className="text-xs text-destructive font-body">{error}</p>}

@@ -32,6 +32,10 @@ export default function TeacherProfile() {
   const [showSubjectsFreeAll, setShowSubjectsFreeAll] = useState(
     () => new URLSearchParams(window.location.search).get("subjects") === "1"
   );
+  // פתיחת רשימת המקצועות (כפתור או הגעה מהבאנר בדף הבית) — מעבירה פוקוס לשדה החיפוש
+  const [focusSubjectSearch, setFocusSubjectSearch] = useState(
+    () => new URLSearchParams(window.location.search).get("subjects") === "1"
+  );
   const [savingSubject, setSavingSubject] = useState(false);
   const [removingSubjectId, setRemovingSubjectId] = useState("");
   const [scanningSubjectId, setScanningSubjectId] = useState("");
@@ -694,7 +698,11 @@ export default function TeacherProfile() {
               </h2>
               <button
                 type="button"
-                onClick={() => setShowSubjectsFreeAll(!showSubjectsFreeAll)}
+                onClick={() => {
+                  const next = !showSubjectsFreeAll;
+                  setShowSubjectsFreeAll(next);
+                  setFocusSubjectSearch(next);
+                }}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-heading font-medium transition-colors min-h-[44px] cursor-pointer ${
                   subjects.length === 0 && !showSubjectsFreeAll
                     ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 ring-2 ring-primary/40 ring-offset-2 ring-offset-card hover:bg-primary/90"
@@ -711,7 +719,10 @@ export default function TeacherProfile() {
             {subjects.length === 0 && (
               <SubjectsRequiredGuide
                 open={showSubjectsFreeAll}
-                onShow={() => setShowSubjectsFreeAll(true)}
+                onShow={() => {
+                  setShowSubjectsFreeAll(true);
+                  setFocusSubjectSearch(true);
+                }}
               />
             )}
             {subjects.length > 0 && (
@@ -777,7 +788,12 @@ export default function TeacherProfile() {
             {showSubjectsFreeAll && (
               <div className="pt-2 border-t border-border">
                 <p className="text-xs font-heading font-semibold text-muted-foreground mb-3">כל המקצועות הזמינים</p>
-                <SubjectsFreeAllList items={subjectsFreeAll} onSelect={handleAddSubject} saving={savingSubject} />
+                <SubjectsFreeAllList
+                  items={subjectsFreeAll}
+                  onSelect={handleAddSubject}
+                  saving={savingSubject}
+                  autoFocusSearch={focusSubjectSearch}
+                />
               </div>
             )}
           </div>

@@ -3,10 +3,16 @@ import { Search, X, Plus, Loader2 } from "lucide-react";
 import SubjectCategoryTabs from "@/components/subjects/SubjectCategoryTabs";
 import { subjectCategory, institutionName } from "@/lib/subjectCategory";
 
-export default function SubjectsFreeAllList({ items, onSelect, saving }) {
+export default function SubjectsFreeAllList({ items, onSelect, saving, autoFocusSearch = false }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("school");
   const prevSaving = useRef(saving);
+  const searchRef = useRef(null);
+
+  // פתיחת הרשימה מכפתור — הפוקוס עובר לשדה החיפוש
+  useEffect(() => {
+    if (autoFocusSearch) searchRef.current?.focus();
+  }, [autoFocusSearch]);
 
   // Clear search after saving completes (not synchronously, to avoid iOS click cancellation)
   useEffect(() => {
@@ -71,6 +77,7 @@ export default function SubjectsFreeAllList({ items, onSelect, saving }) {
       <div className="relative">
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <input
+          ref={searchRef}
           type="text"
           dir="rtl"
           value={query}

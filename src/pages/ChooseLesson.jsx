@@ -334,6 +334,22 @@ export default function ChooseLesson() {
 
   const displayedSubjects = useMemo(() => filteredSubjects.slice(0, 50), [filteredSubjects]);
 
+  // רמז גלילה ברשימת המקצועות — מוצג כשיש עוד מקצועות מתחת לגלוי
+  const subjectListBoxRef = useRef(null);
+  const [listHasMore, setListHasMore] = useState(false);
+
+  const updateListHasMore = () => {
+    const el = subjectListBoxRef.current;
+    if (!el) { setListHasMore(false); return; }
+    setListHasMore(el.scrollHeight - el.scrollTop - el.clientHeight > 8);
+  };
+
+  useEffect(() => {
+    if (!showSubjectList) { setListHasMore(false); return undefined; }
+    const frame = requestAnimationFrame(updateListHasMore);
+    return () => cancelAnimationFrame(frame);
+  }, [showSubjectList, filteredSubjects, displayedSubjects]);
+
   return (
     <div dir="rtl" className="space-y-6">
       {/* Header */}
@@ -611,7 +627,11 @@ export default function ChooseLesson() {
 
             {/* Dropdown list */}
             {showSubjectList && (
-              <div className="max-h-60 overflow-y-auto rounded-md border border-border bg-popover shadow-md divide-y divide-border">
+              <div
+                ref={subjectListBoxRef}
+                onScroll={updateListHasMore}
+                className="subject-scroll max-h-60 overflow-y-auto rounded-md border border-border bg-popover shadow-md divide-y divide-border"
+              >
                 {filteredSubjects.length === 0 ? (
                   <div className="px-3 py-4 text-center text-sm text-muted-foreground font-body">לא נמצאו תוצאות</div>
                 ) : (
@@ -637,6 +657,11 @@ export default function ChooseLesson() {
                     {filteredSubjects.length > 50 && (
                       <div className="px-3 py-2 text-center text-xs text-muted-foreground font-body">
                         מציג 50 מתוך {filteredSubjects.length} — המשיכו להקליד לסינון
+                      </div>
+                    )}
+                    {listHasMore && (
+                      <div className="sticky bottom-0 pointer-events-none bg-gradient-to-t from-popover via-popover/95 to-transparent pt-6 pb-1.5 text-center text-xs font-body text-muted-foreground">
+                        גללו לראות עוד מקצועות ↓
                       </div>
                     )}
                   </>

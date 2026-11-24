@@ -44,7 +44,7 @@ export const STUDENT_TUTORIAL_STEPS = [
     route: "/student-home",
     selector: '[data-tour="upcoming-lessons"]',
     title: "השיעורים הבאים",
-    body: "כל השיעורים הקרובים שלכם: יום, תאריך, שעה, מקצוע ושם המורה. מכאן גם נכנסים לשיעור.",
+    body: "כל השיעורים הקרובים שלכם: יום, תאריך, שעה, מקצוע ושם המורה.",
   },
   {
     key: "show-cancel",
@@ -67,7 +67,7 @@ export const STUDENT_TUTORIAL_STEPS = [
     nav: true,
     selector: '[data-tour="nav-teachers"]',
     title: "רשימת מורים",
-    body: "כל המורים באתר, עם פרופילים ודירוגים, אם אתם רוצים לעיין לפני שבוחרים.",
+    body: "כל המורים שכבר למדתם איתם באתר, עם פרופילים ודירוגים, אם אתם רוצים לעיין לפני שבוחרים.",
   },
   {
     key: "nav-classroom",

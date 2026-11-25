@@ -15,6 +15,7 @@ import Welcome from './pages/Welcome';
 import TeacherLogin from './pages/TeacherLogin';
 import StudentLogin from './pages/StudentLogin';
 import RegisterStudent from './pages/RegisterStudent';
+import StudentWelcome from './pages/StudentWelcome';
 import RegisterTeacher from './pages/RegisterTeacher';
 import TeacherHome from './pages/TeacherHome';
 import TeacherSchedule from './pages/TeacherSchedule';
@@ -69,6 +70,7 @@ function App() {
             <Route path="/teacher-login" element={<TeacherLogin />} />
             <Route path="/student-login" element={<StudentLogin />} />
             <Route path="/register-student" element={<RegisterStudent />} />
+            <Route path="/student-welcome" element={<StudentWelcome />} />
             <Route path="/register-teacher" element={<RegisterTeacher />} />
             <Route element={<TeacherLayout />}>
               <Route path="/teacher-home" element={<RoleGuard role="teacher"><TeacherHome /></RoleGuard>} />

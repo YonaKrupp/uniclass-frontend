@@ -239,7 +239,7 @@ export default function RegisterStudent() {
       localStorage.setItem("userData", JSON.stringify(loginData));
       sessionStorage.setItem("authToken", token);
       sessionStorage.setItem("userData", JSON.stringify(loginData));
-      navigate("/student-home");
+      navigate("/student-welcome");
     } catch (err) {
       setError("שגיאה: " + (err.message || "בדקו את החיבור לאינטרנט ונסו שוב."));
     } finally {

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { GraduationCap, Mail, Lock, Eye, EyeOff, Loader2, Sun, Moon, User, Phone, Calendar, ArrowRight, ShieldCheck, KeyRound } from "lucide-react";
 import { useDarkMode } from "@/lib/useDarkMode";
 import StudentConsentCheckbox from "@/components/legal/StudentConsentCheckbox";
-import { trackGaEvent } from "@/lib/gtagEvents";
+import { trackGaEvent, trackStudentSignupConversion } from "@/lib/gtagEvents";
 import { passwordError } from "@/lib/passwordPolicy";
 
 import { FUNCTIONS_BASE } from "@/lib/functionsBase";
@@ -214,6 +214,8 @@ export default function RegisterStudent() {
       }
 
       trackGaEvent("sign_up", { method: "email", user_type: "student" });
+      // המרת Google Ads — נשלחת פעם אחת, רק אחרי שהמשתמש נוצר בפועל בשרת.
+      trackStudentSignupConversion();
 
       // התחברות אוטומטית אחרי האימות, כדי לפתוח ישר את עמוד הבית של התלמיד.
       let loginData = {};

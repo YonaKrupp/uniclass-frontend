@@ -106,6 +106,11 @@ export default function WelcomeFooter() {
                   בלוג
                 </Link>
               </li>
+              <li>
+                <Link to="/private-tutor-math" className="text-sm font-body text-muted-foreground transition-colors hover:text-primary">
+                  מורה פרטי למתמטיקה
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -10,6 +10,7 @@ export const LAST_REVIEWED = "2026-11-26";
 export const STATIC_PAGES = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/blog", changefreq: "weekly", priority: "0.8" },
+  { path: "/private-tutor-math", changefreq: "monthly", priority: "0.8" },
   { path: "/privacy-policy", changefreq: "monthly", priority: "0.5" },
   { path: "/terms", changefreq: "monthly", priority: "0.5" },
   { path: "/privacy", changefreq: "monthly", priority: "0.5" },

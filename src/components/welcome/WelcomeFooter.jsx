@@ -111,6 +111,11 @@ export default function WelcomeFooter() {
                   מורה פרטי למתמטיקה
                 </Link>
               </li>
+              <li>
+                <Link to="/private-tutor-english" className="text-sm font-body text-muted-foreground transition-colors hover:text-primary">
+                  מורה פרטי לאנגלית
+                </Link>
+              </li>
             </ul>
           </div>
 

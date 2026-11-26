@@ -54,6 +54,7 @@ import AccessibilityToolbar from './components/landing/AccessibilityToolbar';
 import AdminInterface from './pages/AdminInterface';
 import Blog from './pages/Blog';
 import PrivateTutorMath from './pages/PrivateTutorMath';
+import PrivateTutorEnglish from './pages/PrivateTutorEnglish';
 import BlogPost from './pages/BlogPost';
 import AdminBlog from './pages/AdminBlog';
 
@@ -119,6 +120,7 @@ function App() {
             <Route path="/admin/legal" element={<AdminLegalDocs />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/private-tutor-math" element={<PrivateTutorMath />} />
+            <Route path="/private-tutor-english" element={<PrivateTutorEnglish />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/admin/blog" element={<AdminBlog />} />
             <Route path="*" element={<PageNotFound />} />

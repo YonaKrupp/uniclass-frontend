@@ -35,6 +35,12 @@ export default function MathFinalCta() {
                 >
                   כבר רשום? התחברות
                 </Link>
+                <Link
+                  to="/private-tutor-english"
+                  className="text-xs font-body text-white/80 underline underline-offset-4 transition-colors hover:text-white md:text-sm"
+                >
+                  מחפשים דווקא שיעורים פרטיים באנגלית?
+                </Link>
               </div>
             </div>
           </div>

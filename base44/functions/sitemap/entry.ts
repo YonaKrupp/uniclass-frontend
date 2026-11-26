@@ -1,14 +1,19 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
-
-const SITE_URL = "https://uniclass.co.il";
+import { SITE_URL, LAST_REVIEWED, STATIC_PAGES } from '../../shared/sitemapPages.js';
 
 // A future publish date keeps an article out of the sitemap until that day.
-function todayIso(): string {
+function todayIso() {
   const now = new Date();
   return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
 
-function escapeXml(value: string): string {
+function toDate(value) {
+  if (!value) return null;
+  const iso = String(value).slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso : null;
+}
+
+function escapeXml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -17,32 +22,69 @@ function escapeXml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
-export default async function (req: Request): Promise<Response> {
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Published articles whose publish date has arrived — drafts and future dates are never exposed.
-    const { items } = await base44.asServiceRole.entities.Article.filter(
-      { status: "published", published_at: { $lte: todayIso() } },
-      { sort: "-published_at", limit: 1000, fields: ["slug", "published_at"] }
-    );
+    // דפים דינמיים מהמסד: מאמרי בלוג מפורסמים + מסמכים משפטיים מפורסמים.
+    const [articlesRes, docsRes] = await Promise.allSettled([
+      base44.asServiceRole.entities.Article.filter(
+        { status: "published", published_at: { $lte: todayIso() } },
+        { sort: "-published_at", limit: 1000, fields: ["slug", "published_at"] }
+      ),
+      base44.asServiceRole.entities.LegalDocument.filter(
+        { is_published: true },
+        { limit: 200, fields: ["slug", "effective_date"] }
+      ),
+    ]);
 
-    const entries = [
-      { loc: `${SITE_URL}/`, changefreq: "weekly", priority: "1.0", lastmod: null },
-      { loc: `${SITE_URL}/blog`, changefreq: "weekly", priority: "0.8", lastmod: null },
-      ...(items || []).map((article) => ({
+    const articles = articlesRes.status === "fulfilled" ? articlesRes.value?.items || [] : [];
+    const docs = docsRes.status === "fulfilled" ? docsRes.value?.items || [] : [];
+
+    // תאריך העדכון של כל מסמך משפטי, לפי ה-slug שלו.
+    const docLastmod = {};
+    docs.forEach((doc) => {
+      if (doc?.slug) docLastmod[String(doc.slug)] = toDate(doc.effective_date);
+    });
+
+    const entries = STATIC_PAGES.map((page) => ({
+      loc: `${SITE_URL}${page.path}`,
+      changefreq: page.changefreq,
+      priority: page.priority,
+      lastmod: docLastmod[page.path.replace(/^\/+/, "")] || LAST_REVIEWED,
+    }));
+
+    const knownPaths = new Set(STATIC_PAGES.map((page) => page.path));
+
+    (articles || []).forEach((article) => {
+      if (!article?.slug) return;
+      entries.push({
         loc: `${SITE_URL}/blog/${article.slug}`,
         changefreq: "monthly",
         priority: "0.7",
-        lastmod: article.published_at ? String(article.published_at).slice(0, 10) : null,
-      })),
-    ];
+        lastmod: toDate(article.published_at) || LAST_REVIEWED,
+      });
+    });
+
+    // מסמכים משפטיים מפורסמים במסד שאין להם עדיין עמוד סטטי — נוספים אוטומטית.
+    docs.forEach((doc) => {
+      const path = `/${String(doc?.slug || "").replace(/^\/+/, "")}`;
+      if (!doc?.slug || knownPaths.has(path)) return;
+      entries.push({
+        loc: `${SITE_URL}${path}`,
+        changefreq: "monthly",
+        priority: "0.5",
+        lastmod: toDate(doc.effective_date) || LAST_REVIEWED,
+      });
+      knownPaths.add(path);
+    });
 
     const body = entries
       .map(
         (entry) => `  <url>
     <loc>${escapeXml(entry.loc)}</loc>
-${entry.lastmod ? `    <lastmod>${entry.lastmod}</lastmod>\n` : ""}    <changefreq>${entry.changefreq}</changefreq>
+    <lastmod>${entry.lastmod}</lastmod>
+    <changefreq>${entry.changefreq}</changefreq>
     <priority>${entry.priority}</priority>
   </url>`
       )
